@@ -2,9 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package dao.userDAO;
+package com.dao.userDAO;
 
-import dbcontext.DBConnect;
+import com.dbcontext.DBConnect;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;

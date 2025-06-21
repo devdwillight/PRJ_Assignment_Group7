@@ -26,11 +26,26 @@ Một giao diện calendar chuyên nghiệp giống Google Calendar với thiế
 - **Local Storage**: Lưu trữ sự kiện trong browser
 - **Notifications**: Thông báo thành công/lỗi
 
+### ✅ Todo List
+- **Thêm công việc**: Click nút "+" để thêm todo mới
+- **Đánh dấu hoàn thành**: Click checkbox để toggle trạng thái
+- **Xóa công việc**: Hover và click nút xóa
+- **Animation**: Slide animation khi thêm/xóa todo
+- **Local Storage**: Tự động lưu trữ todo list
+
+### 🤖 Chatbot Assistant
+- **Trợ lý thông minh**: Hỗ trợ tạo sự kiện, quản lý todo
+- **Giao diện chat**: Thiết kế giống messenger
+- **Responsive**: Minimize/maximize chatbot
+- **Tương tác tự nhiên**: Hiểu và trả lời các câu hỏi
+- **Animation**: Smooth transitions và effects
+
 ### 🎯 Tương tác
 - Click vào ngày để tạo sự kiện
 - Click vào sự kiện để xem chi tiết
 - Toggle hiển thị các loại lịch
 - Keyboard shortcuts (ESC để đóng modal)
+- Chat với trợ lý AI
 
 ## 🚀 Cách sử dụng
 
@@ -42,11 +57,22 @@ Mở file `calendar.html` trong trình duyệt web.
 - Điền thông tin: tiêu đề, ngày, thời gian, mô tả, loại lịch
 - Click "Lưu" để tạo sự kiện
 
-### 3. Quản lý lịch
+### 3. Quản lý Todo List
+- Click nút "+" trong phần Todo List
+- Nhập nội dung công việc và nhấn Enter
+- Click checkbox để đánh dấu hoàn thành
+- Hover và click nút xóa để xóa công việc
+
+### 4. Sử dụng Chatbot
+- Click vào chatbot ở góc phải dưới
+- Nhập câu hỏi như "Tạo sự kiện", "Quản lý todo"
+- Chatbot sẽ hướng dẫn bạn cách sử dụng
+
+### 5. Quản lý lịch
 - Click vào các loại lịch trong sidebar để ẩn/hiện
 - Mỗi loại lịch có màu sắc riêng biệt
 
-### 4. Navigation
+### 6. Navigation
 - Sử dụng nút mũi tên để chuyển tháng
 - Click vào các view options (Tháng/Tuần/Ngày)
 
@@ -109,12 +135,27 @@ Calendar tự động tạo 3 sự kiện mẫu khi lần đầu sử dụng:
 - Sinh nhật bạn (Cá nhân)
 - Đi chơi gia đình (Gia đình)
 
+### Sample Todos
+Todo list tự động tạo 3 công việc mẫu:
+- Hoàn thành báo cáo dự án
+- Gọi điện cho khách hàng (đã hoàn thành)
+- Chuẩn bị cho cuộc họp ngày mai
+
 ### Local Storage
-Tất cả sự kiện được lưu trong localStorage của browser, không mất dữ liệu khi refresh trang.
+Tất cả sự kiện và todo được lưu trong localStorage của browser, không mất dữ liệu khi refresh trang.
+
+### Chatbot Commands
+Chatbot hiểu các lệnh:
+- "Tạo sự kiện" / "Thêm sự kiện"
+- "Todo" / "Công việc"
+- "Lịch" / "Calendar"
+- "Xin chào" / "Hello"
+- "Cảm ơn" / "Thanks"
 
 ### Keyboard Shortcuts
-- `ESC`: Đóng modal
-- `Enter`: Lưu sự kiện (khi focus vào form)
+- `ESC`: Đóng modal và todo input
+- `Enter`: Lưu sự kiện/todo (khi focus vào form)
+- `Enter`: Gửi tin nhắn chatbot
 
 ## 🎯 Tương thích
 
@@ -129,9 +170,20 @@ Tất cả sự kiện được lưu trong localStorage của browser, không m�
 - Icons sử dụng Font Awesome 6
 - Tất cả animations được tối ưu cho performance
 - Code được viết theo ES6+ standards
+- Todo list và chatbot hoạt động độc lập
+- Dữ liệu được lưu trữ locally trong browser
+
+## 🔮 Tính năng tương lai
+
+- [ ] Đồng bộ với Google Calendar API
+- [ ] Nhắc nhở thông báo
+- [ ] Chia sẻ lịch với người khác
+- [ ] Export/Import dữ liệu
+- [ ] Theme tùy chỉnh
+- [ ] Multi-language support
 
 ---
 
 **Tác giả**: Professional Calendar Team  
-**Phiên bản**: 1.0  
+**Phiên bản**: 2.0  
 **Ngày tạo**: 2024 
