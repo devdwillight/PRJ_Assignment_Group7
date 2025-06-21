@@ -14,13 +14,19 @@ import java.util.logging.Logger;
  *
  * @author DELL
  */
-public class DBConnect implements DBInfor {
+public class DBConnect {
 
     public DBConnect() {
     }
 
     public static Connection getConnection() {
+
+        String driverName = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+        String dbURL = "jdbc:sqlserver://localhost:1433;databaseName=Calendar;trustServerCertificate=true";
+        String userDB = "sa";
+        String passDB = "123456";
         Connection con = null;
+        
         try {
             Class.forName(driverName);
             con = DriverManager.getConnection(dbURL, userDB, passDB);
