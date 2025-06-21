@@ -5,7 +5,7 @@ Một giao diện calendar chuyên nghiệp giống Google Calendar với thiế
 ## 🎨 Tính năng
 
 ### ✨ Giao diện chuyên nghiệp
-- Thiết kế giống Google Calendar với layout hiện đại
+- Thiết kế với layout hiện đại
 - Màu sắc sống động với gradient và shadow effects
 - Responsive design cho mọi thiết bị
 - Font Roboto chuyên nghiệp
@@ -25,6 +25,7 @@ Một giao diện calendar chuyên nghiệp giống Google Calendar với thiế
 - **Mini Calendar**: Xem nhanh tháng hiện tại
 - **Local Storage**: Lưu trữ sự kiện trong browser
 - **Notifications**: Thông báo thành công/lỗi
+- **Ai Agent**: Trợ lý quản lí thời gian
 
 ### 🎯 Tương tác
 - Click vào ngày để tạo sự kiện
@@ -132,6 +133,6 @@ Tất cả sự kiện được lưu trong localStorage của browser, không m�
 
 ---
 
-**Tác giả**: Professional Calendar Team  
+**Tác giả**: PRJ_Group7 
 **Phiên bản**: 1.0  
-**Ngày tạo**: 2024 
+**Ngày tạo**: 2025
