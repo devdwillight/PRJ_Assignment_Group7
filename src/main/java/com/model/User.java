@@ -2,9 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package model.user;
+package com.model;
 
-import java.util.Date;
+import java.sql.Date;
 
 /**
  *
@@ -27,6 +27,9 @@ public class User {
     private Date update_at;
     private String avatar;
 
+    public User() {
+    }
+    
     public User(int id, String userName, String passWord, String first_name, String last_name, Date birthday, String email, String phone, String gender, boolean active, boolean admin, Date created_at, Date update_at, String avatar) {
         this.id = id;
         this.userName = userName;
@@ -160,7 +163,5 @@ public class User {
     public String toString() {
         return "User{" + "id=" + id + ", userName=" + userName + ", passWord=" + passWord + ", first_name=" + first_name + ", last_name=" + last_name + ", birthday=" + birthday + ", email=" + email + ", phone=" + phone + ", gender=" + gender + ", active=" + active + ", admin=" + admin + ", created_at=" + created_at + ", update_at=" + update_at + ", avatar=" + avatar + '}';
     }
-
-  
 
 }

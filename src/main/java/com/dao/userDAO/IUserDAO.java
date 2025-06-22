@@ -4,32 +4,34 @@
  */
 package com.dao.userDAO;
 
+import com.model.User;
 import java.sql.SQLException;
 import java.util.List;
-import model.user.User;
 
 /**
  *
  * @author DELL
  */
 public interface IUserDAO {
+
     public int insertUser(User user) throws SQLException;
-    
-    public  User selectUserByID(int id);
-    
+
+    public User selectUserByID(int id);
+
     public User selectUserByEmail(String email);
-    
+
     public List<User> selectAllUsers();
-    
+
     public List<User> selectUserByPage(int pageNumber, int pageSize);
-    
+
     public boolean updateUser(User user) throws SQLException;
-    
+
     public boolean deleteUser(int id) throws SQLException;
-    
+
     public boolean existsByEmail(String email);
-    
+
     public boolean existsByID(int ID);
 
     public int countUser();
+    
 }
