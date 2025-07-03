@@ -1,4 +1,4 @@
-# Google Calendar Style - Professional Calendar
+# Jikan Calendar  - Professional Calendar
 
 Một giao diện calendar chuyên nghiệp giống Google Calendar với thiết kế hiện đại, màu sắc sống động và animation mượt mà.
 
