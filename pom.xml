@@ -13,16 +13,13 @@
     </properties>
     
     <dependencies>
-
-        <!-- Jakarta EE API tổng hợp (Servlet, JSP, JPA...) -->
         <dependency>
             <groupId>jakarta.platform</groupId>
             <artifactId>jakarta.jakartaee-api</artifactId>
             <version>${jakartaee}</version>
-            <scope>provided</scope> <!-- Application server sẽ cung cấp thư viện này -->
+            <scope>provided</scope>
         </dependency>
-
-        <!-- Servlet API riêng -->
+        <!-- Servlet API -->
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
@@ -30,14 +27,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Hibernate ORM (JPA Implementation) -->
-        <dependency>
-            <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>6.3.1.Final</version>
-        </dependency>
-
-        <!-- JSTL (Jakarta Standard Tag Library) cho JSP -->
+        <!-- JSP JSTL -->
         <dependency>
             <groupId>jakarta.servlet.jsp.jstl</groupId>
             <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
@@ -46,48 +36,41 @@
         <dependency>
             <groupId>org.glassfish.web</groupId>
             <artifactId>jakarta.servlet.jsp.jstl</artifactId>
-            <version>3.0.1</version>
+            <version>2.0.0</version>
         </dependency>
 
-        <!-- JDBC Driver cho SQL Server -->
+        <!-- Hibernate -->
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>6.3.1.Final</version>
+        </dependency>
+
+        <!-- SQL Server JDBC -->
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
-            <version>12.6.4.jre11</version>
+            <version>12.6.1.jre11</version>
         </dependency>
 
-        <!-- Jakarta Persistence API (JPA 3.1) -->
+        <!-- JPA API -->
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
             <version>3.1.0</version>
         </dependency>
 
-        <!-- Logging với SLF4J (optional) -->
+        <!-- Logging (optional) -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>2.0.12</version>
         </dependency>
+        
         <dependency>
-            <groupId>org.hibernate.common</groupId>
-            <artifactId>hibernate-commons-annotations</artifactId>
-            <version>5.0.5.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>5.6.15.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
-            <version>5.0.5.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.1-api</artifactId>
-            <version>1.0.0.Final</version>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
         </dependency>
     </dependencies>
     

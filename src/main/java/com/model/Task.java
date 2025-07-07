@@ -65,7 +65,7 @@ public class Task implements Serializable {
     private Date updatedAt;
     @JoinColumn(name = "id_user", referencedColumnName = "id_user")
     @ManyToOne(optional = false)
-    private Users idUser;
+    private User idUser;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idTask")
     private List<ToDo> toDoList;
 
@@ -121,11 +121,11 @@ public class Task implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-    public Users getIdUser() {
+    public User getIdUser() {
         return idUser;
     }
 
-    public void setIdUser(Users idUser) {
+    public void setIdUser(User idUser) {
         this.idUser = idUser;
     }
 

@@ -78,8 +78,6 @@ public class Course implements Serializable {
     private Date updatedAt;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCourse")
     private List<OrderItem> orderItemList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCourse")
-    private List<Cart> cartList;
 
     public Course() {
     }
@@ -165,15 +163,6 @@ public class Course implements Serializable {
 
     public void setOrderItemList(List<OrderItem> orderItemList) {
         this.orderItemList = orderItemList;
-    }
-
-    @XmlTransient
-    public List<Cart> getCartList() {
-        return cartList;
-    }
-
-    public void setCartList(List<Cart> cartList) {
-        this.cartList = cartList;
     }
 
     @Override

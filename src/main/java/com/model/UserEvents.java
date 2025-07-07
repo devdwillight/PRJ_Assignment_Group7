@@ -97,7 +97,7 @@ public class UserEvents implements Serializable {
     private Date createdAt;
     @JoinColumn(name = "id_calendar", referencedColumnName = "id_calendar")
     @ManyToOne(optional = false)
-    private Calendar_1 idCalendar;
+    private Calendar idCalendar;
 
     public UserEvents() {
     }
@@ -231,11 +231,11 @@ public class UserEvents implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public Calendar_1 getIdCalendar() {
+    public Calendar getIdCalendar() {
         return idCalendar;
     }
 
-    public void setIdCalendar(Calendar_1 idCalendar) {
+    public void setIdCalendar(Calendar idCalendar) {
         this.idCalendar = idCalendar;
     }
 

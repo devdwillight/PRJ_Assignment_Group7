@@ -65,7 +65,7 @@ public class Orders implements Serializable {
     private List<OrderItem> orderItemList;
     @JoinColumn(name = "id_user", referencedColumnName = "id_user")
     @ManyToOne(optional = false)
-    private Users idUser;
+    private User idUser;
 
     public Orders() {
     }
@@ -121,11 +121,11 @@ public class Orders implements Serializable {
         this.orderItemList = orderItemList;
     }
 
-    public Users getIdUser() {
+    public User getIdUser() {
         return idUser;
     }
 
-    public void setIdUser(Users idUser) {
+    public void setIdUser(User idUser) {
         this.idUser = idUser;
     }
 

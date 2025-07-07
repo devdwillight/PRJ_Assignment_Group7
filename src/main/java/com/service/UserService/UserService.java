@@ -4,11 +4,9 @@
  */
 package com.service.UserService;
 
-import com.dao.userDAO.UserDAO;
+import com.dao.UserDAO.UserDAO;
 import com.model.User;
-import java.sql.Date;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -106,28 +104,17 @@ public class UserService implements IUserService {
     public static void main(String[] args) {
         UserService userService = new UserService();
 
-        try {
-            UserService service = new UserService();
-            User newUser = new User();
-            newUser.setUserName("Nguyen Van B");
-            newUser.setPassWord("123456");
-            newUser.setFirst_name("Nguyen");
-            newUser.setLast_name("B");
-            newUser.setBirthday(Date.valueOf("2000-01-01"));
-            newUser.setEmail("vana@example.com");
-            newUser.setPhone("0123456789");
-            newUser.setGender("Nam");
-            newUser.setActive(true);
-            newUser.setAdmin(false);
-            newUser.setCreated_at(Date.valueOf(LocalDate.now()));
-            newUser.setUpdate_at(Date.valueOf(LocalDate.now()));
-            newUser.setAvatar("avatar.jpg");
+        System.out.println("Danh sách người dùng:");
+        List<User> userList = userService.getAllUsers();
 
-            int result = service.createUser(newUser);
-            System.out.println("User created with result: " + result);
-        } catch (Exception e) {
-            e.printStackTrace(); // In lỗi thực sự
+        for (User user : userList) {
+            System.out.println("ID: " + user.getIdUser()
+                    + ", Họ tên: " + user.getFirstName() + " " + user.getLastName()
+                    + ", Email: " + user.getEmail()
+                    + ", Ngày sinh: " + user.getBirthday());
         }
+
+        System.out.println("Tổng số người dùng: " + userService.countUsers());
     }
 
 }
