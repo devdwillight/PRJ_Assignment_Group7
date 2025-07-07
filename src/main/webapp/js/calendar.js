@@ -20,11 +20,11 @@ class Calendar {
     bindEvents() {
         // Navigation buttons
         document.getElementById('prevMonth').addEventListener('click', () => {
-            this.navigateMonth(-1);
+            this.navigate(-1);
         });
 
         document.getElementById('nextMonth').addEventListener('click', () => {
-            this.navigateMonth(1);
+            this.navigate(1);
         });
 
         // Add event button
@@ -48,7 +48,7 @@ class Calendar {
         // View options
         document.querySelectorAll('.view-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                this.changeView(e.target.dataset.view);
+                this.changeView(e.target.dataset.view, e.target);
             });
         });
 
@@ -114,11 +114,18 @@ class Calendar {
         });
     }
 
-    navigateMonth(direction) {
-        this.currentDate.setMonth(this.currentDate.getMonth() + direction);
+    navigate(direction) {
+        if (this.currentView === 'month') {
+            this.currentDate.setMonth(this.currentDate.getMonth() + direction);
+        } else if (this.currentView === 'week') {
+            this.currentDate.setDate(this.currentDate.getDate() + direction * 7);
+        } else if (this.currentView === 'day') {
+            this.currentDate.setDate(this.currentDate.getDate() + direction);
+        }
+
         this.renderCurrentView();
+        this.renderMiniCalendar();
         
-        // Add animation
         const calendarDays = document.getElementById('calendarDays');
         calendarDays.style.animation = 'none';
         calendarDays.offsetHeight; // Trigger reflow
@@ -126,36 +133,35 @@ class Calendar {
     }
 
     renderCurrentView() {
+        const weekdayHeaders = document.querySelector('.weekday-headers');
         if (this.currentView === 'month') {
+            weekdayHeaders.style.display = 'grid';
             this.renderCalendar();
         } else if (this.currentView === 'week') {
+            weekdayHeaders.style.display = 'grid';
             this.renderWeekView();
         } else if (this.currentView === 'day') {
+            weekdayHeaders.style.display = 'none';
             this.renderDayView();
         }
     }
 
     renderCalendar() {
+        const calendarDays = document.getElementById('calendarDays');
+        calendarDays.style.gridTemplateColumns = 'repeat(7, 1fr)';
+        
         const year = this.currentDate.getFullYear();
         const month = this.currentDate.getMonth();
         
-        // Update header
-        const monthNames = [
-            'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
-            'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
-        ];
+        const monthNames = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
         document.getElementById('currentMonth').textContent = `${monthNames[month]}, ${year}`;
 
-        // Get first day of month and number of days
         const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
         const startDate = new Date(firstDay);
         startDate.setDate(startDate.getDate() - firstDay.getDay());
 
-        const calendarDays = document.getElementById('calendarDays');
         calendarDays.innerHTML = '';
 
-        // Generate calendar days
         for (let i = 0; i < 42; i++) {
             const currentDate = new Date(startDate);
             currentDate.setDate(startDate.getDate() + i);
@@ -163,14 +169,10 @@ class Calendar {
             const dayElement = document.createElement('div');
             dayElement.className = 'calendar-day';
             
-            const isCurrentMonth = currentDate.getMonth() === month;
-            const isToday = this.isToday(currentDate);
-            
-            if (!isCurrentMonth) {
+            if (currentDate.getMonth() !== month) {
                 dayElement.classList.add('other-month');
             }
-            
-            if (isToday) {
+            if (this.isToday(currentDate)) {
                 dayElement.classList.add('today');
             }
 
@@ -180,11 +182,7 @@ class Calendar {
                     ${this.renderEventsForDate(currentDate)}
                 </div>
             `;
-
-            dayElement.addEventListener('click', () => {
-                this.selectDate(currentDate);
-            });
-
+            dayElement.addEventListener('click', () => { this.selectDate(currentDate); });
             calendarDays.appendChild(dayElement);
         }
     }
@@ -489,16 +487,15 @@ class Calendar {
         this.showEventModal(date);
     }
 
-    changeView(view) {
-        // Remove active class from all buttons
+    changeView(view, targetElement) {
         document.querySelectorAll('.view-btn').forEach(btn => {
             btn.classList.remove('active');
         });
-        // Add active class to clicked button
-        event.target.classList.add('active');
+        targetElement.classList.add('active');
         this.currentView = view;
+        
         this.renderCurrentView();
-        // Add animation
+        
         const calendarGrid = document.querySelector('.calendar-grid');
         calendarGrid.style.animation = 'none';
         calendarGrid.offsetHeight;
@@ -531,9 +528,10 @@ class Calendar {
         return date.toISOString().split('T')[0];
     }
 
-    getMonthName(month) {
-        const names = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'];
-        return names[month];
+    getMonthName(month, full = false) {
+        const shortNames = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'];
+        const longNames = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+        return full ? longNames[month] : shortNames[month];
     }
 
     generateId() {
@@ -657,38 +655,42 @@ class Calendar {
     }
 
     renderWeekView() {
-        const year = this.currentDate.getFullYear();
-        const month = this.currentDate.getMonth();
-        const day = this.currentDate.getDate();
-        // Tìm ngày đầu tuần (Chủ nhật)
-        const current = new Date(year, month, day);
-        const weekStart = new Date(current);
-        weekStart.setDate(current.getDate() - current.getDay());
-        // Update header
-        document.getElementById('currentMonth').textContent = `Tuần ${this.getWeekNumber(current)}, ${year}`;
-        // Render weekday headers
+        const weekStart = new Date(this.currentDate);
+        weekStart.setDate(this.currentDate.getDate() - this.currentDate.getDay());
+        
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekStart.getDate() + 6);
+
+        const startMonthName = this.getMonthName(weekStart.getMonth(), true);
+        const endMonthName = this.getMonthName(weekEnd.getMonth(), true);
+        
+        let headerText = `${weekStart.getDate()} ${startMonthName} - ${weekEnd.getDate()} ${endMonthName}, ${weekEnd.getFullYear()}`;
+        if (weekStart.getFullYear() !== weekEnd.getFullYear()) {
+             headerText = `${weekStart.getDate()} ${startMonthName} ${weekStart.getFullYear()} - ${weekEnd.getDate()} ${endMonthName} ${weekEnd.getFullYear()}`;
+        }
+        
+        document.getElementById('currentMonth').textContent = headerText;
+
         const calendarDays = document.getElementById('calendarDays');
         calendarDays.innerHTML = '';
+        calendarDays.style.gridTemplateColumns = 'repeat(7, 1fr)';
+        
         for (let i = 0; i < 7; i++) {
             const date = new Date(weekStart);
             date.setDate(weekStart.getDate() + i);
             const dayElement = document.createElement('div');
             dayElement.className = 'calendar-day';
             if (this.isToday(date)) dayElement.classList.add('today');
+            
             dayElement.innerHTML = `
-                <div class="day-number">${date.getDate()}/${date.getMonth()+1}</div>
+                <div class="day-number">${date.getDate()}</div>
                 <div class="events-container">
                     ${this.renderEventsForDate(date)}
                 </div>
             `;
-            dayElement.addEventListener('click', () => {
-                this.selectDate(date);
-            });
+            dayElement.addEventListener('click', () => { this.selectDate(date); });
             calendarDays.appendChild(dayElement);
         }
-        // Set grid to 7 columns
-        calendarDays.style.display = 'grid';
-        calendarDays.style.gridTemplateColumns = 'repeat(7, 1fr)';
     }
 
     renderDayView() {
@@ -696,32 +698,26 @@ class Calendar {
         const month = this.currentDate.getMonth();
         const day = this.currentDate.getDate();
         const date = new Date(year, month, day);
-        document.getElementById('currentMonth').textContent = `Ngày ${date.getDate()}/${date.getMonth()+1}/${year}`;
+
+        const monthNames = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+        document.getElementById('currentMonth').textContent = `Ngày ${day}, ${monthNames[month]}, ${year}`;
+        
         const calendarDays = document.getElementById('calendarDays');
         calendarDays.innerHTML = '';
+        calendarDays.style.gridTemplateColumns = '1fr';
+
         const dayElement = document.createElement('div');
-        dayElement.className = 'calendar-day';
-        dayElement.classList.add('today');
+        dayElement.className = 'calendar-day single-day-view';
+        if (this.isToday(date)) dayElement.classList.add('today');
+
         dayElement.innerHTML = `
-            <div class="day-number">${date.getDate()}/${date.getMonth()+1}</div>
+            <div class="day-number">${date.getDate()}</div>
             <div class="events-container">
                 ${this.renderEventsForDate(date)}
             </div>
         `;
-        dayElement.addEventListener('click', () => {
-            this.selectDate(date);
-        });
+        dayElement.addEventListener('click', () => this.selectDate(date));
         calendarDays.appendChild(dayElement);
-        // Set grid to 1 column
-        calendarDays.style.display = 'grid';
-        calendarDays.style.gridTemplateColumns = '1fr';
-    }
-
-    // Thêm hàm lấy số tuần trong năm
-    getWeekNumber(date) {
-        const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-        const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
-        return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
     }
 }
 

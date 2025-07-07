@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.service.UserService;
+package com.service.user;
 
 import com.model.User;
 import java.sql.SQLException;
@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface IUserService {
 
-    int createUser(User user) throws SQLException;
+    void createUser(User user) throws SQLException;
 
     User getUserById(int id);
 

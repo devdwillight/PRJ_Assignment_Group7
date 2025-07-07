@@ -2,22 +2,21 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.dao.CourseDAO;
+package com.service.course;
 
 import com.model.Course;
 import java.util.List;
 
 /**
  *
- * @author DELL
+ * @author Admin
  */
-public interface ICourseDAO {
-
+public interface ICourseService {
     void create(Course course);
 
-    void update(Course course);
+    boolean update(Course course);
 
-    void delete(int id);
+    boolean delete(int id);
 
     List<Course> findAll();
 

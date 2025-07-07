@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.dao.CalendarDAO;
+package com.service.calendar;
 
 import com.model.Calendar;
 import java.util.Date;
@@ -12,16 +12,16 @@ import java.util.List;
  *
  * @author DELL
  */
-public interface ICalendarDAO {
+public interface ICalendarService {
     // Thêm mới một Calendar
 
     void create(Calendar calendar);
 
     // Cập nhật Calendar
-    void update(Calendar calendar);
+    boolean update(Calendar calendar);
 
     // Xoá theo ID
-    void delete(int id);
+    boolean delete(int id);
 
     // Tìm theo ID
     Calendar findById(int id);
