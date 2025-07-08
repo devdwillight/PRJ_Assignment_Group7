@@ -21,21 +21,37 @@ public class UserDAO extends BaseDAO<User> implements IUserDAO {
     }
 
     @Override
-    public int insertUser(User user) {
-        save(user); // kế thừa từ BaseDAO
-        return 1;
+    public int countUser() {
+        return (int) count();
+    }
+
+    @Override
+    public boolean insertUser(User user) {
+        return save(user);
     }
 
     @Override
     public boolean updateUser(User user) {
-        update(user);
-        return true;
+        return update(user);
     }
 
     @Override
     public boolean deleteUser(int id) {
-        delete(id);
-        return true;
+        return delete(id);
+    }
+
+    @Override
+    public boolean existsByID(int id) {
+        return find(id) != null;
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        EntityManager em = getEntityManager();
+        Long count = em.createQuery("SELECT COUNT(u) FROM User u WHERE u.email = :email", Long.class)
+                .setParameter("email", email)
+                .getSingleResult();
+        return count > 0;
     }
 
     @Override
@@ -44,25 +60,10 @@ public class UserDAO extends BaseDAO<User> implements IUserDAO {
     }
 
     @Override
-    public List<User> selectAllUsers() {
-        return findAll();
-    }
-
-    @Override
-    public int countUser() {
-        return (int) count();
-    }
-
-    @Override
-    public boolean existsByID(int ID) {
-        return find(ID) != null;
-    }
-
-    @Override
     public User selectUserByEmail(String email) {
         EntityManager em = getEntityManager();
         try {
-            return em.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
+            return em.createQuery("User.findByEmail", User.class)
                     .setParameter("email", email)
                     .getSingleResult();
         } catch (NoResultException e) {
@@ -73,21 +74,23 @@ public class UserDAO extends BaseDAO<User> implements IUserDAO {
     }
 
     @Override
-    public List<User> selectUserByPage(int pageNumber, int pageSize) {
-        EntityManager em = getEntityManager();
-        return em.createQuery("SELECT u FROM User u ORDER BY u.idUser", User.class)
-                .setFirstResult((pageNumber - 1) * pageSize)
-                .setMaxResults(pageSize)
-                .getResultList();
+    public List<User> selectAllUsers() {
+        return findAllByEntity("User.findAll");
     }
 
     @Override
-    public boolean existsByEmail(String email) {
+    public List<User> selectUserByPage(int pageNumber, int pageSize) {
         EntityManager em = getEntityManager();
-        Long count = em.createQuery("SELECT COUNT(u) FROM User u WHERE u.email = :email", Long.class)
-                .setParameter("email", email)
-                .getSingleResult();
-        return count > 0;
+        try {
+            return em.createQuery("SELECT u FROM User u ORDER BY u.idUser", User.class)
+                    .setFirstResult((pageNumber - 1) * pageSize)
+                    .setMaxResults(pageSize)
+                    .getResultList();
+        } catch (NoResultException e) {
+            return null;
+        } finally {
+            em.close();
+        }
     }
 
 }

@@ -13,17 +13,20 @@ import java.util.List;
  */
 public interface ICourseDAO {
 
-    void create(Course course);
+    public int countCourse();
 
-    void update(Course course);
+    public boolean insertCourse(Course course);
 
-    void delete(int id);
+    public boolean updateCourse(Course course);
 
-    List<Course> selectAllCourse();
+    public boolean deleteCourse(int id);
 
-    List<Course> findByName(String name);
+    public Course selectCourseById(int id);
 
-    List<Course> findByCategory(String category);
+    public List<Course> selectAllCourse();
 
-    List<Course> findByUserId(int userId);
+    public List<Course> selectCourseByCategory(String category);
+
+    public List<Course> selectCourseByPage(int pageNumber, int pageSize);
+
 }

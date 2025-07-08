@@ -6,10 +6,6 @@ package com.dao.Calendar;
 
 import com.dao.BaseDAO;
 import com.model.Calendar;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -23,61 +19,38 @@ public class CalendarDAO extends BaseDAO<Calendar> implements ICalendarDAO {
     }
 
     @Override
-    public int insertCalendar(Calendar calendar) {
-        save(calendar);
-        return 1;
+    public int countCalendar() {
+        return (int) count();
+    }
+
+    @Override
+    public boolean insertCalendar(Calendar calendar) {
+        return save(calendar);
     }
 
     @Override
     public boolean deleteCalendar(int id) {
-        delete(id);
-        return true;
+        return delete(id);
     }
 
     @Override
-    public Calendar findById(int id) {
+    public boolean updateCalendar(Calendar calendar) {
+        return update(calendar);
+    }
+
+    @Override
+    public Calendar selectCalendarById(int id) {
         return find(id);
     }
 
     @Override
     public List<Calendar> selectCalendarByUserId(int userId) {
-        EntityManager em = getEntityManager();
-        return em.createQuery(
-                "SELECT c FROM Calendar c WHERE c.idUser.idUser = :userId", Calendar.class)
-                .setParameter("userId", userId)
-                .getResultList();
-
-    }
-
-    @Override
-    public List<Calendar> selectCalendarByDateRange(Date start, Date end) {
-        EntityManager em = getEntityManager();
-        return em.createQuery(
-                "SELECT c FROM Calendar c WHERE c.startDate >= :start AND c.endDate <= :end", Calendar.class)
-                .setParameter("start", start)
-                .setParameter("end", end)
-                .getResultList();
-
-    }
-
-    @Override
-    public List<Calendar> selectCalendarByName(String name) {
-        EntityManager em = getEntityManager();
-        return em.createQuery(
-                "SELECT c FROM Calendar c WHERE LOWER(c.name) LIKE :name", Calendar.class)
-                .setParameter("name", "%" + name.toLowerCase() + "%")
-                .getResultList();
+        return findAllByNamedEntity("Calendar.findByUserId", "userId", userId);
     }
 
     @Override
     public List<Calendar> selectAllCalendar() {
-        return findAll();
-    }
-
-    @Override
-    public boolean updateCalendar(Calendar calendar) {
-        update(calendar);
-        return true;
+        return findAllByEntity("Calendar.findAll");
     }
 
 }

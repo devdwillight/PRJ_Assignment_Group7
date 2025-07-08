@@ -14,21 +14,22 @@ import java.util.List;
  */
 public interface IOrderDAO {
 
-    public int insertOrder(Orders order) ;
+    public int countOrder();
+
+    public boolean insertOrder(Orders order);
 
     public boolean updateOrder(Orders order);
 
     public boolean deleteOrder(int id);
 
+    public boolean existsById(int id);
+
     public Orders selectOrderById(int id);
 
     public List<Orders> selectAllOrder();
-
-    public List<Orders> selectByUserId(int userId);
 
     public List<Orders> selectByStatus(String status);
 
     public List<Orders> selectByDateRange(Date startDate, Date endDate);
 
-    public int countOrder();
 }

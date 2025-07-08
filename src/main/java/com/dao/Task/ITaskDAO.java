@@ -4,10 +4,24 @@
  */
 package com.dao.Task;
 
+import com.model.Task;
+import java.util.List;
+
 /**
  *
  * @author DELL
  */
-public class ITaskDAO {
-    
+public interface ITaskDAO {
+
+    public int countTask();
+
+    public boolean insertTask(Task task);
+
+    public boolean updateTask(Task task);
+
+    public boolean deleteTask(int id);
+
+    public Task selectTaskById(int id);
+
+    public List<Task> selectAllTasks();
 }

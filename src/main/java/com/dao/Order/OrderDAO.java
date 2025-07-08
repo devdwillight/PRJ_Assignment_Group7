@@ -7,6 +7,7 @@ package com.dao.Order;
 import com.dao.BaseDAO;
 import com.model.Orders;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import java.util.Date;
 import java.util.List;
 
@@ -21,21 +22,28 @@ public class OrderDAO extends BaseDAO<Orders> implements IOrderDAO {
     }
 
     @Override
-    public int insertOrder(Orders order) {
-        save(order);
-        return 1;
+    public int countOrder() {
+        return (int) count();
+    }
+
+    @Override
+    public boolean insertOrder(Orders order) {
+        return save(order);
     }
 
     @Override
     public boolean updateOrder(Orders order) {
-        update(order);
-        return true;
+        return update(order);
     }
 
     @Override
     public boolean deleteOrder(int id) {
-        delete(id);
-        return true;
+        return delete(id);
+    }
+
+    @Override
+    public boolean existsById(int id) {
+        return find(id) != null;
     }
 
     @Override
@@ -45,37 +53,28 @@ public class OrderDAO extends BaseDAO<Orders> implements IOrderDAO {
 
     @Override
     public List<Orders> selectAllOrder() {
-        return findAll();
-    }
-
-    @Override
-    public List<Orders> selectByUserId(int userId) {
-        EntityManager em = getEntityManager();
-        return em.createQuery("SELECT o FROM Orders o WHERE o.idUser.idUser = :userId", Orders.class)
-                .setParameter("userId", userId)
-                .getResultList();
+        return findAllByEntity("Orders.findAll");
     }
 
     @Override
     public List<Orders> selectByStatus(String status) {
-        EntityManager em = getEntityManager();
-        return em.createQuery("SELECT o FROM Orders o WHERE o.status = :status", Orders.class)
-                .setParameter("status", status)
-                .getResultList();
+        return findAllByNamedEntity("Orders.findByStatus", "status", status);
     }
 
     @Override
     public List<Orders> selectByDateRange(Date startDate, Date endDate) {
         EntityManager em = getEntityManager();
-        return em.createQuery("SELECT o FROM Orders o WHERE o.orderDate BETWEEN :start AND :end", Orders.class)
-                .setParameter("start", startDate)
-                .setParameter("end", endDate)
-                .getResultList();
-    }
+        try {
+            return em.createQuery("SELECT o FROM Orders o WHERE o.paymentTime  BETWEEN :start AND :end", Orders.class)
+                    .setParameter("start", startDate)
+                    .setParameter("end", endDate)
+                    .getResultList();
 
-    @Override
-    public int countOrder() {
-        return (int) count();
+        } catch (NoResultException e) {
+            return null;
+        } finally {
+            em.close();
+        }
     }
 
 }

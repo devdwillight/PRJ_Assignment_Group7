@@ -14,13 +14,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -57,6 +60,8 @@ public class OrderItem implements Serializable {
     @JoinColumn(name = "id_order", referencedColumnName = "id_order")
     @ManyToOne(optional = false)
     private Orders idOrder;
+    @OneToMany(mappedBy = "idOrderItem")
+    private List<Cart> cartList;
 
     public OrderItem() {
     }
@@ -111,6 +116,15 @@ public class OrderItem implements Serializable {
 
     public void setIdOrder(Orders idOrder) {
         this.idOrder = idOrder;
+    }
+
+    @XmlTransient
+    public List<Cart> getCartList() {
+        return cartList;
+    }
+
+    public void setCartList(List<Cart> cartList) {
+        this.cartList = cartList;
     }
 
     @Override

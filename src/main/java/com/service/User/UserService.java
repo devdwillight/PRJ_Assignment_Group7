@@ -6,7 +6,6 @@ package com.service.User;
 
 import com.dao.User.UserDAO;
 import com.model.User;
-import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -22,99 +21,128 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public int createUser(User user) throws SQLException {
-        System.out.println("Service: createUser called with user = " + user);
-        int result = userDAO.insertUser(user);
-        System.out.println("Service: createUser result = " + result);
-        return result;
+    public User createUser(User user) {
+        System.out.println("[createUser] → Kiểm tra email đã tồn tại: " + user.getEmail());
+
+        if (userDAO.existsByEmail(user.getEmail())) {
+            System.out.println("[createUser] ✖ Email đã được sử dụng.");
+            throw new IllegalArgumentException("Email đã được sử dụng.");
+        }
+
+        if (!userDAO.insertUser(user)) {
+            System.out.println("[createUser] ✖ Lỗi khi lưu người dùng.");
+            throw new RuntimeException("Không thể tạo người dùng.");
+        }
+
+        System.out.println("[createUser] ✔ Tạo người dùng thành công: " + user);
+        return user;
     }
 
     @Override
     public User getUserById(int id) {
-        System.out.println("Service: getUserById called with id = " + id);
+        System.out.println("[getUserById] → ID: " + id);
         User user = userDAO.selectUserByID(id);
-        System.out.println("Service: getUserById result = " + user);
+        if (user != null) {
+            System.out.println("[getUserById] ✔ Tìm thấy: " + user);
+        } else {
+            System.out.println("[getUserById] ✖ Không tìm thấy người dùng.");
+        }
         return user;
     }
 
     @Override
     public User getUserByEmail(String email) {
-        System.out.println("Service: getUserByEmail called with email = " + email);
+        System.out.println("[getUserByEmail] → Email: " + email);
         User user = userDAO.selectUserByEmail(email);
-        System.out.println("Service: getUserByEmail result = " + user);
+        if (user != null) {
+            System.out.println("[getUserByEmail] ✔ Tìm thấy: " + user);
+        } else {
+            System.out.println("[getUserByEmail] ✖ Không tìm thấy.");
+        }
         return user;
     }
 
     @Override
     public List<User> getAllUsers() {
-        System.out.println("Service: getAllUsers called");
+        System.out.println("[getAllUsers] → Đang lấy danh sách tất cả người dùng...");
         List<User> users = userDAO.selectAllUsers();
-        System.out.println("Service: getAllUsers found " + users.size() + " users");
+        System.out.println("[getAllUsers] ✔ Tổng số: " + users.size());
         return users;
     }
 
     @Override
     public List<User> getUsersByPage(int pageNumber, int pageSize) {
-        System.out.println("Service: getUsersByPage called with pageNumber = " + pageNumber + ", pageSize = " + pageSize);
+        System.out.println("[getUsersByPage] → Trang: " + pageNumber + ", Kích thước: " + pageSize);
         List<User> users = userDAO.selectUserByPage(pageNumber, pageSize);
-        System.out.println("Service: getUsersByPage returned " + users.size() + " users");
+        System.out.println("[getUsersByPage] ✔ Trả về " + users.size() + " người dùng.");
         return users;
     }
 
     @Override
-    public boolean updateUser(User user) throws SQLException {
-        System.out.println("Service: updateUser called with user = " + user);
+    public boolean updateUser(User user) {
+        System.out.println("[updateUser] → ID: " + user.getIdUser());
+
+        if (!userDAO.existsByID(user.getIdUser())) {
+            System.out.println("[updateUser] ✖ Người dùng không tồn tại.");
+            return false;
+        }
+
         boolean result = userDAO.updateUser(user);
-        System.out.println("Service: updateUser result = " + result);
+        System.out.println(result ? "[updateUser] ✔ Cập nhật thành công." : "[updateUser] ✖ Lỗi cập nhật.");
         return result;
     }
 
     @Override
-    public boolean removeUser(int id) throws SQLException {
-        System.out.println("Service: removeUser called with id = " + id);
+    public boolean removeUser(int id) {
+        System.out.println("[removeUser] → Xóa người dùng với ID: " + id);
+
+        if (!userDAO.existsByID(id)) {
+            System.out.println("[removeUser] ✖ Không tồn tại người dùng cần xóa.");
+            return false;
+        }
+
         boolean result = userDAO.deleteUser(id);
-        System.out.println("Service: removeUser result = " + result);
+        System.out.println(result ? "[removeUser] ✔ Đã xóa thành công." : "[removeUser] ✖ Xóa thất bại.");
         return result;
     }
 
     @Override
     public boolean isEmailTaken(String email) {
-        System.out.println("Service: isEmailTaken called with email = " + email);
         boolean exists = userDAO.existsByEmail(email);
-        System.out.println("Service: isEmailTaken result = " + exists);
+        System.out.println("[isEmailTaken] → Email " + email + " đã " + (exists ? "tồn tại." : "chưa được sử dụng."));
         return exists;
     }
 
     @Override
     public boolean isUserExists(int id) {
-        System.out.println("Service: isUserExists called with id = " + id);
         boolean exists = userDAO.existsByID(id);
-        System.out.println("Service: isUserExists result = " + exists);
+        System.out.println("[isUserExists] → Người dùng với ID " + id + (exists ? " tồn tại." : " không tồn tại."));
         return exists;
     }
 
     @Override
     public int countUsers() {
-        System.out.println("Service: countUsers called");
         int count = userDAO.countUser();
-        System.out.println("Service: countUsers result = " + count);
+        System.out.println("[countUsers] → Tổng số người dùng: " + count);
         return count;
     }
 
     public static void main(String[] args) {
         UserService userService = new UserService();
 
-        System.out.println("Danh sách người dùng:");
+        System.out.println("==== Danh sách người dùng ====");
         List<User> userList = userService.getAllUsers();
 
         for (User user : userList) {
-            System.out.println("ID: " + user.getIdUser()
-                    + ", Họ tên: " + user.getFirstName() + " " + user.getLastName()
-                    + ", Email: " + user.getEmail()
-                    + ", Ngày sinh: " + user.getBirthday());
+            System.out.printf("ID: %d\tTên: %s %s\tEmail: %s\tNgày sinh: %s\n",
+                    user.getIdUser(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getEmail(),
+                    user.getBirthday());
         }
 
-        System.out.println("Tổng số người dùng: " + userService.countUsers());
+        System.out.println("→ Tổng người dùng: " + userService.countUsers());
     }
 
 }

@@ -4,10 +4,24 @@
  */
 package com.service.Task;
 
+import com.model.Task;
+import java.util.List;
+
 /**
  *
  * @author DELL
  */
-public class ITaskService {
-    
+public interface ITaskService {
+
+    int countTask();
+
+    boolean updateTask(Task task);
+
+    boolean removeTask(int id);
+
+    Task createTask(Task task);
+
+    Task getTaskById(int id);
+
+    List<Task> getAllTasks();
 }

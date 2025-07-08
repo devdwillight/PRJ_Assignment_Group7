@@ -5,7 +5,6 @@
 package com.service.User;
 
 import com.model.User;
-import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -14,7 +13,17 @@ import java.util.List;
  */
 public interface IUserService {
 
-    int createUser(User user) throws SQLException;
+    int countUsers();
+
+    boolean updateUser(User user);
+
+    boolean removeUser(int id);
+
+    boolean isEmailTaken(String email);
+
+    boolean isUserExists(int id);
+
+    User createUser(User user);
 
     User getUserById(int id);
 
@@ -23,15 +32,5 @@ public interface IUserService {
     List<User> getAllUsers();
 
     List<User> getUsersByPage(int pageNumber, int pageSize);
-
-    boolean updateUser(User user) throws SQLException;
-
-    boolean removeUser(int id) throws SQLException;
-
-    boolean isEmailTaken(String email);
-
-    boolean isUserExists(int id);
-
-    int countUsers();
 
 }

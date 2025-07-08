@@ -5,6 +5,7 @@
 package com.model;
 
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,14 +13,17 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -101,6 +105,14 @@ public class User implements Serializable {
     @Size(max = 255)
     @Column(name = "avatar")
     private String avatar;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idUser")
+    private List<Orders> ordersList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idUser")
+    private List<Task> taskList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idUser")
+    private List<Calendar> calendarList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idUser")
+    private List<Cart> cartList;
 
     public User() {
     }
@@ -228,6 +240,42 @@ public class User implements Serializable {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    @XmlTransient
+    public List<Orders> getOrdersList() {
+        return ordersList;
+    }
+
+    public void setOrdersList(List<Orders> ordersList) {
+        this.ordersList = ordersList;
+    }
+
+    @XmlTransient
+    public List<Task> getTaskList() {
+        return taskList;
+    }
+
+    public void setTaskList(List<Task> taskList) {
+        this.taskList = taskList;
+    }
+
+    @XmlTransient
+    public List<Calendar> getCalendarList() {
+        return calendarList;
+    }
+
+    public void setCalendarList(List<Calendar> calendarList) {
+        this.calendarList = calendarList;
+    }
+
+    @XmlTransient
+    public List<Cart> getCartList() {
+        return cartList;
+    }
+
+    public void setCartList(List<Cart> cartList) {
+        this.cartList = cartList;
     }
 
     @Override

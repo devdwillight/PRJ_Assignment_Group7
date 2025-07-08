@@ -14,20 +14,18 @@ import java.util.List;
  */
 public interface ICalendarService {
 
-    int createCalendar(Calendar calendar);
+    int countCalendar();
 
     boolean updateCalendar(Calendar calendar);
 
     boolean removeCalendar(int id);
+
+    Calendar createCalendar(Calendar calendar);
 
     Calendar getCalendarById(int id);
 
     List<Calendar> getAllCalendar();
 
     List<Calendar> getCalendarByUserId(int userid);
-
-    List<Calendar> getCalendarByDateRange(Date start, Date end);
-
-    List<Calendar> getCalendarByName(String name);
 
 }

@@ -5,7 +5,6 @@
 package com.dao.User;
 
 import com.model.User;
-import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -14,23 +13,23 @@ import java.util.List;
  */
 public interface IUserDAO {
 
-    public int insertUser(User user) throws SQLException;
+    public int countUser();
 
-    public User selectUserByID(int id);
+    public boolean insertUser(User user);
 
-    public List<User> selectAllUsers();
+    public boolean updateUser(User user);
 
-    public boolean updateUser(User user) throws SQLException;
-
-    public boolean deleteUser(int id) throws SQLException;
+    public boolean deleteUser(int id);
 
     public boolean existsByEmail(String email);
 
-    public boolean existsByID(int ID);
+    public boolean existsByID(int id);
 
-    public int countUser();
+    public User selectUserByID(int id);
 
     public User selectUserByEmail(String email);
+
+    public List<User> selectAllUsers();
 
     public List<User> selectUserByPage(int pageNumber, int pageSize);
 

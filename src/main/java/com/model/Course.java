@@ -42,7 +42,8 @@ import java.util.List;
     @NamedQuery(name = "Course.findByDescription", query = "SELECT c FROM Course c WHERE c.description = :description"),
     @NamedQuery(name = "Course.findByFrequency", query = "SELECT c FROM Course c WHERE c.frequency = :frequency"),
     @NamedQuery(name = "Course.findByCreatedAt", query = "SELECT c FROM Course c WHERE c.createdAt = :createdAt"),
-    @NamedQuery(name = "Course.findByUpdatedAt", query = "SELECT c FROM Course c WHERE c.updatedAt = :updatedAt")})
+    @NamedQuery(name = "Course.findByUpdatedAt", query = "SELECT c FROM Course c WHERE c.updatedAt = :updatedAt"),
+    @NamedQuery(name = "Course.findByCategory", query = "SELECT c FROM Course c WHERE c.category = :category")})
 public class Course implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -76,8 +77,13 @@ public class Course implements Serializable {
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
+    @Size(max = 255)
+    @Column(name = "category")
+    private String category;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCourse")
     private List<OrderItem> orderItemList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCourse")
+    private List<Cart> cartList;
 
     public Course() {
     }
@@ -156,6 +162,14 @@ public class Course implements Serializable {
         this.updatedAt = updatedAt;
     }
 
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     @XmlTransient
     public List<OrderItem> getOrderItemList() {
         return orderItemList;
@@ -163,6 +177,15 @@ public class Course implements Serializable {
 
     public void setOrderItemList(List<OrderItem> orderItemList) {
         this.orderItemList = orderItemList;
+    }
+
+    @XmlTransient
+    public List<Cart> getCartList() {
+        return cartList;
+    }
+
+    public void setCartList(List<Cart> cartList) {
+        this.cartList = cartList;
     }
 
     @Override

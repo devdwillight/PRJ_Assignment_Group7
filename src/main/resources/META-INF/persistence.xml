@@ -11,6 +11,8 @@
     <class>com.model.ToDo</class>
     <class>com.model.User</class>
     <class>com.model.UserEvents</class>
+    <class>com.model.Cart</class>
+    <class>com.model.Users</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <!-- Cấu hình kết nối -->
     <properties>

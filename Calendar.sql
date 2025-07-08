@@ -22,6 +22,7 @@ CREATE TABLE Users (
 CREATE TABLE Course (
     id_course INT IDENTITY(1,1) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+	category VARCHAR(255),
     price DECIMAL(10,2) NOT NULL,
     duration VARCHAR(255),
     description nvarchar(max),
@@ -174,28 +175,29 @@ VALUES
 ('wyatt_collins', 'hashed_pwd51', 'Wyatt', 'Collins', '1992-06-18', 'wyatt.collins@email.com', '5553841729', 'Male', 1, 0),
 ('yasmin_stewart', 'hashed_pwd52', 'Yasmin', 'Stewart', '1988-10-25', 'yasmin.stewart@email.com', '5559274183', 'Female', 1, 1);
 
-INSERT INTO Course (name, price, duration, description, frequency)
+INSERT INTO Course (name, price, duration, description, frequency, category)
 VALUES
-('Mobile App Development', 249.99, '5 months', N'Create iOS and Android apps using React Native and Flutter.', 'Weekly'),
-('Digital Marketing Fundamentals', 149.99, '6 weeks', N'Master SEO, social media marketing, and Google Ads strategies.', 'Bi-weekly'),
-('Python Programming Bootcamp', 179.99, '8 weeks', N'Complete Python course from basics to advanced programming concepts.', 'Weekly'),
-('Graphic Design Essentials', 129.99, '10 weeks', N'Learn Adobe Creative Suite, typography, and design principles.', 'Weekly'),
-('Project Management Professional', 399.99, '12 weeks', N'PMP certification preparation with real-world project scenarios.', 'Weekly'),
-('Photography Masterclass', 89.99, '4 weeks', N'Digital photography techniques, lighting, and post-processing skills.', 'Bi-weekly'),
-('Financial Planning & Investment', 199.99, '8 weeks', N'Personal finance management, investment strategies, and retirement planning.', 'Weekly'),
-('UI/UX Design Workshop', 219.99, '6 weeks', N'User interface and experience design using Figma and design thinking.', 'Weekly'),
-('Cybersecurity Fundamentals', 279.99, '10 weeks', N'Network security, ethical hacking, and cybersecurity best practices.', 'Weekly'),
-('Creative Writing Workshop', 99.99, '8 weeks', N'Develop storytelling skills, character development, and narrative techniques.', 'Bi-weekly'),
-('Machine Learning Basics', 349.99, '12 weeks', N'Introduction to ML algorithms, neural networks, and AI applications.', 'Weekly'),
-('Foreign Language - Spanish', 119.99, '16 weeks', N'Conversational Spanish from beginner to intermediate level.', 'Bi-weekly'),
-('Business Analytics', 259.99, '9 weeks', N'Data visualization, statistical analysis, and business intelligence tools.', 'Weekly'),
-('Video Production & Editing', 169.99, '7 weeks', N'Video creation, editing techniques, and post-production workflows.', 'Weekly'),
-('Public Speaking Mastery', 79.99, '5 weeks', N'Overcome speaking anxiety and deliver compelling presentations.', 'Weekly'),
-('E-commerce Business Setup', 189.99, '6 weeks', N'Build and launch successful online stores using Shopify and marketing.', 'Bi-weekly'),
-('Artificial Intelligence Ethics', 149.99, '4 weeks', N'Explore AI ethics, bias in algorithms, and responsible AI development.', 'Weekly'),
-('Yoga Instructor Training', 499.99, '20 weeks', N'Comprehensive 200-hour yoga teacher certification program.', 'Bi-weekly'),
-('Blockchain & Cryptocurrency', 299.99, '8 weeks', N'Understanding blockchain technology, crypto trading, and DeFi basics.', 'Weekly'),
-('Interior Design Principles', 139.99, '12 weeks', N'Space planning, color theory, and home decoration techniques.', 'Bi-weekly');
+('Mobile App Development', 249.99, '5 months', N'Create iOS and Android apps using React Native and Flutter.', 'Weekly', 'Technology'),
+('Digital Marketing Fundamentals', 149.99, '6 weeks', N'Master SEO, social media marketing, and Google Ads strategies.', 'Bi-weekly', 'Marketing'),
+('Python Programming Bootcamp', 179.99, '8 weeks', N'Complete Python course from basics to advanced programming concepts.', 'Weekly', 'Programming'),
+('Graphic Design Essentials', 129.99, '10 weeks', N'Learn Adobe Creative Suite, typography, and design principles.', 'Weekly', 'Design'),
+('Project Management Professional', 399.99, '12 weeks', N'PMP certification preparation with real-world project scenarios.', 'Weekly', 'Business'),
+('Photography Masterclass', 89.99, '4 weeks', N'Digital photography techniques, lighting, and post-processing skills.', 'Bi-weekly', 'Art'),
+('Financial Planning & Investment', 199.99, '8 weeks', N'Personal finance management, investment strategies, and retirement planning.', 'Weekly', 'Finance'),
+('UI/UX Design Workshop', 219.99, '6 weeks', N'User interface and experience design using Figma and design thinking.', 'Weekly', 'Design'),
+('Cybersecurity Fundamentals', 279.99, '10 weeks', N'Network security, ethical hacking, and cybersecurity best practices.', 'Weekly', 'Technology'),
+('Creative Writing Workshop', 99.99, '8 weeks', N'Develop storytelling skills, character development, and narrative techniques.', 'Bi-weekly', 'Writing'),
+('Machine Learning Basics', 349.99, '12 weeks', N'Introduction to ML algorithms, neural networks, and AI applications.', 'Weekly', 'Artificial Intelligence'),
+('Foreign Language - Spanish', 119.99, '16 weeks', N'Conversational Spanish from beginner to intermediate level.', 'Bi-weekly', 'Language'),
+('Business Analytics', 259.99, '9 weeks', N'Data visualization, statistical analysis, and business intelligence tools.', 'Weekly', 'Business'),
+('Video Production & Editing', 169.99, '7 weeks', N'Video creation, editing techniques, and post-production workflows.', 'Weekly', 'Media'),
+('Public Speaking Mastery', 79.99, '5 weeks', N'Overcome speaking anxiety and deliver compelling presentations.', 'Weekly', 'Communication'),
+('E-commerce Business Setup', 189.99, '6 weeks', N'Build and launch successful online stores using Shopify and marketing.', 'Bi-weekly', 'Business'),
+('Artificial Intelligence Ethics', 149.99, '4 weeks', N'Explore AI ethics, bias in algorithms, and responsible AI development.', 'Weekly', 'Artificial Intelligence'),
+('Yoga Instructor Training', 499.99, '20 weeks', N'Comprehensive 200-hour yoga teacher certification program.', 'Bi-weekly', 'Health'),
+('Blockchain & Cryptocurrency', 299.99, '8 weeks', N'Understanding blockchain technology, crypto trading, and DeFi basics.', 'Weekly', 'Technology'),
+('Interior Design Principles', 139.99, '12 weeks', N'Space planning, color theory, and home decoration techniques.', 'Bi-weekly', 'Design');
+
 
 INSERT INTO Orders (id_user, status, payment_method, payment_time)
 VALUES

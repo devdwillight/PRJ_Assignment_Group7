@@ -6,6 +6,8 @@ package com.dao.Course;
 
 import com.dao.BaseDAO;
 import com.model.Course;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import java.util.List;
 
 /**
@@ -19,33 +21,53 @@ public class CourseDAO extends BaseDAO<Course> implements ICourseDAO {
     }
 
     @Override
-    public void create(Course course) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public int countCourse() {
+        return (int) count();
     }
 
     @Override
-    public void delete(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public boolean insertCourse(Course course) {
+        return save(course);
     }
 
     @Override
-    public List<Course> findByName(String name) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public boolean updateCourse(Course course) {
+        return update(course);
     }
 
     @Override
-    public List<Course> findByCategory(String category) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public boolean deleteCourse(int id) {
+        return delete(id);
     }
 
     @Override
-    public List<Course> findByUserId(int userId) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public Course selectCourseById(int id) {
+        return find(id);
     }
 
     @Override
     public List<Course> selectAllCourse() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return findAllByEntity("Course.findAll");
+    }
+
+    @Override
+    public List<Course> selectCourseByCategory(String category) {
+        return findAllByNamedEntity("Course.findByCategory", "category", category);
+    }
+
+    @Override
+    public List<Course> selectCourseByPage(int pageNumber, int pageSize) {
+        EntityManager em = getEntityManager();
+        try {
+            return em.createQuery("SELECT c FROM Course c ORDER BY c.idCourse", Course.class)
+                    .setFirstResult((pageNumber - 1) * pageSize)
+                    .setMaxResults(pageSize)
+                    .getResultList();
+        } catch (NoResultException e) {
+            return null;
+        } finally {
+            em.close();
+        }
     }
 
 }
