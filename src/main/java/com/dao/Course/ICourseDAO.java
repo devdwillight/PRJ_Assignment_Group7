@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.dao.CourseDAO;
+package com.dao.Course;
 
 import com.model.Course;
 import java.util.List;
@@ -19,7 +19,7 @@ public interface ICourseDAO {
 
     void delete(int id);
 
-    List<Course> findAll();
+    List<Course> selectAllCourse();
 
     List<Course> findByName(String name);
 

@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.dao.CalendarDAO;
+package com.dao.Calendar;
 
 import com.model.Calendar;
 import java.util.Date;
@@ -13,28 +13,28 @@ import java.util.List;
  * @author DELL
  */
 public interface ICalendarDAO {
+    
     // Thêm mới một Calendar
-
-    void create(Calendar calendar);
+    public int insertCalendar(Calendar calendar);
 
     // Cập nhật Calendar
-    void update(Calendar calendar);
+    public boolean updateCalendar(Calendar calendar);
 
     // Xoá theo ID
-    void delete(int id);
+    public boolean deleteCalendar(int id);
 
     // Tìm theo ID
-    Calendar findById(int id);
+    public Calendar findById(int id);
 
     // Lấy tất cả các calendar
-    List<Calendar> findAll();
+    public List<Calendar> selectAllCalendar();
 
     // Tìm lịch theo id_user
-    List<Calendar> findByUserId(int userId);
+    public List<Calendar> selectCalendarByUserId(int userId);
 
     // Tìm lịch trong khoảng thời gian
-    List<Calendar> findByDateRange(Date start, Date end);
+    public List<Calendar> selectCalendarByDateRange(Date start, Date end);
 
     // Tìm lịch theo tên
-    List<Calendar> findByName(String name);
+    public List<Calendar> selectCalendarByName(String name);
 }

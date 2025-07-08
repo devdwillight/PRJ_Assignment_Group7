@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.dao.CalendarDAO;
+package com.dao.Calendar;
 
 import com.dao.BaseDAO;
 import com.model.Calendar;
@@ -16,20 +16,22 @@ import java.util.List;
  *
  * @author DELL
  */
-public class CalendarDAO extends BaseDAO<Calendar, Integer> implements ICalendarDAO {
+public class CalendarDAO extends BaseDAO<Calendar> implements ICalendarDAO {
 
     public CalendarDAO() {
         super(Calendar.class);
     }
 
     @Override
-    public void create(Calendar calendar) {
+    public int insertCalendar(Calendar calendar) {
         save(calendar);
+        return 1;
     }
 
     @Override
-    public void delete(int id) {
+    public boolean deleteCalendar(int id) {
         delete(id);
+        return true;
     }
 
     @Override
@@ -38,7 +40,7 @@ public class CalendarDAO extends BaseDAO<Calendar, Integer> implements ICalendar
     }
 
     @Override
-    public List<Calendar> findByUserId(int userId) {
+    public List<Calendar> selectCalendarByUserId(int userId) {
         EntityManager em = getEntityManager();
         return em.createQuery(
                 "SELECT c FROM Calendar c WHERE c.idUser.idUser = :userId", Calendar.class)
@@ -48,7 +50,7 @@ public class CalendarDAO extends BaseDAO<Calendar, Integer> implements ICalendar
     }
 
     @Override
-    public List<Calendar> findByDateRange(Date start, Date end) {
+    public List<Calendar> selectCalendarByDateRange(Date start, Date end) {
         EntityManager em = getEntityManager();
         return em.createQuery(
                 "SELECT c FROM Calendar c WHERE c.startDate >= :start AND c.endDate <= :end", Calendar.class)
@@ -59,12 +61,23 @@ public class CalendarDAO extends BaseDAO<Calendar, Integer> implements ICalendar
     }
 
     @Override
-    public List<Calendar> findByName(String name) {
+    public List<Calendar> selectCalendarByName(String name) {
         EntityManager em = getEntityManager();
         return em.createQuery(
                 "SELECT c FROM Calendar c WHERE LOWER(c.name) LIKE :name", Calendar.class)
                 .setParameter("name", "%" + name.toLowerCase() + "%")
                 .getResultList();
+    }
+
+    @Override
+    public List<Calendar> selectAllCalendar() {
+        return findAll();
+    }
+
+    @Override
+    public boolean updateCalendar(Calendar calendar) {
+        update(calendar);
+        return true;
     }
 
 }

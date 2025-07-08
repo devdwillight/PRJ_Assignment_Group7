@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.dao.userDAO;
+package com.dao.User;
 
 import com.model.User;
 import java.sql.SQLException;
@@ -18,11 +18,7 @@ public interface IUserDAO {
 
     public User selectUserByID(int id);
 
-    public User selectUserByEmail(String email);
-
     public List<User> selectAllUsers();
-
-    public List<User> selectUserByPage(int pageNumber, int pageSize);
 
     public boolean updateUser(User user) throws SQLException;
 
@@ -33,5 +29,9 @@ public interface IUserDAO {
     public boolean existsByID(int ID);
 
     public int countUser();
-    
+
+    public User selectUserByEmail(String email);
+
+    public List<User> selectUserByPage(int pageNumber, int pageSize);
+
 }

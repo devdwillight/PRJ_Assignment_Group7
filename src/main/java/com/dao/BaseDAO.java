@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author DELL
  */
-public abstract class BaseDAO<T, ID extends Serializable> {
+public abstract class BaseDAO<T> {
 
     private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("CLDPU");
 
@@ -26,7 +26,7 @@ public abstract class BaseDAO<T, ID extends Serializable> {
         return emf.createEntityManager();
     }
 
-    public T find(ID id) {
+    public T find(int id) {
         EntityManager em = getEntityManager();
         try {
             return em.find(entityClass, id);
@@ -79,7 +79,7 @@ public abstract class BaseDAO<T, ID extends Serializable> {
         }
     }
 
-    public void delete(ID id) {
+    public void delete(int id) {
         EntityManager em = getEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
