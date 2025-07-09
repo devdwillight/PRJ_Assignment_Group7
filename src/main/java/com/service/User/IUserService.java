@@ -13,6 +13,8 @@ import java.util.List;
  */
 public interface IUserService {
 
+    void updatePassWord(String email, String passWord);
+
     int countUsers();
 
     boolean updateUser(User user);

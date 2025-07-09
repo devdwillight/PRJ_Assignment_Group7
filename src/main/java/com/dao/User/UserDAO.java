@@ -7,6 +7,7 @@ package com.dao.User;
 import com.dao.BaseDAO;
 import com.model.User;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
 import java.util.List;
 
@@ -88,6 +89,30 @@ public class UserDAO extends BaseDAO<User> implements IUserDAO {
                     .getResultList();
         } catch (NoResultException e) {
             return null;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public void updatePassWord(String email, String newPassword) {
+        EntityManager em = getEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            int updated = em.createQuery(
+                    "UPDATE User u SET u.password = :password WHERE u.email = :email")
+                    .setParameter("password", newPassword)
+                    .setParameter("email", email)
+                    .executeUpdate();
+            tx.commit();
+            System.out.println("[updatePassword] ✔ Cập nhật thành công cho email: " + email + " (số dòng ảnh hưởng: " + updated + ")");
+        } catch (Exception e) {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            System.err.println("[updatePassword] ✖ Lỗi khi cập nhật mật khẩu:");
+            e.printStackTrace();
         } finally {
             em.close();
         }
