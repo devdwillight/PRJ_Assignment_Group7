@@ -1,4 +1,4 @@
---create database Calendar;
+﻿--create database Calendar;
 
 --use Calendar
 
@@ -6,10 +6,10 @@ CREATE TABLE Users (
     id_user INT IDENTITY(1,1) PRIMARY KEY,
     username NVARCHAR(255) NOT NULL,
     password NVARCHAR(255) NOT NULL,
-    first_name NVARCHAR(255) NOT NULL,
-    last_name NVARCHAR(255)NOT NULL,
-    birthday DATE NOT NULL,
-    email NVARCHAR(255) unique,
+    first_name NVARCHAR(255) default null,
+    last_name NVARCHAR(255)default null,
+    birthday DATE default null,
+    email NVARCHAR(255) unique NOT NULL,
     phone NVARCHAR(20) default null,
     gender NVARCHAR(10) default null,
     active BIT default null,
@@ -31,6 +31,16 @@ CREATE TABLE Course (
     updated_at DATETIME
 );
 
+CREATE TABLE Enrollment (
+    id_enroll INT IDENTITY(1,1) PRIMARY KEY,
+    id_user INT NOT NULL,
+    id_course INT NOT NULL,
+    enroll_date DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (id_user) REFERENCES Users(id_user),
+    FOREIGN KEY (id_course) REFERENCES Course(id_course),
+    UNIQUE (id_user, id_course) -- đảm bảo 1 user chỉ học 1 course 1 lần
+);
+
 CREATE TABLE Orders (
     id_order INT IDENTITY(1,1) PRIMARY KEY,
     id_user INT NOT NULL,
@@ -38,28 +48,6 @@ CREATE TABLE Orders (
 	payment_method nvarchar(255) NOT NULL,
 	payment_time datetime NOT NULL,
     FOREIGN KEY (id_user) REFERENCES Users(id_user)
-);
-
-CREATE TABLE Order_Item (
-    id_order_item INT IDENTITY(1,1) PRIMARY KEY,
-    id_order INT NOT NULL,
-    id_course INT NOT NULL,
-    price DECIMAL(10,2),
-    discount DECIMAL(10,2),
-    created_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (id_order) REFERENCES Orders(id_order),
-    FOREIGN KEY (id_course) REFERENCES Course(id_course)
-);
-
-CREATE TABLE Cart (
-    id_cart INT IDENTITY(1,1) PRIMARY KEY,
-    id_user INT NOT NULL,
-    id_course INT NOT NULL,
-	id_order_item int null,
-    FOREIGN KEY (id_user) REFERENCES Users(id_user),
-    FOREIGN KEY (id_course) REFERENCES Course(id_course),
-	foreign key (id_order_item) references Order_Item(id_order_item),
-	UNIQUE(id_user, id_course)
 );
 
 CREATE TABLE Calendar (
@@ -118,10 +106,8 @@ CREATE TABLE To_Do (
 );
 
 INSERT INTO Users (username, password, first_name, last_name, birthday, email, phone, gender, active, is_admin)
-VALUES('sa','abc@123','admin','admin','2000-1-1','abc@gmail.com','1234567890','Male',1,1);
-
-INSERT INTO Users (username, password, first_name, last_name, birthday, email, phone, gender, active, is_admin)
 VALUES
+('sa','abc@123','admin','admin','2000-1-1','abc@gmail.com','1234567890','Male',1,1),
 ('john_doe', 'hashed_pwd1', 'John', 'Doe', '1990-01-01', 'john@example.com', '1234567890', 'Male', 1, 0),
 ('jane_smith', 'hashed_pwd2', 'Jane', 'Smith', '1992-02-02', 'jane@example.com', '0987654321', 'Female', 1, 1),
 ('alice_johnson', 'hashed_pwd3', 'Alice', 'Johnson', '1988-03-15', 'alice.johnson@email.com', '5551234567', 'Female', 1, 0),
@@ -198,21 +184,10 @@ VALUES
 ('Blockchain & Cryptocurrency', 299.99, '8 weeks', N'Understanding blockchain technology, crypto trading, and DeFi basics.', 'Weekly', 'Technology'),
 ('Interior Design Principles', 139.99, '12 weeks', N'Space planning, color theory, and home decoration techniques.', 'Bi-weekly', 'Design');
 
-
 INSERT INTO Orders (id_user, status, payment_method, payment_time)
 VALUES
 (1, 'Paid', 'Credit Card', GETDATE()),
 (2, 'Pending', 'PayPal', GETDATE());
-
-INSERT INTO Order_Item (id_order, id_course, price, discount)
-VALUES
-(1, 1, 199.99, 0),
-(2, 2, 299.99, 20.00);
-
-INSERT INTO Cart (id_user, id_course, id_order_item)
-VALUES
-(1, 1, 1),
-(2, 2, 2);
 
 INSERT INTO Calendar (id_user, name, color)
 VALUES
@@ -431,3 +406,55 @@ VALUES
 (25, 'Set up development environment', 'Configure IDE and dependencies', '2025-07-04 13:00:00', 0, 0, NULL, 1),
 (25, 'Code authentication module', 'Implement user login system', '2025-07-18 16:30:00', 0, 0, NULL, 0);
 
+INSERT INTO Enrollment (id_user, id_course)
+VALUES 
+(1, 1),
+(1, 2),
+(2, 1),
+(2, 3),
+(3, 4),
+(3, 5),
+(4, 6),
+(4, 7),
+(5, 8),
+(5, 9),
+(6, 10),
+(6, 11),
+(7, 12),
+(7, 13),
+(8, 14),
+(8, 15),
+(9, 16),
+(9, 17),
+(10, 18),
+(10, 19),
+(11, 1),
+(11, 2),
+(12, 3),
+(12, 4),
+(13, 5),
+(13, 6),
+(14, 7),
+(14, 8),
+(15, 9),
+(15, 10),
+(16, 11),
+(16, 12),
+(17, 13),
+(17, 14),
+(18, 15),
+(18, 16),
+(19, 17),
+(19, 18),
+(20, 19),
+(20, 20),
+(1, 3),
+(2, 4),
+(3, 6),
+(4, 8),
+(5, 10),
+(6, 12),
+(7, 14),
+(8, 16),
+(9, 18),
+(10, 20);

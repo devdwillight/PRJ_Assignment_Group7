@@ -37,13 +37,13 @@ import java.util.List;
     @NamedQuery(name = "Course.findAll", query = "SELECT c FROM Course c"),
     @NamedQuery(name = "Course.findByIdCourse", query = "SELECT c FROM Course c WHERE c.idCourse = :idCourse"),
     @NamedQuery(name = "Course.findByName", query = "SELECT c FROM Course c WHERE c.name = :name"),
+    @NamedQuery(name = "Course.findByCategory", query = "SELECT c FROM Course c WHERE c.category = :category"),
     @NamedQuery(name = "Course.findByPrice", query = "SELECT c FROM Course c WHERE c.price = :price"),
     @NamedQuery(name = "Course.findByDuration", query = "SELECT c FROM Course c WHERE c.duration = :duration"),
     @NamedQuery(name = "Course.findByDescription", query = "SELECT c FROM Course c WHERE c.description = :description"),
     @NamedQuery(name = "Course.findByFrequency", query = "SELECT c FROM Course c WHERE c.frequency = :frequency"),
     @NamedQuery(name = "Course.findByCreatedAt", query = "SELECT c FROM Course c WHERE c.createdAt = :createdAt"),
-    @NamedQuery(name = "Course.findByUpdatedAt", query = "SELECT c FROM Course c WHERE c.updatedAt = :updatedAt"),
-    @NamedQuery(name = "Course.findByCategory", query = "SELECT c FROM Course c WHERE c.category = :category")})
+    @NamedQuery(name = "Course.findByUpdatedAt", query = "SELECT c FROM Course c WHERE c.updatedAt = :updatedAt")})
 public class Course implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -57,6 +57,9 @@ public class Course implements Serializable {
     @Size(min = 1, max = 255)
     @Column(name = "name")
     private String name;
+    @Size(max = 255)
+    @Column(name = "category")
+    private String category;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Basic(optional = false)
     @NotNull
@@ -77,13 +80,8 @@ public class Course implements Serializable {
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
-    @Size(max = 255)
-    @Column(name = "category")
-    private String category;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCourse")
-    private List<OrderItem> orderItemList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCourse")
-    private List<Cart> cartList;
+    private List<Enrollment> enrollmentList;
 
     public Course() {
     }
@@ -112,6 +110,14 @@ public class Course implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public BigDecimal getPrice() {
@@ -162,30 +168,13 @@ public class Course implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
     @XmlTransient
-    public List<OrderItem> getOrderItemList() {
-        return orderItemList;
+    public List<Enrollment> getEnrollmentList() {
+        return enrollmentList;
     }
 
-    public void setOrderItemList(List<OrderItem> orderItemList) {
-        this.orderItemList = orderItemList;
-    }
-
-    @XmlTransient
-    public List<Cart> getCartList() {
-        return cartList;
-    }
-
-    public void setCartList(List<Cart> cartList) {
-        this.cartList = cartList;
+    public void setEnrollmentList(List<Enrollment> enrollmentList) {
+        this.enrollmentList = enrollmentList;
     }
 
     @Override

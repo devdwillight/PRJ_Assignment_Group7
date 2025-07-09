@@ -66,23 +66,19 @@ public class User implements Serializable {
     @Size(min = 1, max = 255)
     @Column(name = "password")
     private String password;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 255)
+    @Size(max = 255)
     @Column(name = "first_name")
     private String firstName;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 255)
+    @Size(max = 255)
     @Column(name = "last_name")
     private String lastName;
-    @Basic(optional = false)
-    @NotNull
     @Column(name = "birthday")
     @Temporal(TemporalType.DATE)
     private Date birthday;
     // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
-    @Size(max = 255)
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 255)
     @Column(name = "email")
     private String email;
     // @Pattern(regexp="^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$", message="Invalid phone/fax format, should be as xxx-xxx-xxxx")//if the field contains phone or fax number consider using this annotation to enforce field validation
@@ -112,7 +108,7 @@ public class User implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idUser")
     private List<Calendar> calendarList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idUser")
-    private List<Cart> cartList;
+    private List<Enrollment> enrollmentList;
 
     public User() {
     }
@@ -121,13 +117,11 @@ public class User implements Serializable {
         this.idUser = idUser;
     }
 
-    public User(Integer idUser, String username, String password, String firstName, String lastName, Date birthday) {
+    public User(Integer idUser, String username, String password, String email) {
         this.idUser = idUser;
         this.username = username;
         this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.birthday = birthday;
+        this.email = email;
     }
 
     public Integer getIdUser() {
@@ -270,12 +264,12 @@ public class User implements Serializable {
     }
 
     @XmlTransient
-    public List<Cart> getCartList() {
-        return cartList;
+    public List<Enrollment> getEnrollmentList() {
+        return enrollmentList;
     }
 
-    public void setCartList(List<Cart> cartList) {
-        this.cartList = cartList;
+    public void setEnrollmentList(List<Enrollment> enrollmentList) {
+        this.enrollmentList = enrollmentList;
     }
 
     @Override
