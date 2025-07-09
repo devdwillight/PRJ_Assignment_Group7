@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface ITodoDAO {
 
-    public int coutTodo();
+    public int countTodo();
 
     public boolean insertTodo(ToDo todo);
 

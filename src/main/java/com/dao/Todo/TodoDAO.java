@@ -22,7 +22,7 @@ public class TodoDAO extends BaseDAO<ToDo> implements ITodoDAO {
     }
 
     @Override
-    public int coutTodo() {
+    public int countTodo() {
         return (int) count();
     }
 
