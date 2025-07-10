@@ -74,25 +74,19 @@
                     <ul class="space-y-4">
                         <li class="flex items-center text-gray-700 text-base">
                             <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-sky-100 mr-3">
-                                <svg class="w-5 h-5 text-sky-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/>
-                                </svg>
+                                <jsp:include page="assets/rightarrow.svg"/>
                             </span>
                             Let AI optimize your calendar for focus and balance.
                         </li>
                         <li class="flex items-center text-gray-700 text-base">
                             <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-sky-100 mr-3">
-                                <svg class="w-5 h-5 text-sky-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/>
-                                </svg>
+                                <jsp:include page="assets/rightarrow.svg"/>
                             </span>
                             Smart time suggestions tailored to your day.
                         </li>
                         <li class="flex items-center text-gray-700 text-base">
                             <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-sky-100 mr-3">
-                                <svg class="w-5 h-5 text-sky-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/>
-                                </svg>
+                                <jsp:include page="assets/rightarrow.svg"/>
                             </span>
                             Intelligent scheduling that adapts to your routine.
                         </li>
@@ -101,8 +95,6 @@
                 <!-- Right: Placeholder for image or custom content -->
                 <div class="flex-1 flex justify-center">
                     <div class="w-full max-w-md h-80 bg-white border border-gray-300 rounded-xl flex items-center justify-center">
-                        <!-- Thêm ảnh/logo hoặc nội dung của bạn vào đây -->
-                        <!-- <img src="assets/your-image.png" alt="CalendBot" class="h-24" /> -->
                         <img src="assets/calendbot.png" alt="CalendBot" class="h-64"/>
                     </div>
                 </div>
@@ -193,28 +185,21 @@
                         <li class="flex items-center">
                             <span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-sky-500 bg-opacity-20 mr-4">
                                 <!-- Location Icon -->
-                                <svg class="w-6 h-6 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path d="M12 21s-6-5.686-6-10A6 6 0 1 1 18 11c0 4.314-6 10-6 10z"/>
-                                <circle cx="12" cy="11" r="2.5" fill="currentColor"/>
-                                </svg>
+                                <jsp:include page="assets/location.svg"/>
                             </span>
                             FPT University, City DaNa, Viet Nam
                         </li>
                         <li class="flex items-center">
                             <span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-sky-500 bg-opacity-20 mr-4">
                                 <!-- Phone Icon -->
-                                <svg class="w-6 h-6 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h1.28a1 1 0 01.95.68l1.16 3.49a1 1 0 01-.27 1.07l-1.4 1.4a16.018 16.018 0 006.6 6.6l1.4-1.4a1 1 0 011.07-.27l3.49 1.16a1 1 0 01.68.95V19a2 2 0 01-2 2h-.28C9.59 21 3 14.41 3 6.28V6a1 1 0 010-.18z"/>
-                                </svg>
+                                <jsp:include page="assets/phone.svg"/>
                             </span>
                             010-010-0110 or 020-020-0220
                         </li>
                         <li class="flex items-center">
                             <span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-sky-500 bg-opacity-20 mr-4">
                                 <!-- Email Icon -->
-                                <svg class="w-6 h-6 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 6h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z"/>
-                                </svg>
+                                <jsp:include page="assets/email.svg"/>
                             </span>
                             info@company.com
                         </li>

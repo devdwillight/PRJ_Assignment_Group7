@@ -23,11 +23,11 @@ import jakarta.servlet.http.HttpSession;
  *
  * @author ADMIN
  */
-
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login", "/logout"})
 public class LoginServlet extends HttpServlet {
 
     UserService userService = new UserService();
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -62,6 +62,12 @@ public class LoginServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String code = request.getParameter("code");
+
+        if (code == null || code.isEmpty()) {
+            response.sendRedirect("views/login/login.jsp");
+            return; // Không làm gì tiếp nếu không có code
+        }
+
         GoogleLogin gl = new GoogleLogin();
         String accessToken = gl.getToken(code);
         System.out.println(accessToken);
@@ -128,53 +134,52 @@ public class LoginServlet extends HttpServlet {
     }
 
     private void checkLogin(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-    String username = request.getParameter("email");
-    String password = request.getParameter("password");
-    String remember = request.getParameter("remember_me");
-    
-    // DEBUG: In ra giá trị để kiểm tra
-    System.out.println("Username: " + username);
-    System.out.println("Password: " + password);
-    System.out.println("Remember: '" + remember + "'"); // Để thấy giá trị chính xác
-    
-    User user = userService.checkLogin(username, password);
-    
-    if (user.getEmail().equals(username) && user.getPassword().equals(password)) {
-        // Lưu thông tin người dùng vào session
-        HttpSession session = request.getSession(true);
-        session.setAttribute("user_email", username);
-        
-        int maxAge = 7 * 24 * 60 * 60; // 7 ngày
-        
-        // Kiểm tra nhiều trường hợp có thể của checkbox
-        if ("true".equals(remember) || "true".equals(remember) || remember != null) {
-            System.out.println("SAVING COOKIES - Remember me is checked");
-            Cookie userCookie = new Cookie("user_email", username);
-            Cookie passCookie = new Cookie("user_password", password);
-            userCookie.setMaxAge(maxAge);
-            passCookie.setMaxAge(maxAge);
-            response.addCookie(userCookie);
-            response.addCookie(passCookie);
+        String username = request.getParameter("email");
+        String password = request.getParameter("password");
+        String remember = request.getParameter("remember_me");
+
+        // DEBUG: In ra giá trị để kiểm tra
+        System.out.println("Username: " + username);
+        System.out.println("Password: " + password);
+        System.out.println("Remember: '" + remember + "'"); // Để thấy giá trị chính xác
+
+        User user = userService.checkLogin(username, password);
+
+        if (user.getEmail().equals(username) && user.getPassword().equals(password)) {
+            // Lưu thông tin người dùng vào session
+            HttpSession session = request.getSession(true);
+            session.setAttribute("user_email", username);
+
+            int maxAge = 7 * 24 * 60 * 60; // 7 ngày
+
+            // Kiểm tra nhiều trường hợp có thể của checkbox
+            if ("true".equals(remember) || "true".equals(remember) || remember != null) {
+                System.out.println("SAVING COOKIES - Remember me is checked");
+                Cookie userCookie = new Cookie("user_email", username);
+                Cookie passCookie = new Cookie("user_password", password);
+                userCookie.setMaxAge(maxAge);
+                passCookie.setMaxAge(maxAge);
+                response.addCookie(userCookie);
+                response.addCookie(passCookie);
+            } else {
+                System.out.println("NOT SAVING PASSWORD - Remember me is NOT checked");
+                // Không tick "Remember me": lưu email, xóa password
+                Cookie userCookie = new Cookie("user_email", username);
+                Cookie passCookie = new Cookie("user_password", "");
+                userCookie.setMaxAge(maxAge); // Lưu email 7 ngày
+                passCookie.setMaxAge(0);      // Xóa password
+                response.addCookie(userCookie);
+                response.addCookie(passCookie);
+            }
+
+            // Chuyển hướng về trang home.jsp sau khi đăng nhập thành công
+            response.sendRedirect(request.getContextPath() + "/home.jsp");
         } else {
-            System.out.println("NOT SAVING PASSWORD - Remember me is NOT checked");
-            // Không tick "Remember me": lưu email, xóa password
-            Cookie userCookie = new Cookie("user_email", username);
-            Cookie passCookie = new Cookie("user_password", "");
-            userCookie.setMaxAge(maxAge); // Lưu email 7 ngày
-            passCookie.setMaxAge(0);      // Xóa password
-            response.addCookie(userCookie);
-            response.addCookie(passCookie);
+            // Nếu đăng nhập không hợp lệ, hiển thị lỗi
+            request.setAttribute("error", "1");
+            request.getRequestDispatcher("views/login/login.jsp").forward(request, response);
         }
-        
-        // Chuyển hướng về trang home.jsp sau khi đăng nhập thành công
-        response.sendRedirect(request.getContextPath() + "/home.jsp");
-    } else {
-        // Nếu đăng nhập không hợp lệ, hiển thị lỗi
-        request.setAttribute("error", "1");
-        request.getRequestDispatcher("views/login/login.jsp").forward(request, response);
     }
-}
-   
 
     private void logout(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         // Xóa session người dùng
@@ -190,7 +195,6 @@ public class LoginServlet extends HttpServlet {
 //        passCookie.setMaxAge(0);
 //        response.addCookie(userCookie);
 //        response.addCookie(passCookie);
-
         response.sendRedirect("views/login/login.jsp");
     }
 }

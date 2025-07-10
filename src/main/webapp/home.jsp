@@ -16,7 +16,7 @@
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item">
                             <span class="nav-link">Welcome, 
-                                <%= session.getAttribute("googleName") != null ? session.getAttribute("googleName") : (session.getAttribute("user_email") != null ? session.getAttribute("user_email") : "Guest") %>
+                                <%= session.getAttribute("googleName") != null ? session.getAttribute("googleName") : (session.getAttribute("user_email") != null ? session.getAttribute("user_email") : "Guest")%>
                             </span>
                         </li>
                     </ul>

@@ -108,7 +108,7 @@ CREATE TABLE To_Do (
 
 INSERT INTO Users (username, password, first_name, last_name, birthday, email, phone, gender, active, is_admin)
 VALUES
-('tuan','123','admin','admin','2000-1-1','nguyenhuuminhtuan20111@gmail.com','1234567890','Male',1,1),
+('sa','123','admin','admin','2000-1-1','abc@gmail.com','1234567890','Male',1,1),
 ('john_doe', 'hashed_pwd1', 'John', 'Doe', '1990-01-01', 'john@example.com', '1234567890', 'Male', 1, 0),
 ('jane_smith', 'hashed_pwd2', 'Jane', 'Smith', '1992-02-02', 'jane@example.com', '0987654321', 'Female', 1, 1),
 ('alice_johnson', 'hashed_pwd3', 'Alice', 'Johnson', '1988-03-15', 'alice.johnson@email.com', '5551234567', 'Female', 1, 0),

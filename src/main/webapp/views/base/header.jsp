@@ -57,8 +57,8 @@
                         </div>
                     </c:when>
                     <c:otherwise>
-                        <a href="/" class="text-gray-400 font-bold mr-2 hover:text-gray-500 transition">LOGIN IN</a>
-                        <a href="/login" class="text-white bg-blue-400 px-6 py-3 rounded-xl font-bold hover:bg-blue-500 transition">SIGN IN</a>
+                        <a href="../login/login.jsp" class="text-gray-400 font-bold mr-2 hover:text-gray-500 transition">LOGIN IN</a>
+                        <a href="../login/signUp.jsp" class="text-white bg-blue-400 px-6 py-3 rounded-xl font-bold hover:bg-blue-500 transition">SIGN IN</a>
                     </c:otherwise>
                 </c:choose>
             </div>

@@ -157,7 +157,7 @@ public class UserService implements IUserService {
 
         // Thử đăng nhập với mật khẩu cũ
         System.out.println("→ Thử đăng nhập với mật khẩu cũ:");
-        User user = userService.getUserByEmail(testEmail);
+        User user = userService.checkLogin(testEmail, oldPassword);
     }
 
 }
