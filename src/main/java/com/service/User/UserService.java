@@ -128,7 +128,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void updatePassWord(String email, String passWord) {
+    public void updatePassword(String email, String passWord) {
         userDAO.updatePassword(email, passWord);
     }
 
@@ -152,12 +152,14 @@ public class UserService implements IUserService {
     public static void main(String[] args) {
         UserService userService = new UserService();
 
-        String testEmail = "nguyenhuuminhtuan20111@gmail.com";
-        String oldPassword = "123";
+        String email = "toantruongcong2005bee@gmail.com";
+        String password = "123";
 
-        // Thử đăng nhập với mật khẩu cũ
-        System.out.println("→ Thử đăng nhập với mật khẩu cũ:");
-        User user = userService.checkLogin(testEmail, oldPassword);
+        User user = new User();
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setUsername("toan215");
+
+        userService.createUser(user);
     }
-
 }

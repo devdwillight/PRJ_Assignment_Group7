@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface IUserService {
 
-    void updatePassWord(String email, String password);
+    void updatePassword(String email, String password);
 
     User checkLogin(String email, String password);
 
