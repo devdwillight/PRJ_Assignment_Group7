@@ -28,7 +28,7 @@ import java.util.List;
 
 /**
  *
- * @author DELL
+ * @author ADMIN
  */
 @Entity
 @Table(name = "Course")
@@ -81,7 +81,7 @@ public class Course implements Serializable {
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
-    @Size(max = 100)
+    @Size(max = 3000)
     @Column(name = "imageUrl")
     private String imageUrl;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCourse")

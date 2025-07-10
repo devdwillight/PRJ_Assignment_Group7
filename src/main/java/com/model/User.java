@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  *
- * @author DELL
+ * @author ADMIN
  */
 @Entity
 @Table(name = "Users")
@@ -109,6 +109,8 @@ public class User implements Serializable {
     private List<UserCourse> userCourseList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idUser")
     private List<Calendar> calendarList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
+    private List<TokenForgetPassword> tokenForgetPasswordList;
 
     public User() {
     }
@@ -119,6 +121,12 @@ public class User implements Serializable {
 
     public User(Integer idUser, String username, String password, String email) {
         this.idUser = idUser;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
+    
+    public User( String username, String password, String email) {
         this.username = username;
         this.password = password;
         this.email = email;
@@ -270,6 +278,15 @@ public class User implements Serializable {
 
     public void setCalendarList(List<Calendar> calendarList) {
         this.calendarList = calendarList;
+    }
+
+    @XmlTransient
+    public List<TokenForgetPassword> getTokenForgetPasswordList() {
+        return tokenForgetPasswordList;
+    }
+
+    public void setTokenForgetPasswordList(List<TokenForgetPassword> tokenForgetPasswordList) {
+        this.tokenForgetPasswordList = tokenForgetPasswordList;
     }
 
     @Override

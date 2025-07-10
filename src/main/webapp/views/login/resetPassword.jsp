@@ -20,7 +20,7 @@
     </head>
     <body class="bg-gray-50 min-h-screen flex items-center justify-center">
         <div class="fixed inset-0 -z-10 flex items-center justify-center">
-            <img src="../../assets/calendar-bg.jpg" alt="background" class="w-full h-full object-cover opacity-30">
+            <img src="/assets/calendar-bg.jpg" alt="background" class="w-full h-full object-cover opacity-30">
         </div>
         <div class="relative z-10 flex flex-col items-center justify-center w-full min-h-screen">
             <div class="bg-white rounded-2xl shadow-xl px-8 py-10 w-full max-w-md flex flex-col items-center">

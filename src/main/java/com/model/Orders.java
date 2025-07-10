@@ -21,11 +21,12 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author ADMIN
  */
 @Entity
 @Table(name = "Orders")
@@ -35,7 +36,8 @@ import java.util.Date;
     @NamedQuery(name = "Orders.findByIdOrder", query = "SELECT o FROM Orders o WHERE o.idOrder = :idOrder"),
     @NamedQuery(name = "Orders.findByStatus", query = "SELECT o FROM Orders o WHERE o.status = :status"),
     @NamedQuery(name = "Orders.findByPaymentMethod", query = "SELECT o FROM Orders o WHERE o.paymentMethod = :paymentMethod"),
-    @NamedQuery(name = "Orders.findByPaymentTime", query = "SELECT o FROM Orders o WHERE o.paymentTime = :paymentTime")})
+    @NamedQuery(name = "Orders.findByPaymentTime", query = "SELECT o FROM Orders o WHERE o.paymentTime = :paymentTime"),
+    @NamedQuery(name = "Orders.findByTotalAmount", query = "SELECT o FROM Orders o WHERE o.totalAmount = :totalAmount")})
 public class Orders implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -57,6 +59,11 @@ public class Orders implements Serializable {
     @Column(name = "payment_time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date paymentTime;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "TotalAmount")
+    private BigDecimal totalAmount;
     @JoinColumn(name = "id_user", referencedColumnName = "id_user")
     @ManyToOne(optional = false)
     private User idUser;
@@ -68,10 +75,11 @@ public class Orders implements Serializable {
         this.idOrder = idOrder;
     }
 
-    public Orders(Integer idOrder, String paymentMethod, Date paymentTime) {
+    public Orders(Integer idOrder, String paymentMethod, Date paymentTime, BigDecimal totalAmount) {
         this.idOrder = idOrder;
         this.paymentMethod = paymentMethod;
         this.paymentTime = paymentTime;
+        this.totalAmount = totalAmount;
     }
 
     public Integer getIdOrder() {
@@ -104,6 +112,14 @@ public class Orders implements Serializable {
 
     public void setPaymentTime(Date paymentTime) {
         this.paymentTime = paymentTime;
+    }
+
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
     }
 
     public User getIdUser() {

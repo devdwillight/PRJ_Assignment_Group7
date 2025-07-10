@@ -144,11 +144,17 @@ public class LoginServlet extends HttpServlet {
         System.out.println("Remember: '" + remember + "'"); // Để thấy giá trị chính xác
 
         User user = userService.checkLogin(username, password);
+        
+        if (user == null) {
+            request.setAttribute("mess", "Email or Password is not correct");
+            request.getRequestDispatcher("views/login/login.jsp").forward(request, response);
+        }
 
         if (user.getEmail().equals(username) && user.getPassword().equals(password)) {
             // Lưu thông tin người dùng vào session
             HttpSession session = request.getSession(true);
             session.setAttribute("user_email", username);
+            session.setAttribute("user_id", user.getIdUser());
 
             int maxAge = 7 * 24 * 60 * 60; // 7 ngày
 

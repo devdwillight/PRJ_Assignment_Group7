@@ -74,6 +74,7 @@
                             <!--Forgot Password-->
                             <a href="requestPassword.jsp" class="text-blue-400 text-sm hover:underline">Forgot password?</a>
                         </div>
+                            <p class="text-danger">${mess}</p>
                         <!--Login-->
                         <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition mb-4">Log In</button>
                     </form>
@@ -90,6 +91,7 @@
                         <img src="../../assets/Google.svg" alt="Google" class="w-5 h-5 mr-2">
                         Google
                     </a>
+                    
                     <div class="text-center text-gray-500 text-sm">
                         Don’t have an account?
                         <a href="signUp.jsp" class="text-blue-500 font-semibold hover:underline">Sign Up</a>

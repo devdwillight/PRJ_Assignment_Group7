@@ -1,6 +1,6 @@
 ﻿--create database Calendar;
 
---use Calendar
+use Calendar
 
 CREATE TABLE Users (
     id_user INT IDENTITY(1,1) PRIMARY KEY,
@@ -38,8 +38,9 @@ CREATE TABLE Course (
     frequency VARCHAR(255),
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME,
-	imageUrl VARCHAR (100)
+	imageUrl VARCHAR (3000)
 );
+
 
 CREATE TABLE User_Course (
     id_enroll INT IDENTITY(1,1) PRIMARY KEY,
@@ -57,7 +58,8 @@ CREATE TABLE Orders (
     status nvarchar(255),
 	payment_method nvarchar(255) NOT NULL,
 	payment_time datetime NOT NULL,
-    FOREIGN KEY (id_user) REFERENCES Users(id_user)
+	TotalAmount DECIMAL(10, 2) NOT NULL DEFAULT 0.00,	
+    FOREIGN KEY (id_user) REFERENCES Users(id_user),
 );
 
 CREATE TABLE Calendar (
@@ -172,114 +174,33 @@ VALUES
 ('yasmin_stewart', 'hashed_pwd52', 'Yasmin', 'Stewart', '1988-10-25', 'yasmin.stewart@email.com', '5559274183', 'Female', 1, 1);
 
 
-UPDATE Course
-SET imageUrl = 'https://admin.12grids.com/uploads/blogs/original_cover_images/Webp/Best_Mobile_App_Development_Technologies_12Grids.webp'
-WHERE id_course = 1;
-
-UPDATE Course
-SET imageUrl = 'https://d2ds8yldqp7gxv.cloudfront.net/Blog+Explanatory+Images/Fundamentals+of+Digital+Marketing+1.webp'
-WHERE id_course = 2;
-
-UPDATE Course
-SET imageUrl = 'https://www.cdmi.in/courses@2x/python-training-institute.webp'
-WHERE id_course = 3;
-
-UPDATE Course
-SET imageUrl = 'https://5.imimg.com/data5/SELLER/Default/2024/9/454403725/GP/XZ/HQ/16304956/graphic-design-essentials.png'
-WHERE id_course = 4;
-
-UPDATE Course
-SET imageUrl = 'https://www.myraacademy.com/wp-content/uploads/2022/05/PMP_PageHeader.jpg'
-WHERE id_course = 5;
-
-UPDATE Course
-SET imageUrl = 'https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1065018073%2F2759876212611%2F1%2Foriginal.20250702-113229?crop=focalpoint&fit=crop&w=600&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.0359848484848&fp-y=0.421352291447&s=7d9bc3dcd806ee176d468940124b114e'
-WHERE id_course = 6;
-
-UPDATE Course
-SET imageUrl = 'https://investoplanning.com/wp-content/uploads/Frequently-Asked-Questions-What-are-Financial-Planning-Features-FAQ-Features-of-Financial-Planning.webp'
-WHERE id_course = 7;
-
-UPDATE Course
-SET imageUrl = 'https://www.figma.com/community/resource/8d2d8ca7-82e1-4eba-8fb1-382ebfcaef36/thumbnail'
-WHERE id_course = 8;
-
-UPDATE Course
-SET imageUrl = 'https://m.media-amazon.com/images/I/71Yh1DLCePL._UF350,350_QL50_.jpg'
-WHERE id_course = 9;
-
-UPDATE Course
-SET imageUrl = 'your_image_url_here'
-WHERE id_course = 10;
-
-UPDATE Course
-SET imageUrl = 'your_image_url_here'
-WHERE id_course = 11;
-
-UPDATE Course
-SET imageUrl = 'your_image_url_here'
-WHERE id_course = 12;
-
-UPDATE Course
-SET imageUrl = 'your_image_url_here'
-WHERE id_course = 13;
-
-UPDATE Course
-SET imageUrl = 'your_image_url_here'
-WHERE id_course = 14;
-
-UPDATE Course
-SET imageUrl = 'your_image_url_here'
-WHERE id_course = 15;
-
-UPDATE Course
-SET imageUrl = 'your_image_url_here'
-WHERE id_course = 16;
-
-UPDATE Course
-SET imageUrl = 'your_image_url_here'
-WHERE id_course = 17;
-
-UPDATE Course
-SET imageUrl = 'your_image_url_here'
-WHERE id_course = 18;
-
-UPDATE Course
-SET imageUrl = 'your_image_url_here'
-WHERE id_course = 19;
-
-UPDATE Course
-SET imageUrl = 'your_image_url_here'
-WHERE id_course = 20;
-
-
-INSERT INTO Course (name, price, duration, description, frequency, category)
+INSERT INTO Course (name, price, duration, description, frequency, category.imageUrl)
 VALUES
-('Mobile App Development', 249.99, '5 months', N'Create iOS and Android apps using React Native and Flutter.', 'Weekly', 'Technology'),
-('Digital Marketing Fundamentals', 149.99, '6 weeks', N'Master SEO, social media marketing, and Google Ads strategies.', 'Bi-weekly', 'Marketing'),
-('Python Programming Bootcamp', 179.99, '8 weeks', N'Complete Python course from basics to advanced programming concepts.', 'Weekly', 'Programming'),
-('Graphic Design Essentials', 129.99, '10 weeks', N'Learn Adobe Creative Suite, typography, and design principles.', 'Weekly', 'Design'),
-('Project Management Professional', 399.99, '12 weeks', N'PMP certification preparation with real-world project scenarios.', 'Weekly', 'Business'),
-('Photography Masterclass', 89.99, '4 weeks', N'Digital photography techniques, lighting, and post-processing skills.', 'Bi-weekly', 'Art'),
-('Financial Planning & Investment', 199.99, '8 weeks', N'Personal finance management, investment strategies, and retirement planning.', 'Weekly', 'Finance'),
-('UI/UX Design Workshop', 219.99, '6 weeks', N'User interface and experience design using Figma and design thinking.', 'Weekly', 'Design'),
-('Cybersecurity Fundamentals', 279.99, '10 weeks', N'Network security, ethical hacking, and cybersecurity best practices.', 'Weekly', 'Technology'),
-('Creative Writing Workshop', 99.99, '8 weeks', N'Develop storytelling skills, character development, and narrative techniques.', 'Bi-weekly', 'Writing'),
-('Machine Learning Basics', 349.99, '12 weeks', N'Introduction to ML algorithms, neural networks, and AI applications.', 'Weekly', 'Artificial Intelligence'),
-('Foreign Language - Spanish', 119.99, '16 weeks', N'Conversational Spanish from beginner to intermediate level.', 'Bi-weekly', 'Language'),
-('Business Analytics', 259.99, '9 weeks', N'Data visualization, statistical analysis, and business intelligence tools.', 'Weekly', 'Business'),
-('Video Production & Editing', 169.99, '7 weeks', N'Video creation, editing techniques, and post-production workflows.', 'Weekly', 'Media'),
-('Public Speaking Mastery', 79.99, '5 weeks', N'Overcome speaking anxiety and deliver compelling presentations.', 'Weekly', 'Communication'),
-('E-commerce Business Setup', 189.99, '6 weeks', N'Build and launch successful online stores using Shopify and marketing.', 'Bi-weekly', 'Business'),
-('Artificial Intelligence Ethics', 149.99, '4 weeks', N'Explore AI ethics, bias in algorithms, and responsible AI development.', 'Weekly', 'Artificial Intelligence'),
-('Yoga Instructor Training', 499.99, '20 weeks', N'Comprehensive 200-hour yoga teacher certification program.', 'Bi-weekly', 'Health'),
-('Blockchain & Cryptocurrency', 299.99, '8 weeks', N'Understanding blockchain technology, crypto trading, and DeFi basics.', 'Weekly', 'Technology'),
-('Interior Design Principles', 139.99, '12 weeks', N'Space planning, color theory, and home decoration techniques.', 'Bi-weekly', 'Design');
+('Mobile App Development', 249.99, '5 months', N'Create iOS and Android apps using React Native and Flutter.', 'Weekly', 'Technology', 'https://admin.12grids.com/uploads/blogs/original_cover_images/Webp/Best_Mobile_App_Development_Technologies_12Grids.webp'),
+('Digital Marketing Fundamentals', 149.99, '6 weeks', N'Master SEO, social media marketing, and Google Ads strategies.', 'Bi-weekly', 'Marketing', 'https://d2ds8yldqp7gxv.cloudfront.net/Blog+Explanatory+Images/Fundamentals+of+Digital+Marketing+1.webp'),
+('Python Programming Bootcamp', 179.99, '8 weeks', N'Complete Python course from basics to advanced programming concepts.', 'Weekly', 'Programming', 'https://www.cdmi.in/courses@2x/python-training-institute.webp'),
+('Graphic Design Essentials', 129.99, '10 weeks', N'Learn Adobe Creative Suite, typography, and design principles.', 'Weekly', 'Design','https://5.imimg.com/data5/SELLER/Default/2024/9/454403725/GP/XZ/HQ/16304956/graphic-design-essentials.png'),
+('Project Management Professional', 399.99, '12 weeks', N'PMP certification preparation with real-world project scenarios.', 'Weekly', 'Business','https://www.myraacademy.com/wp-content/uploads/2022/05/PMP_PageHeader.jpg'),
+('Photography Masterclass', 89.99, '4 weeks', N'Digital photography techniques, lighting, and post-processing skills.', 'Bi-weekly', 'Art','https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1065018073%2F2759876212611%2F1%2Foriginal.20250702-113229?crop=focalpoint&fit=crop&w=600&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.0359848484848&fp-y=0.421352291447&s=7d9bc3dcd806ee176d468940124b114e'),
+('Financial Planning & Investment', 199.99, '8 weeks', N'Personal finance management, investment strategies, and retirement planning.', 'Weekly', 'Finance','https://investoplanning.com/wp-content/uploads/Frequently-Asked-Questions-What-are-Financial-Planning-Features-FAQ-Features-of-Financial-Planning.webp'),
+('UI/UX Design Workshop', 219.99, '6 weeks', N'User interface and experience design using Figma and design thinking.', 'Weekly', 'Design','https://www.figma.com/community/resource/8d2d8ca7-82e1-4eba-8fb1-382ebfcaef36/thumbnail'),
+('Cybersecurity Fundamentals', 279.99, '10 weeks', N'Network security, ethical hacking, and cybersecurity best practices.', 'Weekly', 'Technology','https://m.media-amazon.com/images/I/71Yh1DLCePL._UF350,350_QL50_.jpg'),
+('Creative Writing Workshop', 99.99, '8 weeks', N'Develop storytelling skills, character development, and narrative techniques.', 'Bi-weekly', 'Writing','https://metapreponline.com/wp-content/uploads/2021/03/Creative-writing-Generic-WORKSHOP-1024x1024.png'),
+('Machine Learning Basics', 349.99, '12 weeks', N'Introduction to ML algorithms, neural networks, and AI applications.', 'Weekly', 'Artificial Intelligence','https://www.worldeducation.net/Shared/Images/Product/Applied-Machine-Learning-Basics/1066248000121998133.png'),
+('Foreign Language - Spanish', 119.99, '16 weeks', N'Conversational Spanish from beginner to intermediate level.', 'Bi-weekly', 'Language','https://3.files.edl.io/c2fa/20/03/16/195213-b81b8a50-bb81-4c99-9475-c68efe9b3cb5.jpg'),
+('Business Analytics', 259.99, '9 weeks', N'Data visualization, statistical analysis, and business intelligence tools.', 'Weekly', 'Business','https://www.smartdatacollective.com/wp-content/uploads/2011/04/Business-Analytics.jpg'),
+('Video Production & Editing', 169.99, '7 weeks', N'Video creation, editing techniques, and post-production workflows.', 'Weekly', 'Media','https://theceoviews.com/wp-content/uploads/2025/07/How-AI-is-Transforming-the-Video-Production-Industry-scaled.webp'),
+('Public Speaking Mastery', 79.99, '5 weeks', N'Overcome speaking anxiety and deliver compelling presentations.', 'Weekly', 'Communication','https://i.ytimg.com/vi/jhFoRx7bjf4/maxresdefault.jpg'),
+('E-commerce Business Setup', 189.99, '6 weeks', N'Build and launch successful online stores using Shopify and marketing.', 'Bi-weekly', 'Business','https://softprodigy.com/storage/2022/09/Follow-these-steps-to-start-your-e-commerce-business-startup.-01.jpg'),
+('Artificial Intelligence Ethics', 149.99, '4 weeks', N'Explore AI ethics, bias in algorithms, and responsible AI development.', 'Weekly', 'Artificial Intelligence','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgZCqhEI6FV4PIterKU1LQcDgC3xaBRJZOhw&s'),
+('Yoga Instructor Training', 499.99, '20 weeks', N'Comprehensive 200-hour yoga teacher certification program.', 'Bi-weekly', 'Health','https://embed-ssl.wistia.com/deliveries/f20818b8690eee8e18f606d5624ceb16.webp?image_crop_resized=960x766'),
+('Blockchain & Cryptocurrency', 299.99, '8 weeks', N'Understanding blockchain technology, crypto trading, and DeFi basics.', 'Weekly', 'Technology','https://www.fahasa.com/blog/wp-content/uploads/2025/05/Screenshot-2025-05-25-084241-1.png'),
+('Interior Design Principles', 139.99, '12 weeks', N'Space planning, color theory, and home decoration techniques.', 'Bi-weekly', 'Design','https://www.dsigndpo.com/blog/wp-content/uploads/2022/09/7-Principles-Of-Interior-Design.jpg');
 
-INSERT INTO Orders (id_user, status, payment_method, payment_time)
+INSERT INTO Orders (id_user, status, payment_method, payment_time, TotalAmount)
 VALUES
-(1, 'Paid', 'Credit Card', GETDATE()),
-(2, 'Pending', 'PayPal', GETDATE());
+(1, 'Paid', 'Credit Card', GETDATE(),100.5),
+(2, 'Pending', 'PayPal', GETDATE(),100.5);
 
 INSERT INTO Calendar (id_user, name, color)
 VALUES
