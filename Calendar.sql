@@ -19,6 +19,15 @@ CREATE TABLE Users (
 	avatar nvarchar(255) default null
 );
 
+CREATE TABLE tokenForgetPassword (
+    id int IDENTITY(1,1) PRIMARY KEY,
+    token VARCHAR(255) NOT NULL,
+    expiryTime DATETIME NOT NULL,
+	isUsed bit NOT NULL,
+	userId int NOT NULL,
+	FOREIGN KEY (userId) REFERENCES [Users](id_user)
+);
+
 CREATE TABLE Course (
     id_course INT IDENTITY(1,1) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -161,6 +170,88 @@ VALUES
 ('violet_edwards', 'hashed_pwd50', 'Violet', 'Edwards', '1994-01-11', 'violet.edwards@email.com', '5557163849', 'Female', 1, 0),
 ('wyatt_collins', 'hashed_pwd51', 'Wyatt', 'Collins', '1992-06-18', 'wyatt.collins@email.com', '5553841729', 'Male', 1, 0),
 ('yasmin_stewart', 'hashed_pwd52', 'Yasmin', 'Stewart', '1988-10-25', 'yasmin.stewart@email.com', '5559274183', 'Female', 1, 1);
+
+
+UPDATE Course
+SET imageUrl = 'https://admin.12grids.com/uploads/blogs/original_cover_images/Webp/Best_Mobile_App_Development_Technologies_12Grids.webp'
+WHERE id_course = 1;
+
+UPDATE Course
+SET imageUrl = 'https://d2ds8yldqp7gxv.cloudfront.net/Blog+Explanatory+Images/Fundamentals+of+Digital+Marketing+1.webp'
+WHERE id_course = 2;
+
+UPDATE Course
+SET imageUrl = 'https://www.cdmi.in/courses@2x/python-training-institute.webp'
+WHERE id_course = 3;
+
+UPDATE Course
+SET imageUrl = 'https://5.imimg.com/data5/SELLER/Default/2024/9/454403725/GP/XZ/HQ/16304956/graphic-design-essentials.png'
+WHERE id_course = 4;
+
+UPDATE Course
+SET imageUrl = 'https://www.myraacademy.com/wp-content/uploads/2022/05/PMP_PageHeader.jpg'
+WHERE id_course = 5;
+
+UPDATE Course
+SET imageUrl = 'https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1065018073%2F2759876212611%2F1%2Foriginal.20250702-113229?crop=focalpoint&fit=crop&w=600&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.0359848484848&fp-y=0.421352291447&s=7d9bc3dcd806ee176d468940124b114e'
+WHERE id_course = 6;
+
+UPDATE Course
+SET imageUrl = 'https://investoplanning.com/wp-content/uploads/Frequently-Asked-Questions-What-are-Financial-Planning-Features-FAQ-Features-of-Financial-Planning.webp'
+WHERE id_course = 7;
+
+UPDATE Course
+SET imageUrl = 'https://www.figma.com/community/resource/8d2d8ca7-82e1-4eba-8fb1-382ebfcaef36/thumbnail'
+WHERE id_course = 8;
+
+UPDATE Course
+SET imageUrl = 'https://m.media-amazon.com/images/I/71Yh1DLCePL._UF350,350_QL50_.jpg'
+WHERE id_course = 9;
+
+UPDATE Course
+SET imageUrl = 'your_image_url_here'
+WHERE id_course = 10;
+
+UPDATE Course
+SET imageUrl = 'your_image_url_here'
+WHERE id_course = 11;
+
+UPDATE Course
+SET imageUrl = 'your_image_url_here'
+WHERE id_course = 12;
+
+UPDATE Course
+SET imageUrl = 'your_image_url_here'
+WHERE id_course = 13;
+
+UPDATE Course
+SET imageUrl = 'your_image_url_here'
+WHERE id_course = 14;
+
+UPDATE Course
+SET imageUrl = 'your_image_url_here'
+WHERE id_course = 15;
+
+UPDATE Course
+SET imageUrl = 'your_image_url_here'
+WHERE id_course = 16;
+
+UPDATE Course
+SET imageUrl = 'your_image_url_here'
+WHERE id_course = 17;
+
+UPDATE Course
+SET imageUrl = 'your_image_url_here'
+WHERE id_course = 18;
+
+UPDATE Course
+SET imageUrl = 'your_image_url_here'
+WHERE id_course = 19;
+
+UPDATE Course
+SET imageUrl = 'your_image_url_here'
+WHERE id_course = 20;
+
 
 INSERT INTO Course (name, price, duration, description, frequency, category)
 VALUES
