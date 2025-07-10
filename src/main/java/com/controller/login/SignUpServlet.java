@@ -5,6 +5,8 @@
 package com.controller.login;
 
 
+import com.model.User;
+import com.service.User.UserService;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -21,6 +23,12 @@ import jakarta.servlet.http.HttpSession;
 @WebServlet(name = "SignupServlet", urlPatterns = {"/SignupServlet"})
 public class SignUpServlet extends HttpServlet {
 
+    private UserService userService;
+
+    public void init() {
+        userService = new UserService();
+    }
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -78,20 +86,19 @@ public class SignUpServlet extends HttpServlet {
         String repass = request.getParameter("repass");
 
         if (!password.equals(repass)) {
-            response.getWriter().println("Passwords do not match!");
+            request.setAttribute("mess", "Password do not match");
+            request.getRequestDispatcher("views/login/signUp.jsp").forward(request, response);
             return;
         }
-
-        HttpSession session = request.getSession();
-        session.setAttribute("email", email);
-        session.setAttribute("username", username);
-        session.setAttribute("password", password);
-
-        response.getWriter().println("<h2>Registration Successful!</h2>");
-        response.getWriter().println("<p>Email: " + email + "</p>");
-        response.getWriter().println("<p>Username: " + username + "</p>");
         
-        response.sendRedirect("login.jsp");
+        User user = new User(username, password, email);
+        
+        if (userService.createUser(user) == null) {
+            request.setAttribute("mess", "Email have be used");
+            request.getRequestDispatcher("views/login/signUp.jsp").forward(request, response);
+            return;
+        }
+        response.sendRedirect("views/login/login.jsp");
     }
 
 

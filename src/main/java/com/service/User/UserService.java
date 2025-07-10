@@ -25,8 +25,7 @@ public class UserService implements IUserService {
         System.out.println("[createUser] → Kiểm tra email đã tồn tại: " + user.getEmail());
         
         if (userDAO.existsByEmail(user.getEmail())) {
-            System.out.println("[createUser] ✖ Email đã được sử dụng.");
-            throw new IllegalArgumentException("Email đã được sử dụng.");
+            return null;
         }
         
         if (!userDAO.insertUser(user)) {
@@ -144,10 +143,12 @@ public class UserService implements IUserService {
 //        
 //        System.out.println("→ Tổng người dùng: " + userService.countUsers());
 
-    String email = "abc@gmail.com";
-    String password = "abc@123";
+    String email = "nguyentuanqb201125@gmail.com";
+    String password = "123";
+    String username = "tuan2";
     
-    User user = userService.getUserByEmail(email);
+    User user = new User( username, password, email);
+    userService.createUser(user);
     
 
     }

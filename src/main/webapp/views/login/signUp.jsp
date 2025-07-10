@@ -22,7 +22,7 @@
                             <h2 class="display-5 fw-bold text-center">Sign Up</h2>
                             <p class="text-center m-0">Already have an account? <a href="login.jsp">Sign in</a></p>
                         </div>
-                        <form action="SignupServlet" method="POST">
+                        <form action="<%=request.getContextPath()%>/SignupServlet" method="POST">
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
                                 <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" required>
@@ -40,6 +40,7 @@
                                 <input type="password" class="form-control" id="repass" name="repass" required>
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Sign Up</button>
+                            <p class="text-danger">${mess}</p>
                         </form>
                     </div>
                 </div>

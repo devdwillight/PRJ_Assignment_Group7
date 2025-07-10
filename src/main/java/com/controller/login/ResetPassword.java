@@ -163,7 +163,7 @@ public class ResetPassword extends HttpServlet {
 
         // Gửi thông báo và chuyển hướng
         request.setAttribute("mess", "Password changed successfully");
-        request.getRequestDispatcher("home.jsp").forward(request, response);
+        request.getRequestDispatcher("views/login/login.jsp").forward(request, response);
     }
 
     /**
