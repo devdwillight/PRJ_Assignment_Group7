@@ -25,7 +25,7 @@ import java.util.Date;
 
 /**
  *
- * @author DELL
+ * @author ADMIN
  */
 @Entity
 @Table(name = "UserEvents")

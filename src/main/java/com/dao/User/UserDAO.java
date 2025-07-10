@@ -64,7 +64,7 @@ public class UserDAO extends BaseDAO<User> implements IUserDAO {
     public User selectUserByEmail(String email) {
         EntityManager em = getEntityManager();
         try {
-            return em.createQuery("User.findByEmail", User.class)
+            return em.createNamedQuery("User.findByEmail", User.class)
                     .setParameter("email", email)
                     .getSingleResult();
         } catch (NoResultException e) {
@@ -95,7 +95,7 @@ public class UserDAO extends BaseDAO<User> implements IUserDAO {
     }
 
     @Override
-    public void updatePassWord(String email, String newPassword) {
+    public void updatePassword(String email, String newPassword) {
         EntityManager em = getEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
@@ -117,5 +117,22 @@ public class UserDAO extends BaseDAO<User> implements IUserDAO {
             em.close();
         }
     }
+
+    @Override
+    public User checkLogin(String email, String password) {
+        EntityManager em = getEntityManager();
+        try {
+            return em.createQuery(
+                    "SELECT u FROM User u WHERE u.email = :email AND u.password = :password", User.class)
+                    .setParameter("email", email)
+                    .setParameter("password", password)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+    
 
 }

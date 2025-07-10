@@ -130,24 +130,48 @@ public class UserService implements IUserService {
     public static void main(String[] args) {
         UserService userService = new UserService();
         
-        System.out.println("==== Danh sách người dùng ====");
-        List<User> userList = userService.getAllUsers();
-        
-        for (User user : userList) {
-            System.out.printf("ID: %d\tTên: %s %s\tEmail: %s\tNgày sinh: %s\n",
-                    user.getIdUser(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    user.getEmail(),
-                    user.getBirthday());
-        }
-        
-        System.out.println("→ Tổng người dùng: " + userService.countUsers());
+//        System.out.println("==== Danh sách người dùng ====");
+//        List<User> userList = userService.getAllUsers();
+//        
+//        for (User user : userList) {
+//            System.out.printf("ID: %d\tTên: %s %s\tEmail: %s\tNgày sinh: %s\n",
+//                    user.getIdUser(),
+//                    user.getFirstName(),
+//                    user.getLastName(),
+//                    user.getEmail(),
+//                    user.getBirthday());
+//        }
+//        
+//        System.out.println("→ Tổng người dùng: " + userService.countUsers());
+
+    String email = "abc@gmail.com";
+    String password = "abc@123";
+    
+    User user = userService.getUserByEmail(email);
+    
+
     }
+    
     
     @Override
     public void updatePassWord(String email, String passWord) {
-        userDAO.updatePassWord(email, passWord);
+        userDAO.updatePassword(email, passWord);
     }
-    
+
+    @Override
+    public User checkLogin(String email, String password) {
+        System.out.println("[checkLogin] Đang kiểm tra đăng nhập cho: " + email);
+        User user = userDAO.checkLogin(email, password);
+
+        if (user == null) {
+            System.out.println("[checkLogin] ✖ Sai email hoặc mật khẩu");
+        } else if (Boolean.FALSE.equals(user.getActive())) {
+            System.out.println("[checkLogin] ✖ Tài khoản chưa kích hoạt");
+            return null;
+        } else {
+            System.out.println("[checkLogin] ✔ Đăng nhập thành công");
+        }
+
+        return user;
+    }
 }
