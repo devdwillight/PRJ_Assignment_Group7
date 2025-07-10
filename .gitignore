@@ -1,1 +1,7 @@
 /target/
+
+# Bỏ qua persistence.xml
+**/persistence.xml
+
+# Bỏ qua DBInformation.java
+**/DBinformation.java

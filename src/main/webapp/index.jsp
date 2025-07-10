@@ -13,7 +13,7 @@
     </head>
     <jsp:include page="views/base/header.jsp" />
     <body>
-        <h1>Hello World!</h1>
-        <jsp:include page="views/admin/user/manageUser.jsp"/>
+    
     </body>
+    <jsp:include page="views/base/footer.jsp"/>
 </html>

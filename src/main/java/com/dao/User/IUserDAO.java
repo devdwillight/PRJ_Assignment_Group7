@@ -13,7 +13,9 @@ import java.util.List;
  */
 public interface IUserDAO {
 
-    public void updatePassWord(String email, String passWord);
+    public void updatePassWord(String email, String password);
+
+    public User checkLogin(String email, String password);
 
     public int countUser();
 
