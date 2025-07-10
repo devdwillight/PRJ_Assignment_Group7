@@ -95,7 +95,7 @@ public class UserDAO extends BaseDAO<User> implements IUserDAO {
     }
 
     @Override
-    public void updatePassWord(String email, String newPassword) {
+    public void updatePassword(String email, String newPassword) {
         EntityManager em = getEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {

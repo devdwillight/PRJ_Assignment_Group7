@@ -43,7 +43,8 @@ import java.util.List;
     @NamedQuery(name = "Course.findByDescription", query = "SELECT c FROM Course c WHERE c.description = :description"),
     @NamedQuery(name = "Course.findByFrequency", query = "SELECT c FROM Course c WHERE c.frequency = :frequency"),
     @NamedQuery(name = "Course.findByCreatedAt", query = "SELECT c FROM Course c WHERE c.createdAt = :createdAt"),
-    @NamedQuery(name = "Course.findByUpdatedAt", query = "SELECT c FROM Course c WHERE c.updatedAt = :updatedAt")})
+    @NamedQuery(name = "Course.findByUpdatedAt", query = "SELECT c FROM Course c WHERE c.updatedAt = :updatedAt"),
+    @NamedQuery(name = "Course.findByImageUrl", query = "SELECT c FROM Course c WHERE c.imageUrl = :imageUrl")})
 public class Course implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -80,8 +81,11 @@ public class Course implements Serializable {
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
+    @Size(max = 100)
+    @Column(name = "imageUrl")
+    private String imageUrl;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCourse")
-    private List<Enrollment> enrollmentList;
+    private List<UserCourse> userCourseList;
 
     public Course() {
     }
@@ -168,13 +172,21 @@ public class Course implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-    @XmlTransient
-    public List<Enrollment> getEnrollmentList() {
-        return enrollmentList;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setEnrollmentList(List<Enrollment> enrollmentList) {
-        this.enrollmentList = enrollmentList;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    @XmlTransient
+    public List<UserCourse> getUserCourseList() {
+        return userCourseList;
+    }
+
+    public void setUserCourseList(List<UserCourse> userCourseList) {
+        this.userCourseList = userCourseList;
     }
 
     @Override

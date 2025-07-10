@@ -14,9 +14,9 @@ import java.util.logging.Logger;
  *
  * @author DELL
  */
-public class DBconnection implements DBinformation {
+public class DBConnection implements DBinformation {
 
-    public DBconnection() {
+    public DBConnection() {
     }
 
     public static Connection getConnection() {
@@ -26,7 +26,7 @@ public class DBconnection implements DBinformation {
             con = DriverManager.getConnection(dbURL, userDB, passDB);
             return con;
         } catch (ClassNotFoundException | SQLException ex) {
-            Logger.getLogger(DBconnection.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
@@ -37,7 +37,7 @@ public class DBconnection implements DBinformation {
                 System.out.println("Connect to Database Calendar success");
             }
         } catch (Exception ex) {
-            Logger.getLogger(DBconnection.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

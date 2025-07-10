@@ -1,6 +1,6 @@
 ﻿--create database Calendar;
 
---use Calendar
+--use Calendar;
 
 CREATE TABLE Users (
     id_user INT IDENTITY(1,1) PRIMARY KEY,
@@ -28,10 +28,11 @@ CREATE TABLE Course (
     description nvarchar(max),
     frequency VARCHAR(255),
     created_at DATETIME DEFAULT GETDATE(),
-    updated_at DATETIME
+    updated_at DATETIME,
+	imageUrl VARCHAR (100)
 );
 
-CREATE TABLE Enrollment (
+CREATE TABLE User_Course (
     id_enroll INT IDENTITY(1,1) PRIMARY KEY,
     id_user INT NOT NULL,
     id_course INT NOT NULL,
@@ -107,7 +108,7 @@ CREATE TABLE To_Do (
 
 INSERT INTO Users (username, password, first_name, last_name, birthday, email, phone, gender, active, is_admin)
 VALUES
-('sa','abc@123','admin','admin','2000-1-1','abc@gmail.com','1234567890','Male',1,1),
+('tuan','123','admin','admin','2000-1-1','nguyenhuuminhtuan20111@gmail.com','1234567890','Male',1,1),
 ('john_doe', 'hashed_pwd1', 'John', 'Doe', '1990-01-01', 'john@example.com', '1234567890', 'Male', 1, 0),
 ('jane_smith', 'hashed_pwd2', 'Jane', 'Smith', '1992-02-02', 'jane@example.com', '0987654321', 'Female', 1, 1),
 ('alice_johnson', 'hashed_pwd3', 'Alice', 'Johnson', '1988-03-15', 'alice.johnson@email.com', '5551234567', 'Female', 1, 0),
@@ -406,55 +407,7 @@ VALUES
 (25, 'Set up development environment', 'Configure IDE and dependencies', '2025-07-04 13:00:00', 0, 0, NULL, 1),
 (25, 'Code authentication module', 'Implement user login system', '2025-07-18 16:30:00', 0, 0, NULL, 0);
 
-INSERT INTO Enrollment (id_user, id_course)
-VALUES 
-(1, 1),
-(1, 2),
-(2, 1),
-(2, 3),
-(3, 4),
-(3, 5),
-(4, 6),
-(4, 7),
-(5, 8),
-(5, 9),
-(6, 10),
-(6, 11),
-(7, 12),
-(7, 13),
-(8, 14),
-(8, 15),
-(9, 16),
-(9, 17),
-(10, 18),
-(10, 19),
-(11, 1),
-(11, 2),
-(12, 3),
-(12, 4),
-(13, 5),
-(13, 6),
-(14, 7),
-(14, 8),
-(15, 9),
-(15, 10),
-(16, 11),
-(16, 12),
-(17, 13),
-(17, 14),
-(18, 15),
-(18, 16),
-(19, 17),
-(19, 18),
-(20, 19),
-(20, 20),
-(1, 3),
-(2, 4),
-(3, 6),
-(4, 8),
-(5, 10),
-(6, 12),
-(7, 14),
-(8, 16),
-(9, 18),
-(10, 20);
+INSERT INTO User_Course (id_user, id_course)
+VALUES
+(1, 1)
+

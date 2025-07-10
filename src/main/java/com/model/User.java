@@ -106,9 +106,9 @@ public class User implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idUser")
     private List<Task> taskList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idUser")
-    private List<Calendar> calendarList;
+    private List<UserCourse> userCourseList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idUser")
-    private List<Enrollment> enrollmentList;
+    private List<Calendar> calendarList;
 
     public User() {
     }
@@ -255,21 +255,21 @@ public class User implements Serializable {
     }
 
     @XmlTransient
+    public List<UserCourse> getUserCourseList() {
+        return userCourseList;
+    }
+
+    public void setUserCourseList(List<UserCourse> userCourseList) {
+        this.userCourseList = userCourseList;
+    }
+
+    @XmlTransient
     public List<Calendar> getCalendarList() {
         return calendarList;
     }
 
     public void setCalendarList(List<Calendar> calendarList) {
         this.calendarList = calendarList;
-    }
-
-    @XmlTransient
-    public List<Enrollment> getEnrollmentList() {
-        return enrollmentList;
-    }
-
-    public void setEnrollmentList(List<Enrollment> enrollmentList) {
-        this.enrollmentList = enrollmentList;
     }
 
     @Override

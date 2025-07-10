@@ -26,13 +26,13 @@ import java.util.Date;
  * @author DELL
  */
 @Entity
-@Table(name = "Enrollment")
+@Table(name = "User_Course")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Enrollment.findAll", query = "SELECT e FROM Enrollment e"),
-    @NamedQuery(name = "Enrollment.findByIdEnroll", query = "SELECT e FROM Enrollment e WHERE e.idEnroll = :idEnroll"),
-    @NamedQuery(name = "Enrollment.findByEnrollDate", query = "SELECT e FROM Enrollment e WHERE e.enrollDate = :enrollDate")})
-public class Enrollment implements Serializable {
+    @NamedQuery(name = "UserCourse.findAll", query = "SELECT u FROM UserCourse u"),
+    @NamedQuery(name = "UserCourse.findByIdEnroll", query = "SELECT u FROM UserCourse u WHERE u.idEnroll = :idEnroll"),
+    @NamedQuery(name = "UserCourse.findByEnrollDate", query = "SELECT u FROM UserCourse u WHERE u.enrollDate = :enrollDate")})
+public class UserCourse implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -50,10 +50,10 @@ public class Enrollment implements Serializable {
     @ManyToOne(optional = false)
     private User idUser;
 
-    public Enrollment() {
+    public UserCourse() {
     }
 
-    public Enrollment(Integer idEnroll) {
+    public UserCourse(Integer idEnroll) {
         this.idEnroll = idEnroll;
     }
 
@@ -99,10 +99,10 @@ public class Enrollment implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Enrollment)) {
+        if (!(object instanceof UserCourse)) {
             return false;
         }
-        Enrollment other = (Enrollment) object;
+        UserCourse other = (UserCourse) object;
         if ((this.idEnroll == null && other.idEnroll != null) || (this.idEnroll != null && !this.idEnroll.equals(other.idEnroll))) {
             return false;
         }
@@ -111,7 +111,7 @@ public class Enrollment implements Serializable {
 
     @Override
     public String toString() {
-        return "com.model.Enrollment[ idEnroll=" + idEnroll + " ]";
+        return "com.model.UserCourse[ idEnroll=" + idEnroll + " ]";
     }
     
 }

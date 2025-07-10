@@ -129,7 +129,7 @@ public class UserService implements IUserService {
 
     @Override
     public void updatePassWord(String email, String passWord) {
-        userDAO.updatePassWord(email, passWord);
+        userDAO.updatePassword(email, passWord);
     }
 
     @Override
@@ -152,7 +152,7 @@ public class UserService implements IUserService {
     public static void main(String[] args) {
         UserService userService = new UserService();
 
-        String testEmail = "abc@gmail.com";
+        String testEmail = "nguyenhuuminhtuan20111@gmail.com";
         String oldPassword = "123";
 
         // Thử đăng nhập với mật khẩu cũ

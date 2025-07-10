@@ -1,7 +1,9 @@
 /target/
 
 # Bỏ qua persistence.xml
-**/persistence.xml
+/src/main/resources/META-INF/persistence.xml
+
 
 # Bỏ qua DBInformation.java
-**/DBinformation.java
+/src/main/java/com/database/DBinformation.java
+
