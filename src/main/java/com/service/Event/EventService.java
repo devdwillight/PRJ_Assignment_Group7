@@ -75,4 +75,14 @@ public class EventService implements IEventService {
 
         System.out.println("Tổng số sự kiện: " + service.countEvent());
     }
+
+    @Override
+    public UserEvents createEvent(UserEvents event) {
+        System.out.println("[createEvent] tạo sự kiện ID = " + event.getIdEvent());
+        boolean success = eventDAO.insertEvent(event);
+        if (success) {
+            System.out.println("[createEvent] " + (success ? "✔ Thành công" : "✖ Thất bại"));
+        }
+        return event;
+    }
 }

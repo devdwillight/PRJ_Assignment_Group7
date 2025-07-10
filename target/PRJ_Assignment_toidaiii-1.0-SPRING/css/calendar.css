@@ -1,0 +1,956 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(120deg, #e0e7ff 0%, #f8fafc 100%);
+    min-height: 100vh;
+    color: #222;
+}
+
+/* Calendar Container */
+.calendar-container {
+    max-width: 1500px;
+    margin: 32px auto;
+    background: rgba(255,255,255,0.85);
+    border-radius: 32px;
+    box-shadow: 0 12px 48px 0 rgba(80,80,180,0.12), 0 1.5px 8px 0 rgba(80,80,180,0.08);
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+    border: 1.5px solid rgba(180,200,255,0.18);
+    animation: slideInUp 0.6s cubic-bezier(.4,2,.6,1);
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header Styles */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 32px 48px 24px 48px;
+    background: linear-gradient(90deg, #6a93ff 0%, #a4e0ff 100%);
+    color: #fff;
+    box-shadow: 0 2px 16px rgba(80,80,180,0.08);
+    border-radius: 32px 32px 0 0;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.logo {
+    font-size: 2.2rem;
+    font-weight: 800;
+    gap: 16px;
+    color: #fff;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+}
+
+.logo i {
+    font-size: 2.5rem;
+    color: #ffe066;
+    filter: drop-shadow(0 2px 8px #ffe06688);
+}
+
+.date-navigation {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.nav-btn {
+    background: rgba(255,255,255,0.18);
+    border: none;
+    color: #fff;
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    box-shadow: 0 2px 8px rgba(80,80,180,0.08);
+}
+
+.nav-btn:hover {
+    background: #fff;
+    color: #6a93ff;
+    transform: scale(1.08);
+}
+
+#currentMonth {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 2px 8px #6a93ff44;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, #ff8c6b 0%, #ffb86b 100%);
+    color: #fff;
+    border: none;
+    padding: 16px 36px;
+    border-radius: 18px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 16px rgba(255,140,107,0.15);
+    transition: background 0.2s, transform 0.2s;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(90deg, #ffb86b 0%, #ff8c6b 100%);
+    color: #fff;
+    transform: translateY(-2px) scale(1.04);
+}
+
+.view-options {
+    display: flex;
+    background: rgba(255,255,255,0.18);
+    border-radius: 18px;
+    padding: 4px 8px;
+    gap: 8px;
+}
+
+.view-btn {
+    background: transparent;
+    border: none;
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 14px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background 0.2s, color 0.2s;
+}
+
+.view-btn.active, .view-btn:hover {
+    background: #fff;
+    color: #6a93ff;
+}
+
+/* Main Calendar Layout */
+.calendar-main {
+    display: flex;
+    min-height: 700px;
+    background: transparent;
+}
+
+/* Sidebar Styles */
+.calendar-sidebar {
+    width: 340px;
+    background: rgba(255,255,255,0.7);
+    border-right: 1.5px solid #e3e8f7;
+    padding: 32px 24px;
+    animation: slideInLeft 0.5s cubic-bezier(.4,2,.6,1);
+    box-shadow: 8px 0 32px rgba(80,80,180,0.04);
+    backdrop-filter: blur(6px);
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.sidebar-section {
+    margin-bottom: 36px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 18px;
+    box-shadow: 0 2px 8px rgba(80,80,180,0.04);
+    padding: 18px 16px 12px 16px;
+}
+
+.sidebar-section h3 {
+    color: #6a93ff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e3e8f7;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    letter-spacing: 0.5px;
+}
+
+.sidebar-section h3 i {
+    margin-right: 8px;
+    color: #6a93ff;
+}
+
+.calendar-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.calendar-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+    font-size: 1rem;
+}
+
+.calendar-item.active, .calendar-item:hover {
+    background: linear-gradient(90deg, #e0e7ff 0%, #a4e0ff 100%);
+    box-shadow: 0 2px 8px #6a93ff22;
+}
+
+.calendar-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 2.5px solid #fff;
+    box-shadow: 0 2px 8px #6a93ff33;
+}
+
+.btn-add-calendar {
+    background: transparent;
+    border: 2px dashed #b3c6ff;
+    color: #6a93ff;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: border 0.2s, color 0.2s, background 0.2s;
+}
+
+.btn-add-calendar:hover {
+    border-color: #6a93ff;
+    color: #fff;
+    background: #6a93ff;
+}
+
+/* Todo List Styles */
+.btn-add-todo {
+    background: #4285f4;
+    color: white;
+    border: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 0.3s ease;
+}
+
+.btn-add-todo:hover {
+    background: #3367d6;
+    transform: scale(1.1);
+}
+
+.todo-container {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.todo-input-container {
+    margin-bottom: 15px;
+    animation: slideInDown 0.3s ease;
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.todo-input-container input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.todo-input-container input:focus {
+    outline: none;
+    border-color: #4285f4;
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+}
+
+.todo-input-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.btn-save-todo, .btn-cancel-todo {
+    background: none;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.btn-save-todo {
+    background: #34a853;
+    color: white;
+}
+
+.btn-save-todo:hover {
+    background: #2d8f47;
+    transform: scale(1.1);
+}
+
+.btn-cancel-todo {
+    background: #ea4335;
+    color: white;
+}
+
+.btn-cancel-todo:hover {
+    background: #d33426;
+    transform: scale(1.1);
+}
+
+.todo-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.todo-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f3f4;
+    animation: slideInRight 0.3s ease;
+}
+
+.todo-item:last-child {
+    border-bottom: none;
+}
+
+.todo-checkbox {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #4285f4;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.todo-checkbox.checked {
+    background: #4285f4;
+    color: white;
+}
+
+.todo-checkbox:hover {
+    transform: scale(1.1);
+}
+
+.todo-text {
+    flex: 1;
+    font-size: 14px;
+    color: #495057;
+    transition: all 0.3s ease;
+}
+
+.todo-text.completed {
+    text-decoration: line-through;
+    color: #adb5bd;
+}
+
+.todo-delete {
+    background: none;
+    border: none;
+    color: #ea4335;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    opacity: 0;
+}
+
+.todo-item:hover .todo-delete {
+    opacity: 1;
+}
+
+.todo-delete:hover {
+    background: rgba(234, 67, 53, 0.1);
+    transform: scale(1.1);
+}
+
+/* Mini Calendar */
+.mini-calendar {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Calendar Grid */
+.calendar-grid {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.weekday-headers {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.weekday {
+    padding: 15px;
+    text-align: center;
+    font-weight: 600;
+    color: #495057;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    flex: 1;
+}
+
+.calendar-day {
+    border: 1px solid #e9ecef;
+    padding: 10px;
+    min-height: 100px;
+    position: relative;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: white;
+}
+
+.calendar-day:hover {
+    background: #f8f9fa;
+    transform: scale(1.02);
+    z-index: 1;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-day.other-month {
+    background: #f8f9fa;
+    color: #adb5bd;
+}
+
+.calendar-day.today {
+    background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+    color: white;
+    font-weight: 600;
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from { box-shadow: 0 0 5px rgba(66, 133, 244, 0.5); }
+    to { box-shadow: 0 0 20px rgba(66, 133, 244, 0.8); }
+}
+
+.day-number {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.events-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.event {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.event:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.event.main { background: #4285f4; }
+.event.work { background: #ea4335; }
+.event.personal { background: #34a853; }
+.event.family { background: #fbbc04; }
+
+/* Chatbot Styles */
+.chatbot-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 350px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    overflow: hidden;
+    animation: slideInUp 0.5s ease;
+}
+
+.chatbot-header {
+    background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.chatbot-header:hover {
+    background: linear-gradient(135deg, #3367d6 0%, #2d8f47 100%);
+}
+
+.chatbot-avatar {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    animation: pulse 2s infinite;
+}
+
+.chatbot-info {
+    flex: 1;
+}
+
+.chatbot-info h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.chatbot-status {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.chatbot-minimize {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.chatbot-minimize:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.chatbot-body {
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #f8f9fa;
+}
+
+.message {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    animation: slideInLeft 0.3s ease;
+}
+
+.message.user-message {
+    flex-direction: row-reverse;
+    animation: slideInRight 0.3s ease;
+}
+
+.message-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.bot-message .message-avatar {
+    background: #4285f4;
+    color: white;
+}
+
+.user-message .message-avatar {
+    background: #34a853;
+    color: white;
+}
+
+.message-content {
+    background: white;
+    padding: 12px 16px;
+    border-radius: 18px;
+    max-width: 80%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.user-message .message-content {
+    background: #4285f4;
+    color: white;
+}
+
+.message-content p {
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.message-content p:last-child {
+    margin-bottom: 0;
+}
+
+.message-content ul {
+    margin: 8px 0;
+    padding-left: 20px;
+}
+
+.message-content li {
+    margin-bottom: 4px;
+}
+
+.chat-input-container {
+    padding: 15px 20px;
+    background: white;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.chat-input-container input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 25px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.chat-input-container input:focus {
+    outline: none;
+    border-color: #4285f4;
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+}
+
+.chat-send-btn {
+    background: #4285f4;
+    color: white;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.chat-send-btn:hover {
+    background: #3367d6;
+    transform: scale(1.1);
+}
+
+.chatbot-container.minimized .chatbot-body {
+    display: none;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideInUp 0.3s ease;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    border-bottom: 1px solid #e9ecef;
+    background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+}
+
+.modal-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.close-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #495057;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #4285f4;
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+    transform: translateY(-1px);
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    padding: 20px 30px;
+    border-top: 1px solid #e9ecef;
+    background: #f8f9fa;
+    border-radius: 0 0 12px 12px;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .calendar-container {
+        margin: 10px;
+        border-radius: 8px;
+    }
+    
+    .calendar-header {
+        flex-direction: column;
+        gap: 20px;
+        padding: 15px;
+    }
+    
+    .header-left {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .calendar-main {
+        flex-direction: column;
+    }
+    
+    .calendar-sidebar {
+        width: 100%;
+        order: 2;
+    }
+    
+    .calendar-grid {
+        order: 1;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .chatbot-container {
+        width: calc(100% - 40px);
+        right: 20px;
+        left: 20px;
+    }
+}
+
+/* Loading Animation */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Success Animation */
+.success {
+    animation: successPulse 0.6s ease;
+}
+
+@keyframes successPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+} 

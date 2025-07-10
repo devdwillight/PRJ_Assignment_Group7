@@ -1,4 +1,10 @@
-﻿--create database Calendar;
+﻿create database Calendar;
+
+ALTER DATABASE Calendar
+SET SINGLE_USER
+WITH ROLLBACK IMMEDIATE;
+
+DROP DATABASE Calendar;
 
 use Calendar
 

@@ -18,6 +18,8 @@ public interface IEventService {
     boolean updateEvent(UserEvents event);
 
     boolean removeEvent(int id);
+    
+    UserEvents createEvent(UserEvents event);
 
     UserEvents getEventById(int id);
 
