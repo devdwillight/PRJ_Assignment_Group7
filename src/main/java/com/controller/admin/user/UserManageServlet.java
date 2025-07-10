@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author DELL
  */
 @WebServlet(name = "userManage", urlPatterns = {"/admin/users"})
-public class UserManageController extends HttpServlet {
+public class UserManageServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
