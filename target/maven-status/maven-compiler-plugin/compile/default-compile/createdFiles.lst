@@ -37,6 +37,7 @@ com\agent\servlet\GreetingServlet.class
 com\dao\TokenForget\TokenForgetDao.class
 com\controller\admin\user\UserManageServlet.class
 com\service\Calendar\ICalendarService.class
+com\service\UserCourse\IUserCourseService.class
 com\service\Course\CourseService.class
 com\constant\Iconstant.class
 com\dao\Task\TaskDAO.class
@@ -55,10 +56,12 @@ com\service\Todo\ITodoService.class
 com\service\Task\ITaskService.class
 com\service\User\UserService.class
 com\dao\BaseDAO.class
+com\dao\User_Course\IUserCourseDAO.class
 com\controller\calendar\CalendarServlet.class
 com\database\DBinformation.class
 com\controller\event\EventServlet.class
 com\model\Course.class
+com\service\UserCourse\UserCourseService.class
 com\service\Calendar\CalendarService.class
 com\dao\Todo\ITodoDAO.class
 com\agent\model\Action.class
@@ -66,6 +69,7 @@ com\agent\service\ExcelDataManager$1.class
 com\controller\login\RequestPassword.class
 com\dao\Course\CourseDAO.class
 com\agent\service\ScheduleAIAgent.class
+com\dao\User_Course\UserCourseDAO.class
 com\service\User\IUserService.class
 com\agent\model\CustomerResponse.class
 com\controller\login\ResetPassword.class

@@ -39,6 +39,8 @@ D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\dao\Todo\TodoDAO.java
 D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\dao\TokenForget\TokenForgetDao.java
 D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\dao\User\IUserDAO.java
 D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\dao\User\UserDAO.java
+D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\dao\User_Course\IUserCourseDAO.java
+D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\dao\User_Course\UserCourseDAO.java
 D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\database\DBConnection.java
 D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\database\DBinformation.java
 D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\entity\GoogleAccount.java
@@ -66,3 +68,5 @@ D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\service\Todo\ITodoServ
 D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\service\Todo\TodoService.java
 D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\service\User\IUserService.java
 D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\service\User\UserService.java
+D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\service\UserCourse\IUserCourseService.java
+D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\service\UserCourse\UserCourseService.java
