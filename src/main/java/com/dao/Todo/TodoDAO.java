@@ -66,4 +66,9 @@ public class TodoDAO extends BaseDAO<ToDo> implements ITodoDAO {
             em.close();
         }
     }
+
+    @Override
+    public List<ToDo> selectAllToDoByTaskId(int id) {
+        return findAllById("idTask", id);
+    }
 }

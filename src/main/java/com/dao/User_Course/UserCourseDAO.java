@@ -48,4 +48,14 @@ public class UserCourseDAO extends BaseDAO<UserCourse> implements IUserCourseDAO
         return findAllByEntity("UserCourse.findAll");
     }
 
+    @Override
+    public List<UserCourse> selectAllUserCoursesByUserId(int id) {
+        return findAllById("userId", id);
+    }
+
+    @Override
+    public List<UserCourse> selectAllUserCoursesByCourseId(int id) {
+        return findAllById("idCourse", id);
+    }
+
 }

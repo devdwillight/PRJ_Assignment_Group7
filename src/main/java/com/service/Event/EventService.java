@@ -63,19 +63,6 @@ public class EventService implements IEventService {
         return list;
     }
 
-    // Hàm test nhanh
-    public static void main(String[] args) {
-        EventService service = new EventService();
-        List<UserEvents> events = service.getAllEvent();
-
-        System.out.println("Danh sách sự kiện:");
-        for (UserEvents e : events) {
-            System.out.println("ID: " + e.getIdEvent() + ", Tên: " + e.getName());
-        }
-
-        System.out.println("Tổng số sự kiện: " + service.countEvent());
-    }
-
     @Override
     public UserEvents createEvent(UserEvents event) {
         System.out.println("[createEvent] tạo sự kiện ID = " + event.getIdEvent());
@@ -85,4 +72,29 @@ public class EventService implements IEventService {
         }
         return event;
     }
+
+    @Override
+    public List<UserEvents> getAllEventsById(int id) {
+        return eventDAO.selectAllEventById(id);
+    }
+
+    public static void main(String[] args) {
+        EventService service = new EventService();
+
+        int userIdToTest = 1; // thay bằng ID user bạn muốn test
+        List<UserEvents> events = service.getAllEventsById(userIdToTest);
+
+        System.out.println("Danh sách sự kiện của người dùng có ID = " + userIdToTest + ":");
+        if (events.isEmpty()) {
+            System.out.println("❌ Không có sự kiện nào được tìm thấy.");
+        } else {
+            for (UserEvents e : events) {
+                System.out.println("✔ Sự kiện: " + e.getName()
+                        + " | Bắt đầu: " + e.getStartDate()
+                        + " | Kết thúc: " + e.getDueDate()
+                        + " | Lịch: " + (e.getIdCalendar() != null ? e.getIdCalendar().getName() : "N/A"));
+            }
+        }
+    }
+
 }

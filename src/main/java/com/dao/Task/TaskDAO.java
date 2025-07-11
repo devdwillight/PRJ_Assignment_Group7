@@ -48,4 +48,9 @@ public class TaskDAO extends BaseDAO<Task> implements ITaskDAO {
         return findAllByEntity("Task.findAll");
     }
 
+    @Override
+    public List<Task> selectAllByUserId(int id) {
+        return findAllById("userId", id);
+    }
+
 }

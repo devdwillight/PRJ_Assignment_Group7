@@ -152,14 +152,9 @@ public class UserService implements IUserService {
     public static void main(String[] args) {
         UserService userService = new UserService();
 
-        String email = "toantruongcong2005bee@gmail.com";
+        String email = "nguyenhuuminhtuan20111@gmail.com";
         String password = "123";
 
-        User user = new User();
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setUsername("toan215");
-
-        userService.createUser(user);
+        userService.checkLogin(email, password);
     }
 }

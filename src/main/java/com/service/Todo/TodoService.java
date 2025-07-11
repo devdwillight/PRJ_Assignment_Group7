@@ -83,6 +83,8 @@ public class TodoService implements ITodoService {
         return list;
     }
 
+ 
+    
     public static void main(String[] args) {
         TodoService service = new TodoService();
         List<ToDo> todos = service.getAllToDo();
@@ -99,5 +101,7 @@ public class TodoService implements ITodoService {
         System.out.println("-----------------------------");
         System.out.println("Tổng cộng: " + todos.size() + " công việc.");
     }
+
+    
 
 }

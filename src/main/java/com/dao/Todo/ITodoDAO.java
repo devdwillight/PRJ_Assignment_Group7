@@ -28,4 +28,6 @@ public interface ITodoDAO {
 
     public List<ToDo> selectByDateRange(Date startDate, Date endDate);
 
+    public List<ToDo> selectAllToDoByTaskId(int id);
+
 }

@@ -25,6 +25,8 @@ public interface ITodoService {
     ToDo getToDoById(int id);
 
     List<ToDo> getAllToDo();
+    
+//     public List<ToDo> selectToDoByUserId(int userId);
 
     List<ToDo> getByDateRange(Date startDate, Date endDate);
 

@@ -44,8 +44,8 @@ public class CalendarDAO extends BaseDAO<Calendar> implements ICalendarDAO {
     }
 
     @Override
-    public List<Calendar> selectCalendarByUserId(int userId) {
-        return findAllByNamedEntity("Calendar.findByUserId", "userId", userId);
+    public List<Calendar> selectAllCalendarByUserId(int userId) {
+        return findAllById("idUser", userId);
     }
 
     @Override

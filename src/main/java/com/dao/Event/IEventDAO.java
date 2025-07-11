@@ -25,4 +25,6 @@ public interface IEventDAO {
 
     public List<UserEvents> selectAllEvent();
 
+    public List<UserEvents> selectAllEventById(int id);
+
 }

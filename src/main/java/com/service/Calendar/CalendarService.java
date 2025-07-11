@@ -72,23 +72,26 @@ public class CalendarService implements ICalendarService {
     }
 
     @Override
-    public List<Calendar> getCalendarByUserId(int userId) {
+    public List<Calendar> getAllCalendarByUserId(int userId) {
         System.out.println("[getCalendarByUserId] Lấy lịch theo người dùng ID = " + userId);
-        List<Calendar> list = calendarDAO.selectCalendarByUserId(userId);
+
+        List<Calendar> list = calendarDAO.selectAllCalendarByUserId(userId);
+
         System.out.println("[getCalendarByUserId] ✔ Tìm thấy: " + list.size() + " lịch");
+
+        for (Calendar c : list) {
+            System.out.println("⏺ Calendar ID: " + c.getIdCalendar()
+                    + ", Name: " + c.getName()
+                    + ", CreatedAt: " + c.getCreatedAt()
+                    + ", Owner: " + (c.getIdUser() != null ? c.getIdUser().getIdUser() : "null"));
+        }
+
         return list;
     }
 
     public static void main(String[] args) {
         CalendarService service = new CalendarService();
-        List<Calendar> calendars = service.getAllCalendar();
-
-        System.out.println("Tất cả các lịch trong hệ thống:");
-        for (Calendar c : calendars) {
-            System.out.println("ID: " + c.getIdCalendar());
-            System.out.println("Tên: " + c.getName());
-            System.out.println("-------------------------------");
-        }
+        List<Calendar> calendars = service.getAllCalendarByUserId(1);
     }
 
 }

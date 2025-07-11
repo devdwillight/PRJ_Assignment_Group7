@@ -25,6 +25,6 @@ public interface ICalendarDAO {
 
     public List<Calendar> selectAllCalendar();
 
-    public List<Calendar> selectCalendarByUserId(int userId);
+    public List<Calendar> selectAllCalendarByUserId(int userId);
 
 }

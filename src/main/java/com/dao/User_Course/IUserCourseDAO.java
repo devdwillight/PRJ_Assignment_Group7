@@ -24,4 +24,8 @@ public interface IUserCourseDAO {
     public UserCourse selectUserCourse(int id);
 
     public List<UserCourse> selectAllUserCourses();
+
+    public List<UserCourse> selectAllUserCoursesByUserId(int id);
+    
+    public List<UserCourse> selectAllUserCoursesByCourseId(int id);
 }

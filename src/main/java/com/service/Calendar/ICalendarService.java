@@ -26,6 +26,6 @@ public interface ICalendarService {
 
     List<Calendar> getAllCalendar();
 
-    List<Calendar> getCalendarByUserId(int userid);
+    List<Calendar> getAllCalendarByUserId(int userid);
 
 }

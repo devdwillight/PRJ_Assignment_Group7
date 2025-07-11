@@ -24,4 +24,6 @@ public interface ITaskDAO {
     public Task selectTaskById(int id);
 
     public List<Task> selectAllTasks();
+
+    public List<Task> selectAllByUserId(int id);
 }

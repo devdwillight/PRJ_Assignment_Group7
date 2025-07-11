@@ -25,7 +25,7 @@ public abstract class BaseDAO<T> {
     protected EntityManager getEntityManager() {
         return emf.createEntityManager();
     }
-    
+
     protected void close() {
         emf.close();
     }
@@ -106,6 +106,18 @@ public abstract class BaseDAO<T> {
         try {
             return em.createNamedQuery(queryName, entityClass)
                     .setParameter(paramName, paramValue)
+                    .getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    protected List<T> findAllById(String fieldName, int Id) {
+        EntityManager em = getEntityManager();
+        try {
+            String jpql = "SELECT e FROM " + entityClass.getSimpleName() + " e WHERE e." + fieldName + ".id = :Id";
+            return em.createQuery(jpql, entityClass)
+                    .setParameter("Id", Id)
                     .getResultList();
         } finally {
             em.close();

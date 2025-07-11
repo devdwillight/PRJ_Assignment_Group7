@@ -48,4 +48,9 @@ public class EventDAO extends BaseDAO<UserEvents> implements IEventDAO {
         return findAllByEntity("UserEvents.findAll");
     }
 
+    @Override
+    public List<UserEvents> selectAllEventById(int id) {
+        return findAllById("idCalendar", id);
+    }
+
 }

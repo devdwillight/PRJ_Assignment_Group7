@@ -77,4 +77,8 @@ public class OrderDAO extends BaseDAO<Orders> implements IOrderDAO {
         }
     }
 
+    @Override
+    public List<Orders> selectAllByUserId(int id) {
+        return findAllById("idUser", id);
+    }
 }

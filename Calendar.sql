@@ -1,12 +1,6 @@
-﻿create database Calendar;
+﻿--create database Calendar;
 
-ALTER DATABASE Calendar
-SET SINGLE_USER
-WITH ROLLBACK IMMEDIATE;
-
-DROP DATABASE Calendar;
-
-use Calendar
+--use Calendar
 
 CREATE TABLE Users (
     id_user INT IDENTITY(1,1) PRIMARY KEY,
@@ -125,7 +119,7 @@ CREATE TABLE To_Do (
 
 INSERT INTO Users (username, password, first_name, last_name, birthday, email, phone, gender, active, is_admin)
 VALUES
-('tuan','123','admin','admin','2000-1-1','nguyenhuuminhtuan20111@gmail.com','1234567890','Male',1,1),
+('sa','123','admin','admin','2000-1-1','abc@gmail.com','1234567890','Male',1,1),
 ('john_doe', 'hashed_pwd1', 'John', 'Doe', '1990-01-01', 'john@example.com', '1234567890', 'Male', 1, 0),
 ('jane_smith', 'hashed_pwd2', 'Jane', 'Smith', '1992-02-02', 'jane@example.com', '0987654321', 'Female', 1, 1),
 ('alice_johnson', 'hashed_pwd3', 'Alice', 'Johnson', '1988-03-15', 'alice.johnson@email.com', '5551234567', 'Female', 1, 0),
@@ -180,7 +174,7 @@ VALUES
 ('yasmin_stewart', 'hashed_pwd52', 'Yasmin', 'Stewart', '1988-10-25', 'yasmin.stewart@email.com', '5559274183', 'Female', 1, 1);
 
 
-INSERT INTO Course (name, price, duration, description, frequency, category.imageUrl)
+INSERT INTO Course (name, price, duration, description, frequency, category, imageUrl)
 VALUES
 ('Mobile App Development', 249.99, '5 months', N'Create iOS and Android apps using React Native and Flutter.', 'Weekly', 'Technology', 'https://admin.12grids.com/uploads/blogs/original_cover_images/Webp/Best_Mobile_App_Development_Technologies_12Grids.webp'),
 ('Digital Marketing Fundamentals', 149.99, '6 weeks', N'Master SEO, social media marketing, and Google Ads strategies.', 'Bi-weekly', 'Marketing', 'https://d2ds8yldqp7gxv.cloudfront.net/Blog+Explanatory+Images/Fundamentals+of+Digital+Marketing+1.webp'),
