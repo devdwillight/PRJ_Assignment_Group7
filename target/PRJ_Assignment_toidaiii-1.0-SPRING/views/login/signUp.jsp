@@ -25,7 +25,7 @@
             <div class="w-full md:w-1/2 flex flex-col justify-center items-center px-8 bg-white">
                 <div class="w-full max-w-md">
                     <h2 class="text-3xl font-bold mb-8">Sign Up</h2>
-                    <form name="signup" method="post" action="<%=request.getContextPath()%>/SignupServlet">
+                    <form name="signup" method="post" action="<%=request.getContextPath()%>/signup">
                         <!-- Username -->
                         <div class="mb-4">
                             <div class="flex items-center border border-gray-300 rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-blue-400 gap-2">

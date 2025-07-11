@@ -74,7 +74,7 @@
                             <!--Forgot Password-->
                             <a href="requestPassword.jsp" class="text-blue-400 text-sm hover:underline">Forgot password?</a>
                         </div>
-                            <p class="text-danger">${mess}</p>
+                            <p class="text-red">${mess}</p>
                         <!--Login-->
                         <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition mb-4">Log In</button>
                     </form>

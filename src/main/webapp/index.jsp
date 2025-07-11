@@ -13,7 +13,7 @@
     </head>
     <jsp:include page="views/base/header.jsp" />
     <body>
-        <section class="relative w-full h-screen flex items-center justify-center bg-cover bg-center" style="background-image: url('assets/home-bg.jpg');">
+        <section id="home" class="relative w-full h-screen flex items-center justify-center bg-cover bg-center" style="background-image: url('assets/home-bg.jpg');">
             <div class="absolute inset-0 bg-black bg-opacity-80"></div>
             <div class="relative z-10 flex flex-col items-center text-center text-white px-4">
                 <h1 class="text-4xl md:text-5xl font-bold mb-2 tracking-wide">JiKan</h1>
@@ -24,7 +24,7 @@
                 <img src="assets/software-img.png" alt="JiKan App Screenshot" class="mx-auto w-full max-w-2xl" />
             </div>
         </section>
-        <section class="bg-white py-16">
+        <section id="features" class="bg-white py-16">
             <div class="max-w-6xl mx-auto px-4">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
                     <!-- Course Scheduling -->
@@ -63,7 +63,7 @@
                 </div>
             </div>
         </section>
-        <section class="bg-[#f7f7f7] py-20">
+        <section id="ai" class="bg-[#f7f7f7] py-20">
             <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center gap-12">
                 <!-- Left: Text content -->
                 <div class="flex-1">
@@ -100,7 +100,7 @@
                 </div>
             </div>
         </section>
-        <section class="bg-[#f9fbfd] py-20">
+        <section id="pricing" class="bg-[#f9fbfd] py-20">
             <div class="max-w-6xl mx-auto px-4">
                 <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 tracking-wide">OUR PRICING</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
@@ -153,7 +153,7 @@
                 </div>
             </div>
         </section>
-        <section class="bg-[#f7f7f7] py-20">
+        <section id="using" class="bg-[#f7f7f7] py-20">
             <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center gap-12">
                 <!-- Left: Text content -->
                 <div class="flex-1 flex flex-col items-center md:items-start text-center md:text-left">
@@ -161,7 +161,7 @@
                     <p class="text-gray-500 text-base md:text-lg mb-8 max-w-md">
                         Take control of your time with our intelligent calendar system — built for learners, teams, and professionals. From smart scheduling to shared calendars and task tracking, everything you need is just one click away.
                     </p>
-                    <a href="#" class="bg-sky-400 hover:bg-sky-500 text-white font-bold px-10 py-3 rounded-xl transition w-48 text-center">
+                    <a href="login.jsp" class="bg-sky-400 hover:bg-sky-500 text-white font-bold px-10 py-3 rounded-xl transition w-48 text-center">
                         SIGN IN
                     </a>
                 </div>
@@ -171,7 +171,7 @@
                 </div>
             </div>
         </section>
-        <section class="relative w-full min-h-[600px] flex items-center justify-center bg-cover bg-center" style="background-image: url('assets/contact-bg.jpg');">
+        <section id="contact" class="relative w-full min-h-[600px] flex items-center justify-center bg-cover bg-center" style="background-image: url('assets/contact-bg.jpg');">
             <div class="absolute inset-0 bg-black bg-opacity-70"></div>
             <div class="relative z-10 w-full max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between px-4 py-20 gap-12">
                 <!-- Left: Contact Info -->

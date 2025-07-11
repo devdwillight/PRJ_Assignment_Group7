@@ -1,3 +1,2 @@
 # Ignore sensitive DB and JPA config files
-src/main/java/com/database/DBinformation.java
-src/main/resources/META-INF/persistence.xml
+

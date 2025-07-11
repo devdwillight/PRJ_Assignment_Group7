@@ -15,23 +15,24 @@
         <link rel="stylesheet" href="https://unpkg.com/flowbite@1.3.3/dist/flowbite.min.css" />
         <script src="https://unpkg.com/flowbite@1.3.3/dist/flowbite.js"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <style>html { scroll-behavior: smooth; }</style>
     </head>
     <%
         User user = (User) request.getSession().getAttribute("user");
     %>
     <body>
-        <nav class="flex items-center justify-between px-32 py-4 bg-white">
+        <nav id="mainHeader" class="fixed top-0 left-0 w-full flex items-center justify-between px-32 py-4 bg-white z-50 shadow border-b border-gray-200 transition-transform duration-300">
             <!-- Logo -->
             <div class="flex items-center">
-                <a href="" class="text-3xl font-extrabold text-blue-400">JiKan</a>
+                <a href="#home" class="text-3xl font-extrabold text-blue-400">JiKan</a>
             </div>
             <div class="flex items-center space-x-4">
                 <!-- Menu -->
                 <div class="flex space-x-8 pr-12">
-                    <a href="/" class="text-blue-400 font-bold hover:underline item-header-link">HOME</a>
-                    <a href="/features" class="text-blue-400 font-bold hover:underline item-header-link">FEATURES</a>
-                    <a href="/pricing" class="text-blue-400 font-bold hover:underline item-header-link">PRICING</a>
-                    <a href="/contact" class="text-blue-400 font-bold hover:underline item-header-link">CONTACT</a>
+                    <a href="#home" class="text-blue-400 font-bold item-header-link border-b-2 border-transparent pb-1">HOME</a>
+                    <a href="#features" class="text-blue-400 font-bold item-header-link border-b-2 border-transparent pb-1">FEATURES</a>
+                    <a href="#pricing" class="text-blue-400 font-bold item-header-link border-b-2 border-transparent pb-1">PRICING</a>
+                    <a href="#contact" class="text-blue-400 font-bold item-header-link border-b-2 border-transparent pb-1">CONTACT</a>
                 </div>
                 <!-- User/Sign in -->
                 <c:choose>
@@ -57,20 +58,48 @@
                         </div>
                     </c:when>
                     <c:otherwise>
-                        <a href="../login/login.jsp" class="text-gray-400 font-bold mr-2 hover:text-gray-500 transition">LOGIN IN</a>
-                        <a href="../login/signUp.jsp" class="text-white bg-blue-400 px-6 py-3 rounded-xl font-bold hover:bg-blue-500 transition">SIGN IN</a>
+                        <a href="login" class="text-gray-400 font-bold mr-2 hover:text-gray-500 transition">LOGIN IN</a>
+                        <a href="SignupServlet" class="text-white bg-blue-400 px-6 py-3 rounded-xl font-bold hover:bg-blue-500 transition">SIGN IN</a>
                     </c:otherwise>
                 </c:choose>
             </div>
         </nav>
         <script>
-            // Highlight current menu
-            $(".item-header-link").each(function () {
-                if ($(this).attr('href') == location.pathname) {
-                    $(this).addClass("md:bg-transparent text-blue-700");
+            // Highlight current menu with border-b-2
+            $(function () {
+                var path = location.hash || "#home";
+                $(".item-header-link").each(function () {
+                    if ($(this).attr('href') == path) {
+                        $(this).addClass("border-blue-500 text-blue-700");
+                    } else {
+                        $(this).removeClass("border-blue-500 text-blue-700");
+                    }
+                });
+                // Update highlight on hash change
+                $(window).on('hashchange', function() {
+                    var path = location.hash || "#home";
+                    $(".item-header-link").each(function () {
+                        if ($(this).attr('href') == path) {
+                            $(this).addClass("border-blue-500 text-blue-700");
+                        } else {
+                            $(this).removeClass("border-blue-500 text-blue-700");
+                        }
+                    });
+                });
+            });
+            // Hide header on scroll down, show on scroll up
+            let lastScroll = window.scrollY;
+            let header = document.getElementById('mainHeader');
+            window.addEventListener('scroll', function() {
+                let currentScroll = window.scrollY;
+                if (currentScroll > lastScroll && currentScroll > 60) {
+                    // Cuộn xuống
+                    header.classList.add('-translate-y-full');
                 } else {
-                    $(this).addClass("hover:bg-gray-50 md:hover:bg-transparent md:border-0 md:hover:text-blue-700");
+                    // Cuộn lên
+                    header.classList.remove('-translate-y-full');
                 }
+                lastScroll = currentScroll;
             });
         </script>
     </body>

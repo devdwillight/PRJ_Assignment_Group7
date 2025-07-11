@@ -144,7 +144,7 @@ public class LoginServlet extends HttpServlet {
         System.out.println("Remember: '" + remember + "'"); // Để thấy giá trị chính xác
 
         User user = userService.checkLogin(username, password);
-        
+
         if (user == null) {
             request.setAttribute("mess", "Email or Password is not correct");
             request.getRequestDispatcher("views/login/login.jsp").forward(request, response);
@@ -179,7 +179,7 @@ public class LoginServlet extends HttpServlet {
             }
 
             // Chuyển hướng về trang home.jsp sau khi đăng nhập thành công
-            response.sendRedirect(request.getContextPath() + "/home.jsp");
+            response.sendRedirect(request.getContextPath() + "/home");
         } else {
             // Nếu đăng nhập không hợp lệ, hiển thị lỗi
             request.setAttribute("error", "1");

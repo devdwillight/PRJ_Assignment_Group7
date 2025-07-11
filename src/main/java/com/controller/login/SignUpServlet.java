@@ -4,7 +4,6 @@
  */
 package com.controller.login;
 
-
 import com.model.User;
 import com.service.User.UserService;
 import java.io.IOException;
@@ -20,7 +19,7 @@ import jakarta.servlet.http.HttpSession;
  *
  * @author ADMIN
  */
-@WebServlet(name = "SignupServlet", urlPatterns = {"/SignupServlet"})
+@WebServlet(name = "SignupServlet", urlPatterns = {"/signup"})
 public class SignUpServlet extends HttpServlet {
 
     private UserService userService;
@@ -28,7 +27,7 @@ public class SignUpServlet extends HttpServlet {
     public void init() {
         userService = new UserService();
     }
-    
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -67,7 +66,7 @@ public class SignUpServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        response.sendRedirect("views/login/signUp.jsp");
     }
 
     /**
@@ -78,7 +77,7 @@ public class SignUpServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-@Override
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String email = request.getParameter("email");
         String username = request.getParameter("username");
@@ -90,9 +89,9 @@ public class SignUpServlet extends HttpServlet {
             request.getRequestDispatcher("views/login/signUp.jsp").forward(request, response);
             return;
         }
-        
+
         User user = new User(username, password, email);
-        
+
         if (userService.createUser(user) == null) {
             request.setAttribute("mess", "Email have be used");
             request.getRequestDispatcher("views/login/signUp.jsp").forward(request, response);
@@ -100,7 +99,6 @@ public class SignUpServlet extends HttpServlet {
         }
         response.sendRedirect("views/login/login.jsp");
     }
-
 
     /**
      * Returns a short description of the servlet.

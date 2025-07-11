@@ -17,6 +17,7 @@ D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\controller\admin\user\
 D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\controller\calendar\CalendarServlet.java
 D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\controller\course\CourseServlet.java
 D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\controller\event\EventServlet.java
+D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\controller\home\HomeServlet.java
 D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\controller\login\LoginServlet.java
 D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\controller\login\RequestPassword.java
 D:\NetbeanProject\PRJ_Assignment_Group7\src\main\java\com\controller\login\ResetPassword.java
