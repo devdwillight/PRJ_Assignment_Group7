@@ -116,7 +116,7 @@
                             <li>One personal calendar</li>
                             <li>Basic Google/Outlook sync</li>
                         </ul>
-                        <button class="border border-sky-400 text-sky-400 px-8 py-1 rounded transition hover:bg-sky-50 font-medium">SIGN UP</button>
+                        <a href="signup" class="border border-sky-400 text-sky-400 px-8 py-1 rounded transition hover:bg-sky-50 font-medium">SIGN UP</a>
                     </div>
                     <!-- Plus Plan -->
                     <div class="bg-white rounded-xl shadow-sm flex flex-col items-center pb-8">
@@ -132,7 +132,7 @@
                             <li>Multiple calendars</li>
                             <li>Full-featured mobile & desktop access</li>
                         </ul>
-                        <button class="border border-sky-400 text-sky-400 px-8 py-1 rounded transition hover:bg-sky-50 font-medium">SIGN UP</button>
+                        <a href="signup" class="border border-sky-400 text-sky-400 px-8 py-1 rounded transition hover:bg-sky-50 font-medium">SIGN UP</a>
                     </div>
                     <!-- Pro Plan -->
                     <div class="bg-white rounded-xl shadow-sm flex flex-col items-center pb-8">
@@ -148,7 +148,7 @@
                             <li>Activity analytics</li>
                             <li>Integrations with Slack, Zoom, Google Meet</li>
                         </ul>
-                        <button class="border border-sky-400 text-sky-400 px-8 py-1 rounded transition hover:bg-sky-50 font-medium">SIGN UP</button>
+                        <a href="signup" class="border border-sky-400 text-sky-400 px-8 py-1 rounded transition hover:bg-sky-50 font-medium">SIGN UP</a>
                     </div>
                 </div>
             </div>
@@ -161,7 +161,7 @@
                     <p class="text-gray-500 text-base md:text-lg mb-8 max-w-md">
                         Take control of your time with our intelligent calendar system — built for learners, teams, and professionals. From smart scheduling to shared calendars and task tracking, everything you need is just one click away.
                     </p>
-                    <a href="login.jsp" class="bg-sky-400 hover:bg-sky-500 text-white font-bold px-10 py-3 rounded-xl transition w-48 text-center">
+                    <a href="login" class="bg-sky-400 hover:bg-sky-500 text-white font-bold px-10 py-3 rounded-xl transition w-48 text-center">
                         SIGN IN
                     </a>
                 </div>
