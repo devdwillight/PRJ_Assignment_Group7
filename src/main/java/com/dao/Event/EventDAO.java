@@ -49,7 +49,7 @@ public class EventDAO extends BaseDAO<UserEvents> implements IEventDAO {
     }
 
     @Override
-    public List<UserEvents> selectAllEventById(int id) {
+    public List<UserEvents> selectAllEventByCalendarId(int id) {
         return findAllById("idCalendar", id);
     }
 

@@ -75,10 +75,18 @@ public class TaskService implements ITaskService {
         return list;
     }
 
+    @Override
+    public List<Task> getAllTasksByUserId(int id) {
+        System.out.println("[getAllTasksByUserId] Lấy toàn bộ danh sách task");
+        List<Task> list = taskDAO.selectAllByUserId(id);
+        System.out.println("[getAllTasksByUserId] ✔ Tổng số: " + list.size() + " task");
+        return list;
+    }
+
     // 🧪 Test nhanh
     public static void main(String[] args) {
         TaskService service = new TaskService();
-        List<Task> tasks = service.getAllTasks();
+        List<Task> tasks = service.getAllTasksByUserId(1);
 
         System.out.println("📋 Danh sách các task:");
         for (Task t : tasks) {
@@ -87,4 +95,5 @@ public class TaskService implements ITaskService {
 
         System.out.println("Tổng số task: " + service.countTask());
     }
+
 }

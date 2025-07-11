@@ -83,11 +83,17 @@ public class TodoService implements ITodoService {
         return list;
     }
 
- 
-    
+    @Override
+    public List<ToDo> getToDoByTaskId(int id) {
+        System.out.println("[getToDoByTaskId] Lấy tất cả ToDo");
+        List<ToDo> list = todoDAO.selectAllToDoByTaskId(id);
+        System.out.println("[getToDoByTaskId] ✔ Tổng: " + list.size());
+        return list;
+    }
+
     public static void main(String[] args) {
         TodoService service = new TodoService();
-        List<ToDo> todos = service.getAllToDo();
+        List<ToDo> todos = service.getToDoByTaskId(1);
 
         System.out.println("📝 Danh sách tất cả ToDo:");
         for (ToDo t : todos) {
@@ -101,7 +107,5 @@ public class TodoService implements ITodoService {
         System.out.println("-----------------------------");
         System.out.println("Tổng cộng: " + todos.size() + " công việc.");
     }
-
-    
 
 }

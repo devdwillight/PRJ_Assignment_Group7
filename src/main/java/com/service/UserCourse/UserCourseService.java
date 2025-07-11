@@ -69,4 +69,20 @@ public class UserCourseService implements IUserCourseService {
         System.out.printf("[Service] getAllUserCourses → total: %d\n", list.size());
         return list;
     }
+
+    @Override
+    public List<UserCourse> getAllUserCoursesByCourseId(int id) {
+        System.out.println("[Service] getAllUserCourses");
+        List<UserCourse> list = userCourseDAO.selectAllUserCoursesByCourseId(id);
+        System.out.printf("[Service] getAllUserCourses → total: %d\n", list.size());
+        return list;
+    }
+
+    @Override
+    public List<UserCourse> getAllUserCoursesByUserId(int id) {
+        System.out.println("[Service] getAllUserCourses");
+        List<UserCourse> list = userCourseDAO.selectAllUserCoursesByUserId(id);
+        System.out.printf("[Service] getAllUserCourses → total: %d\n", list.size());
+        return list;
+    }
 }

@@ -50,7 +50,7 @@ public class UserCourseDAO extends BaseDAO<UserCourse> implements IUserCourseDAO
 
     @Override
     public List<UserCourse> selectAllUserCoursesByUserId(int id) {
-        return findAllById("userId", id);
+        return findAllById("idUser", id);
     }
 
     @Override

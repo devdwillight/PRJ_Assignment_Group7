@@ -99,10 +99,18 @@ public class OrderService implements IOrderService {
         return list;
     }
 
+    @Override
+    public List<Orders> getAllOrderByUserId(int id) {
+        System.out.println("[getAllOrderByUserId] Lấy danh sách toàn bộ đơn hàng");
+        List<Orders> list = orderDAO.selectAllByUserId(id);
+        System.out.println("[getAllOrderByUserId] ✔ Số lượng đơn hàng: " + list.size());
+        return list;
+    }
+
     // 🧪 Test nhanh
     public static void main(String[] args) {
         OrderService service = new OrderService();
-        List<Orders> orders = service.getAllOrder();
+        List<Orders> orders = service.getAllOrderByUserId(1);
 
         System.out.println("🧾 Danh sách tất cả đơn hàng:");
         for (Orders o : orders) {

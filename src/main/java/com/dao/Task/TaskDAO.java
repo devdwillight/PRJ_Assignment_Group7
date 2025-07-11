@@ -50,7 +50,7 @@ public class TaskDAO extends BaseDAO<Task> implements ITaskDAO {
 
     @Override
     public List<Task> selectAllByUserId(int id) {
-        return findAllById("userId", id);
+        return findAllById("idUser", id);
     }
 
 }

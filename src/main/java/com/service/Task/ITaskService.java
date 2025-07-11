@@ -24,4 +24,6 @@ public interface ITaskService {
     Task getTaskById(int id);
 
     List<Task> getAllTasks();
+
+    List<Task> getAllTasksByUserId(int id);
 }

@@ -31,4 +31,6 @@ public interface IOrderService {
     List<Orders> getByStatus(String status);
 
     List<Orders> getByDateRange(Date startDate, Date endDate);
+
+    List<Orders> getAllOrderByUserId(int id);
 }

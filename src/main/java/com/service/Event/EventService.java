@@ -74,15 +74,15 @@ public class EventService implements IEventService {
     }
 
     @Override
-    public List<UserEvents> getAllEventsById(int id) {
-        return eventDAO.selectAllEventById(id);
+    public List<UserEvents> getAllEventsByCalendarId(int id) {
+        return eventDAO.selectAllEventByCalendarId(id);
     }
 
     public static void main(String[] args) {
         EventService service = new EventService();
 
         int userIdToTest = 1; // thay bằng ID user bạn muốn test
-        List<UserEvents> events = service.getAllEventsById(userIdToTest);
+        List<UserEvents> events = service.getAllEventsByCalendarId(userIdToTest);
 
         System.out.println("Danh sách sự kiện của người dùng có ID = " + userIdToTest + ":");
         if (events.isEmpty()) {

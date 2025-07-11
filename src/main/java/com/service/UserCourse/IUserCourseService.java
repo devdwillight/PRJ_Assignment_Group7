@@ -24,4 +24,8 @@ public interface IUserCourseService {
     UserCourse getUserCourseById(int id);
 
     List<UserCourse> getAllUserCourses();
+
+    List<UserCourse> getAllUserCoursesByCourseId(int id);
+
+    List<UserCourse> getAllUserCoursesByUserId(int id);
 }
