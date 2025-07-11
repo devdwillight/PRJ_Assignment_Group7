@@ -47,5 +47,9 @@
                 setSidebar(!sidebarOpen);
             };
         </script>
+        <form action="logout" method="POST">
+            <input type="hidden" name="action" value="logout" />
+            <input type="submit" value="Logout" class="btn btn-danger" />
+        </form>
     </body>
 </html>

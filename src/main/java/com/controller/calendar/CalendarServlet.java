@@ -57,6 +57,19 @@ public class CalendarServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String view = request.getParameter("view");
+        String dateStr = request.getParameter("date");
+        if ("week".equals(view) && dateStr != null) {
+            // Parse dateStr thành java.util.Date hoặc Calendar
+            // Tính toán ngày đầu tuần, danh sách ngày trong tuần
+            // Trả về JSON
+            response.setContentType("application/json");
+            PrintWriter out = response.getWriter();
+            // Ví dụ trả về cứng, bạn nên tính động:
+            out.print("{\"days\":[{\"date\":\"2025-07-06\",\"label\":\"CN\",\"dayOfMonth\":6,\"isToday\":false}, ...], \"hours\":[1,2,...,23]}");
+            out.flush();
+            return;
+        }
         processRequest(request, response);
     }
 
