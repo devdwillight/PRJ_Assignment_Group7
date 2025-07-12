@@ -28,6 +28,7 @@ com\model\UserEvents.class
 com\model\Calendar.class
 com\service\Course\ICourseService.class
 com\database\DBConnection.class
+com\controller\calendar\calendarServlet.class
 com\dao\Event\IEventDAO.class
 com\entity\GoogleAccount.class
 com\agent\service\ExcelDataManager.class
@@ -54,12 +55,10 @@ com\dao\Order\IOrderDAO.class
 com\agent\servlet\ChatServlet.class
 com\service\Todo\ITodoService.class
 com\service\Task\ITaskService.class
-com\controller\calendar\CalendarRouterServlet.class
 com\controller\home\HomeServlet.class
 com\service\User\UserService.class
 com\dao\BaseDAO.class
 com\dao\User_Course\IUserCourseDAO.class
-com\controller\calendar\CalendarServlet.class
 com\database\DBinformation.class
 com\controller\event\EventServlet.class
 com\model\Course.class
