@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Calendar API</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">Test Calendar API</h1>
+        
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">Test API Calls</h2>
+            
+            <div class="space-y-4">
+                <button id="testWeekBtn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Test Week Data API
+                </button>
+                
+                <button id="testEventsBtn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                    Test Events API
+                </button>
+                
+                <button id="testCreateEventBtn" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+                    Test Create Event API
+                </button>
+            </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-4">API Response</h2>
+            <pre id="apiResponse" class="bg-gray-100 p-4 rounded text-sm overflow-auto max-h-96"></pre>
+        </div>
+    </div>
+
+    <script>
+        const responseEl = document.getElementById('apiResponse');
+        
+        function logResponse(data) {
+            responseEl.textContent = JSON.stringify(data, null, 2);
+        }
+        
+        function testWeekData() {
+            const date = new Date().toISOString();
+            console.log('Testing week data API with date:', date);
+            
+            fetch('/PRJ_Assignment_toidaiii/Calendar?view=week&date=' + date)
+                .then(res => {
+                    console.log('Response status:', res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    console.log('Week data received:', data);
+                    logResponse(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    logResponse({ error: error.message });
+                });
+        }
+        
+        function testEvents() {
+            const date = new Date().toISOString();
+            console.log('Testing events API with date:', date);
+            
+            fetch('/PRJ_Assignment_toidaiii/Calendar?action=getEvents&date=' + date + '&view=week')
+                .then(res => res.json())
+                .then(data => {
+                    console.log('Events received:', data);
+                    logResponse(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    logResponse({ error: error.message });
+                });
+        }
+        
+        function testCreateEvent() {
+            const eventData = {
+                action: 'createEvent',
+                title: 'Test Event',
+                start: new Date().toISOString(),
+                end: new Date(Date.now() + 3600000).toISOString(),
+                color: '#4285f4'
+            };
+            
+            console.log('Testing create event API:', eventData);
+            
+            fetch('/PRJ_Assignment_toidaiii/Calendar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(eventData)
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log('Create event response:', data);
+                logResponse(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                logResponse({ error: error.message });
+            });
+        }
+        
+        // Event listeners
+        document.getElementById('testWeekBtn').addEventListener('click', testWeekData);
+        document.getElementById('testEventsBtn').addEventListener('click', testEvents);
+        document.getElementById('testCreateEventBtn').addEventListener('click', testCreateEvent);
+        
+        // Auto test on load
+        window.addEventListener('load', () => {
+            console.log('Page loaded, testing API...');
+            setTimeout(testWeekData, 1000);
+        });
+    </script>
+</body>
+</html> 

@@ -17,6 +17,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 /**
  *
@@ -74,16 +76,60 @@ public class HomeServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("user_id");
+        
         if (userId == null) {
             // Nếu chưa đăng nhập, chuyển hướng về trang login
-            response.sendRedirect("login.jsp");
+            response.sendRedirect("views/login/login.jsp");
             return;
         }
-        List<Calendar> calendars = calendarService.getAllCalendarByUserId(userId);
-        List<Task> todos = taskService.getAllTasksByUserId(userId);
-        request.setAttribute("calendars", calendars);
-        request.setAttribute("todos", todos);
-        request.getRequestDispatcher("home.jsp").forward(request, response);
+        
+        try {
+            // Lấy dữ liệu từ database
+            List<Calendar> calendars = calendarService.getAllCalendarByUserId(userId);
+            List<Task> todos = taskService.getAllTasksByUserId(userId);
+            
+            // Tạo dữ liệu calendar cơ bản cho tuần hiện tại
+            Date currentDate = new Date();
+            SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            String currentDateStr = isoFormat.format(currentDate);
+            
+            // Tạo dữ liệu tuần mặc định
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            cal.setTime(currentDate);
+            
+            // Tìm ngày đầu tuần (Chủ nhật)
+            cal.set(java.util.Calendar.DAY_OF_WEEK, java.util.Calendar.SUNDAY);
+            Date startOfWeek = cal.getTime();
+            
+            // Set attributes cho JSP
+            request.setAttribute("calendars", calendars);
+            request.setAttribute("todos", todos);
+            request.setAttribute("currentDate", currentDateStr);
+            request.setAttribute("startOfWeek", startOfWeek);
+            request.setAttribute("userId", userId);
+            
+            // Forward đến home.jsp
+            request.getRequestDispatcher("home.jsp").forward(request, response);
+            
+        } catch (Exception e) {
+            // Log lỗi
+            System.err.println("Error in HomeServlet: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Vẫn forward đến home.jsp với dữ liệu rỗng
+            Date currentDate = new Date();
+            SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            String currentDateStr = isoFormat.format(currentDate);
+            
+            request.setAttribute("calendars", java.util.Collections.emptyList());
+            request.setAttribute("todos", java.util.Collections.emptyList());
+            request.setAttribute("currentDate", currentDateStr);
+            request.setAttribute("startOfWeek", new Date());
+            request.setAttribute("userId", userId);
+            request.setAttribute("error", "Không thể tải dữ liệu từ database");
+            
+            request.getRequestDispatcher("home.jsp").forward(request, response);
+        }
     }
 
     /**
@@ -107,7 +153,7 @@ public class HomeServlet extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Short description";
+        return "Home Servlet - Loads user calendar and task data";
     }// </editor-fold>
 
 }
