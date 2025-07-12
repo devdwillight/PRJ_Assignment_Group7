@@ -54,6 +54,7 @@ com\dao\Order\IOrderDAO.class
 com\agent\servlet\ChatServlet.class
 com\service\Todo\ITodoService.class
 com\service\Task\ITaskService.class
+com\controller\calendar\CalendarRouterServlet.class
 com\controller\home\HomeServlet.class
 com\service\User\UserService.class
 com\dao\BaseDAO.class
