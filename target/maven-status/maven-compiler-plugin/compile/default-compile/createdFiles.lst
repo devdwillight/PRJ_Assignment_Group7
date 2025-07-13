@@ -39,6 +39,7 @@ com\dao\TokenForget\TokenForgetDao.class
 com\controller\admin\user\UserManageServlet.class
 com\service\Calendar\ICalendarService.class
 com\service\UserCourse\IUserCourseService.class
+com\vnpay\common\ajaxServlet.class
 com\service\Course\CourseService.class
 com\constant\Iconstant.class
 com\dao\Task\TaskDAO.class
@@ -46,6 +47,7 @@ com\controller\login\SignUpServlet.class
 com\controller\user\UserServlet.class
 com\service\Event\IEventService.class
 com\controller\login\ResetService$1.class
+com\vnpay\common\VnpayReturn.class
 com\service\Todo\TodoService.class
 com\agent\model\ScheduleItem.class
 com\dao\Task\ITaskDAO.class

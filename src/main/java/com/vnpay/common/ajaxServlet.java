@@ -25,6 +25,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import com.model.Orders;
+import com.model.User;
 import java.math.BigDecimal;
 
 /**
@@ -46,19 +47,18 @@ public class ajaxServlet extends HttpServlet {
         double amountDouble = Double.parseDouble(req.getParameter("totalBill"));
 
         // Lấy user_id từ session thay vì gán cứng
-        HttpSession session = req.getSession();
-        Integer userId = (Integer) session.getAttribute("user_id");
+        HttpSession session = req.getSession(false); // không tạo mới để tránh session rác
+        User user = (User) session.getAttribute("user");
 
-        if (userId == null) {
-            // Nếu không có user_id trong session (nghĩa là người dùng chưa đăng nhập)
-            resp.sendRedirect("login.jsp"); // Chuyển hướng về trang login
+        if (user == null) {
+            resp.sendRedirect("login.jsp");
             return;
         }
-
+        
         OrderDAO orderDao = new OrderDAO();
-                
+
         Orders order = new Orders();
-        order.setIdUser(userId);
+        order.setIdUser(user);
         order.setTotalAmount(amountDouble);
 
         if (!orderDao.insertOrder(order)) {
@@ -68,7 +68,7 @@ public class ajaxServlet extends HttpServlet {
         int orderId = order.getIdOrder();
 
         if (orderId < 1) {
-            resp.sendRedirect("cart");
+            resp.sendRedirect("Course");
             return;
         }
         String vnp_Version = "2.1.0";

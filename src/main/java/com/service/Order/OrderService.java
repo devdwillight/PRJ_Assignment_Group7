@@ -106,6 +106,14 @@ public class OrderService implements IOrderService {
         System.out.println("[getAllOrderByUserId] ✔ Số lượng đơn hàng: " + list.size());
         return list;
     }
+    
+    @Override
+    public boolean updateOrderStatus(Orders order) {
+        System.out.println("[updateOrderStatus] Cập nhật trạng thái đơn hàng ID = " + order.getIdOrder() + " thành: " + order.getStatus());
+        boolean success = orderDAO.updateOrderStatus(order);
+        System.out.println("[updateOrderStatus] " + (success ? "✔ Thành công" : "✖ Thất bại"));
+        return success;
+    }
 
     // 🧪 Test nhanh
     public static void main(String[] args) {

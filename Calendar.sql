@@ -32,7 +32,7 @@ CREATE TABLE Course (
     id_course INT IDENTITY(1,1) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
 	category VARCHAR(255),
-    price DECIMAL(10,2) NOT NULL,
+    price FLOAT NOT NULL,
     duration VARCHAR(255),
     description nvarchar(max),
     frequency VARCHAR(255),
@@ -40,7 +40,6 @@ CREATE TABLE Course (
     updated_at DATETIME,
 	imageUrl VARCHAR (3000)
 );
-
 
 CREATE TABLE User_Course (
     id_enroll INT IDENTITY(1,1) PRIMARY KEY,
@@ -196,6 +195,68 @@ VALUES
 ('Yoga Instructor Training', 499.99, '20 weeks', N'Comprehensive 200-hour yoga teacher certification program.', 'Bi-weekly', 'Health','https://embed-ssl.wistia.com/deliveries/f20818b8690eee8e18f606d5624ceb16.webp?image_crop_resized=960x766'),
 ('Blockchain & Cryptocurrency', 299.99, '8 weeks', N'Understanding blockchain technology, crypto trading, and DeFi basics.', 'Weekly', 'Technology','https://www.fahasa.com/blog/wp-content/uploads/2025/05/Screenshot-2025-05-25-084241-1.png'),
 ('Interior Design Principles', 139.99, '12 weeks', N'Space planning, color theory, and home decoration techniques.', 'Bi-weekly', 'Design','https://www.dsigndpo.com/blog/wp-content/uploads/2022/09/7-Principles-Of-Interior-Design.jpg');
+
+
+UPDATE Course SET description = N'Master the complete workflow of creating high‑performance iOS and Android applications, from wireframing and state management to publishing on App Store and Google Play, while learning best practices for UI, performance tuning, and continuous integration.' 
+WHERE name = 'Mobile App Development';
+
+UPDATE Course SET description = N'Gain a rock‑solid foundation in digital marketing by exploring SEO, content strategy, social media advertising, Google Ads, and analytics. You will design campaigns, optimise conversion funnels, and measure ROI for real‑world business scenarios.' 
+WHERE name = 'Digital Marketing Fundamentals';
+
+UPDATE Course SET description = N'This intensive bootcamp takes you from Python basics to advanced topics such as object‑oriented programming, web scraping, database integration, and RESTful APIs. Finish by building and deploying a capstone project that showcases your new skills.' 
+WHERE name = 'Python Programming Bootcamp';
+
+UPDATE Course SET description = N'Learn the principles of compelling visual communication through hands‑on projects with Adobe Photoshop, Illustrator, and InDesign. Develop portfolios covering typography, layout, colour theory, branding, and social‑media graphics that meet professional standards.' 
+WHERE name = 'Graphic Design Essentials';
+
+UPDATE Course SET description = N'Prepare thoroughly for the PMP exam with structured lessons on project initiation, planning, execution, monitoring, and closure. Real‑world case studies and mock tests ensure you master PMBOK concepts and confidently lead complex projects.' 
+WHERE name = 'Project Management Professional';
+
+UPDATE Course SET description = N'Explore camera settings, composition, lighting, and storytelling techniques while shooting in diverse environments. Post‑production sessions using Lightroom and Photoshop help you transform raw images into stunning, portfolio‑ready photographs.' 
+WHERE name = 'Photography Masterclass';
+
+UPDATE Course SET description = N'Develop a personalised financial roadmap covering budgeting, risk management, diversified investing, and retirement planning. Interactive tools and market simulations teach you to analyse portfolios, reduce taxes, and achieve long‑term financial security.' 
+WHERE name = 'Financial Planning & Investment';
+
+UPDATE Course SET description = N'Practice design‑thinking methodologies while crafting intuitive interfaces in Figma. You will conduct user research, build wireframes, prototype high‑fidelity screens, and run usability tests to deliver delightful digital experiences.' 
+WHERE name = 'UI/UX Design Workshop';
+
+UPDATE Course SET description = N'Dive into cyber‑threat landscapes, encryption, firewalls, and ethical hacking techniques. Lab exercises on vulnerability assessment and incident response equip you to safeguard networks and prepare for industry certifications.' 
+WHERE name = 'Cybersecurity Fundamentals';
+
+UPDATE Course SET description = N'Unlock your creativity through guided exercises in character building, dialogue, pacing, and world‑building. You will critique peer work, refine drafts, and compile a polished short story or opening book chapter by course end.' 
+WHERE name = 'Creative Writing Workshop';
+
+UPDATE Course SET description = N'Build a solid grounding in supervised and unsupervised learning, neural networks, and model evaluation. Hands‑on notebooks in Python and TensorFlow guide you from data preprocessing to deploying predictive models in production.' 
+WHERE name = 'Machine Learning Basics';
+
+UPDATE Course SET description = N'Progress from everyday greetings to confident conversations about travel, culture, and current events. Multimedia lessons, interactive quizzes, and live speaking sessions ensure balanced development of listening, reading, writing, and pronunciation skills.' 
+WHERE name = 'Foreign Language - Spanish';
+
+UPDATE Course SET description = N'Use Excel, SQL, and Tableau to transform raw data into actionable business insights. Learn statistical methods, dashboard design, and storytelling with data to support strategic decision‑making across industries.' 
+WHERE name = 'Business Analytics';
+
+UPDATE Course SET description = N'Master every phase of video production, from pre‑production scripting and storyboarding to filming, colour grading, and sound design. Edit with Premiere Pro and DaVinci Resolve, delivering professional projects for YouTube or client work.' 
+WHERE name = 'Video Production & Editing';
+
+UPDATE Course SET description = N'Overcome stage fright through proven psychological techniques, vocal exercises, and structured rehearsal methods. Craft persuasive speeches, handle Q&A confidently, and discover your authentic speaking style for meetings or large audiences.' 
+WHERE name = 'Public Speaking Mastery';
+
+UPDATE Course SET description = N'Launch a profitable online store by selecting niche products, configuring Shopify, integrating payment gateways, and planning fulfilment. Learn traffic acquisition through SEO, email automation, and social‑media ads to scale revenue effectively.' 
+WHERE name = 'E-commerce Business Setup';
+
+UPDATE Course SET description = N'Examine ethical concerns in AI, including algorithmic bias, privacy, transparency, and governance. Case studies and debates help you formulate responsible AI policies and propose fairness‑aware solutions for real‑world applications.' 
+WHERE name = 'Artificial Intelligence Ethics';
+
+UPDATE Course SET description = N'Complete a 200‑hour yoga curriculum covering anatomy, asana alignment, pranayama, meditation, and class sequencing. Practical teaching labs build the confidence and pedagogy required to earn Yoga Alliance certification.' 
+WHERE name = 'Yoga Instructor Training';
+
+UPDATE Course SET description = N'Deepen your understanding of blockchain architecture, consensus mechanisms, smart contracts, and decentralised finance. Simulated trading labs teach wallet security, technical analysis, and risk management for cryptocurrency investments.' 
+WHERE name = 'Blockchain & Cryptocurrency';
+
+UPDATE Course SET description = N'Apply professional interior‑design principles to residential and commercial spaces, mastering colour palettes, lighting, furniture selection, and 3‑D visualisation tools. Final projects include a complete design proposal and mood boards.' 
+WHERE name = 'Interior Design Principles';
+
 
 INSERT INTO Orders (id_user, payment_method, payment_time, TotalAmount)
 VALUES
