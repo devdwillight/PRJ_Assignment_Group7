@@ -5,7 +5,6 @@
 package com.dao;
 
 import jakarta.persistence.*;
-import java.io.Serializable;
 import java.util.List;
 
 /**
