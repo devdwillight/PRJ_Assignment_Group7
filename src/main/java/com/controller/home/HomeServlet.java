@@ -6,8 +6,10 @@ package com.controller.home;
 
 import com.model.Calendar;
 import com.model.Task;
+import com.model.UserEvents;
 import com.service.Calendar.CalendarService;
 import com.service.Task.TaskService;
+import com.service.Event.EventService;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -19,6 +21,7 @@ import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 /**
  *
@@ -29,11 +32,13 @@ public class HomeServlet extends HttpServlet {
 
     private CalendarService calendarService;
     private TaskService taskService;
+    private EventService eventService;
 
     @Override
     public void init() throws ServletException {
         calendarService = new CalendarService();
         taskService = new TaskService();
+        eventService = new EventService();
     }
 
     /**
@@ -88,6 +93,35 @@ public class HomeServlet extends HttpServlet {
             List<Calendar> calendars = calendarService.getAllCalendarByUserId(userId);
             List<Task> todos = taskService.getAllTasksByUserId(userId);
             
+            // Lấy events cho calendar chính
+            List<UserEvents> events = new ArrayList<>();
+            if (!calendars.isEmpty()) {
+                Integer calendarId = calendars.get(0).getIdCalendar();
+                System.out.println("[HomeServlet] Loading events for calendar ID: " + calendarId);
+                events = eventService.getAllEventsByCalendarId(calendarId);
+                System.out.println("[HomeServlet] Found " + events.size() + " events");
+            } else {
+                System.out.println("[HomeServlet] No calendars found for user ID: " + userId);
+            }
+            
+            // Chuyển events sang JSON cho FullCalendar
+            StringBuilder eventsJson = new StringBuilder("[");
+            for (int i = 0; i < events.size(); i++) {
+                UserEvents e = events.get(i);
+                eventsJson.append("{")
+                    .append("\"id\":").append(e.getIdEvent()).append(",")
+                    .append("\"title\":\"").append(e.getName().replace("\"", "\\\"")).append("\",")
+                    .append("\"start\":\"").append(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(e.getStartDate())).append("\",")
+                    .append("\"end\":\"").append(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(e.getDueDate())).append("\",")
+                    .append("\"color\":\"").append(e.getColor() != null ? e.getColor() : "#3b82f6").append("\"")
+                    .append("}");
+                if (i < events.size() - 1) eventsJson.append(",");
+            }
+            eventsJson.append("]");
+            
+            String finalJson = eventsJson.toString();
+            System.out.println("[HomeServlet] Generated JSON: " + finalJson);
+            
             // Tạo dữ liệu calendar cơ bản cho tuần hiện tại
             Date currentDate = new Date();
             SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -104,6 +138,7 @@ public class HomeServlet extends HttpServlet {
             // Set attributes cho JSP
             request.setAttribute("calendars", calendars);
             request.setAttribute("todos", todos);
+            request.setAttribute("eventsJson", finalJson);
             request.setAttribute("currentDate", currentDateStr);
             request.setAttribute("startOfWeek", startOfWeek);
             request.setAttribute("userId", userId);
@@ -123,6 +158,7 @@ public class HomeServlet extends HttpServlet {
             
             request.setAttribute("calendars", java.util.Collections.emptyList());
             request.setAttribute("todos", java.util.Collections.emptyList());
+            request.setAttribute("eventsJson", "[]");
             request.setAttribute("currentDate", currentDateStr);
             request.setAttribute("startOfWeek", new Date());
             request.setAttribute("userId", userId);

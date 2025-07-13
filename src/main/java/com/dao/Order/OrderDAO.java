@@ -81,4 +81,28 @@ public class OrderDAO extends BaseDAO<Orders> implements IOrderDAO {
     public List<Orders> selectAllByUserId(int id) {
         return findAllById("idUser", id);
     }
+
+    @Override
+    public boolean updateOrderStatus(Orders order) {
+        EntityManager em = getEntityManager();
+        try {
+            em.getTransaction().begin();
+            Orders existingOrder = em.find(Orders.class, order.getIdOrder());
+            if (existingOrder != null) {
+                existingOrder.setStatus(order.getStatus());
+                em.merge(existingOrder);
+                em.getTransaction().commit();
+                return true;
+            }
+            return false;
+        } catch (Exception ex) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.out.println(ex);
+            return false;
+        } finally {
+            em.close();
+        }
+    }
 }

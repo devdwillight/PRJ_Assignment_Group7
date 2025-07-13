@@ -34,4 +34,6 @@ public interface IOrderDAO {
 
     public List<Orders> selectAllByUserId(int id);
 
+    public boolean updateOrderStatus(Orders order);
+
 }
