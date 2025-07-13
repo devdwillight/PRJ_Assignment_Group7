@@ -1,2 +1,1 @@
-# Ignore sensitive DB and JPA config files
-
+/target/

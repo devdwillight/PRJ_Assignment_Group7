@@ -109,7 +109,8 @@ public class OrderService implements IOrderService {
 
     @Override
     public boolean updateOrderStatus(Orders order) {
-        System.out.println("[updateOrderStatus] Cập nhật trạng thái đơn hàng ID = " + order.getIdOrder() + " thành: " + order.getStatus());
+        System.out.println("[updateOrderStatus] Cập nhật trạng thái đơn hàng ID = " + order.getIdOrder() + " thành: "
+                + order.getStatus());
         boolean success = orderDAO.updateOrderStatus(order);
         System.out.println("[updateOrderStatus] " + (success ? "✔ Thành công" : "✖ Thất bại"));
         return success;
@@ -118,9 +119,9 @@ public class OrderService implements IOrderService {
     // 🧪 Test nhanh
     public static void main(String[] args) {
         OrderService service = new OrderService();
-        
+
         System.out.println("=== 🧪 TEST UPDATE ORDER STATUS ===");
-        
+
         // Test 1: Lấy danh sách đơn hàng hiện tại
         List<Orders> orders = service.getAllOrderByUserId(1);
         System.out.println("\n📋 Danh sách đơn hàng hiện tại:");
@@ -133,18 +134,18 @@ public class OrderService implements IOrderService {
             Orders firstOrder = orders.get(0);
             System.out.println("\n🔄 Test cập nhật trạng thái đơn hàng ID: " + firstOrder.getIdOrder());
             System.out.println("Trạng thái cũ: " + firstOrder.getStatus());
-            
+
             // Tạo order mới với status mới
             Orders updateOrder = new Orders();
             updateOrder.setIdOrder(firstOrder.getIdOrder());
             updateOrder.setStatus("Đã giao hàng");
-            
+
             // Thực hiện cập nhật
             boolean success = service.updateOrderStatus(updateOrder);
-            
+
             if (success) {
                 System.out.println("✅ Cập nhật thành công!");
-                
+
                 // Kiểm tra lại trạng thái sau khi cập nhật
                 Orders updatedOrder = service.getOrderById(firstOrder.getIdOrder());
                 System.out.println("Trạng thái mới: " + updatedOrder.getStatus());
@@ -158,12 +159,12 @@ public class OrderService implements IOrderService {
         // Test 3: Thống kê tổng quan
         System.out.println("\n📊 Thống kê:");
         System.out.println("Tổng đơn hàng: " + service.countOrder());
-        
+
         // Test 4: Lọc theo trạng thái
         System.out.println("\n🔍 Test lọc theo trạng thái 'Đã giao hàng':");
         List<Orders> deliveredOrders = service.getByStatus("Đã giao hàng");
         System.out.println("Số đơn hàng đã giao: " + deliveredOrders.size());
-        
+
         System.out.println("\n=== 🎯 TEST HOÀN THÀNH ===");
     }
 }

@@ -22,7 +22,6 @@ import jakarta.validation.constraints.Size;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -62,10 +61,9 @@ public class Course implements Serializable {
     @Column(name = "category")
     private String category;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Basic(optional = false)
     @NotNull
     @Column(name = "price")
-    private BigDecimal price;
+    private Double price;
     @Size(max = 255)
     @Column(name = "duration")
     private String duration;
@@ -94,10 +92,9 @@ public class Course implements Serializable {
         this.idCourse = idCourse;
     }
 
-    public Course(Integer idCourse, String name, BigDecimal price) {
+    public Course(Integer idCourse, String name) {
         this.idCourse = idCourse;
         this.name = name;
-        this.price = price;
     }
 
     public Integer getIdCourse() {
@@ -124,11 +121,11 @@ public class Course implements Serializable {
         this.category = category;
     }
 
-    public BigDecimal getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 

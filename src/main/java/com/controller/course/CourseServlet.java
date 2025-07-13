@@ -4,6 +4,9 @@
  */
 package com.controller.course;
 
+import com.model.Course;
+import com.service.Course.CourseService;
+import jakarta.servlet.RequestDispatcher;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -11,6 +14,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  *
@@ -19,6 +23,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet(name = "CourseServlet", urlPatterns = {"/Course"})
 public class CourseServlet extends HttpServlet {
 
+    CourseService courseService = new CourseService();
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -55,9 +60,16 @@ public class CourseServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Lấy danh sách sản phẩm từ cơ sở dữ liệu
+        List<Course> courses = courseService.getAllCourses(); // Giả sử phương thức này trả về danh sách sản phẩm
+
+        // Đặt sản phẩm vào attribute của request
+        request.setAttribute("courses", courses);
+
+        // Chuyển tiếp đến JSP
+        RequestDispatcher dispatcher = request.getRequestDispatcher("views/vnpay/course_list.jsp");
+        dispatcher.forward(request, response);
     }
 
     /**

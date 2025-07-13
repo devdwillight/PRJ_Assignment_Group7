@@ -13,7 +13,7 @@
     <%
         if (session != null && session.getAttribute("user_email") != null) {
             // Nếu đã đăng nhập thì chuyển hướng đến trang home.jsp
-            response.sendRedirect("home.jsp");
+            response.sendRedirect(request.getContextPath() + "/home.jsp");
             return; // Dừng lại, không cần tiếp tục xử lý trong trang login.jsp
         }
     %>

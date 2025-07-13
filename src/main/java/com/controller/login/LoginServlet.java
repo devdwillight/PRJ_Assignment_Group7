@@ -154,6 +154,7 @@ public class LoginServlet extends HttpServlet {
             HttpSession session = request.getSession(true);
             session.setAttribute("user_email", username);
             session.setAttribute("user_id", user.getIdUser());
+            session.setAttribute("user", user);  
 
             int maxAge = 7 * 24 * 60 * 60; // 7 ngày
 

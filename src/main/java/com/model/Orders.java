@@ -21,7 +21,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -60,10 +59,8 @@ public class Orders implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date paymentTime;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Basic(optional = false)
-    @NotNull
     @Column(name = "TotalAmount")
-    private BigDecimal totalAmount;
+    private Double totalAmount;
     @JoinColumn(name = "id_user", referencedColumnName = "id_user")
     @ManyToOne(optional = false)
     private User idUser;
@@ -75,11 +72,10 @@ public class Orders implements Serializable {
         this.idOrder = idOrder;
     }
 
-    public Orders(Integer idOrder, String paymentMethod, Date paymentTime, BigDecimal totalAmount) {
+    public Orders(Integer idOrder, String paymentMethod, Date paymentTime) {
         this.idOrder = idOrder;
         this.paymentMethod = paymentMethod;
         this.paymentTime = paymentTime;
-        this.totalAmount = totalAmount;
     }
 
     public Integer getIdOrder() {
@@ -114,11 +110,11 @@ public class Orders implements Serializable {
         this.paymentTime = paymentTime;
     }
 
-    public BigDecimal getTotalAmount() {
+    public Double getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(BigDecimal totalAmount) {
+    public void setTotalAmount(Double totalAmount) {
         this.totalAmount = totalAmount;
     }
 
