@@ -90,7 +90,10 @@ public class SignUpServlet extends HttpServlet {
             return;
         }
 
-        User user = new User(username, password, email);
+        User user = new User();
+        user.setEmail(email);
+        user.setUsername(username);
+        user.setPassword(password);
 
         if (userService.createUser(user) == null) {
             request.setAttribute("mess", "Email have be used");

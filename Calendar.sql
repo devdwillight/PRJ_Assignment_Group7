@@ -1,6 +1,6 @@
 ﻿--create database Calendar;
 
---use Calendar
+use Calendar
 
 CREATE TABLE Users (
     id_user INT IDENTITY(1,1) PRIMARY KEY,
@@ -55,10 +55,10 @@ CREATE TABLE User_Course (
 CREATE TABLE Orders (
     id_order INT IDENTITY(1,1) PRIMARY KEY,
     id_user INT NOT NULL,
-    status nvarchar(255),
+    status nvarchar(255 )DEFAULT 'Processing' CHECK (Status IN ('Processing', 'Completed', 'Failed')),
 	payment_method nvarchar(255) NOT NULL,
 	payment_time datetime NOT NULL,
-	TotalAmount DECIMAL(10, 2) NOT NULL DEFAULT 0.00,	
+	TotalAmount FLOAT NOT NULL DEFAULT 0.00,	
     FOREIGN KEY (id_user) REFERENCES Users(id_user),
 );
 
@@ -119,7 +119,7 @@ CREATE TABLE To_Do (
 
 INSERT INTO Users (username, password, first_name, last_name, birthday, email, phone, gender, active, is_admin)
 VALUES
-('sa','123','admin','admin','2000-1-1','abc@gmail.com','1234567890','Male',1,1),
+('tuan','123','admin','admin','2000-1-1','nguyenhuuminhtuan20111@gmail.com','1234567890','Male',1,1),
 ('john_doe', 'hashed_pwd1', 'John', 'Doe', '1990-01-01', 'john@example.com', '1234567890', 'Male', 1, 0),
 ('jane_smith', 'hashed_pwd2', 'Jane', 'Smith', '1992-02-02', 'jane@example.com', '0987654321', 'Female', 1, 1),
 ('alice_johnson', 'hashed_pwd3', 'Alice', 'Johnson', '1988-03-15', 'alice.johnson@email.com', '5551234567', 'Female', 1, 0),
@@ -174,7 +174,7 @@ VALUES
 ('yasmin_stewart', 'hashed_pwd52', 'Yasmin', 'Stewart', '1988-10-25', 'yasmin.stewart@email.com', '5559274183', 'Female', 1, 1);
 
 
-INSERT INTO Course (name, price, duration, description, frequency, category, imageUrl)
+INSERT INTO Course (name, price, duration, description, frequency, category,imageUrl)
 VALUES
 ('Mobile App Development', 249.99, '5 months', N'Create iOS and Android apps using React Native and Flutter.', 'Weekly', 'Technology', 'https://admin.12grids.com/uploads/blogs/original_cover_images/Webp/Best_Mobile_App_Development_Technologies_12Grids.webp'),
 ('Digital Marketing Fundamentals', 149.99, '6 weeks', N'Master SEO, social media marketing, and Google Ads strategies.', 'Bi-weekly', 'Marketing', 'https://d2ds8yldqp7gxv.cloudfront.net/Blog+Explanatory+Images/Fundamentals+of+Digital+Marketing+1.webp'),
@@ -197,10 +197,10 @@ VALUES
 ('Blockchain & Cryptocurrency', 299.99, '8 weeks', N'Understanding blockchain technology, crypto trading, and DeFi basics.', 'Weekly', 'Technology','https://www.fahasa.com/blog/wp-content/uploads/2025/05/Screenshot-2025-05-25-084241-1.png'),
 ('Interior Design Principles', 139.99, '12 weeks', N'Space planning, color theory, and home decoration techniques.', 'Bi-weekly', 'Design','https://www.dsigndpo.com/blog/wp-content/uploads/2022/09/7-Principles-Of-Interior-Design.jpg');
 
-INSERT INTO Orders (id_user, status, payment_method, payment_time, TotalAmount)
+INSERT INTO Orders (id_user, payment_method, payment_time, TotalAmount)
 VALUES
-(1, 'Paid', 'Credit Card', GETDATE(),100.5),
-(2, 'Pending', 'PayPal', GETDATE(),100.5);
+(1,  'Credit Card', GETDATE(),100.5),
+(2,  'PayPal', GETDATE(),100.5);
 
 INSERT INTO Calendar (id_user, name, color)
 VALUES
@@ -421,5 +421,6 @@ VALUES
 
 INSERT INTO User_Course (id_user, id_course)
 VALUES
-(1, 1)
+(1, 1),
+(2, 1)
 

@@ -27,6 +27,7 @@ com\constant\GoogleLogin.class
 com\model\UserEvents.class
 com\model\Calendar.class
 com\service\Course\ICourseService.class
+com\vnpay\common\Config.class
 com\database\DBConnection.class
 com\dao\Event\IEventDAO.class
 com\entity\GoogleAccount.class
