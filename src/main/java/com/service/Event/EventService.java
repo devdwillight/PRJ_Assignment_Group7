@@ -78,6 +78,21 @@ public class EventService implements IEventService {
         return eventDAO.selectAllEventByCalendarId(id);
     }
 
+    @Override
+    public List<UserEvents> getAllEventsByUserId(int userId) {
+        System.out.println("[getAllEventsByUserId] Lấy tất cả events của user ID = " + userId);
+        List<UserEvents> events = eventDAO.selectAllEventsByUserId(userId);
+        System.out.println("[getAllEventsByUserId] ✔ Tìm thấy: " + events.size() + " events");
+        
+        for (UserEvents event : events) {
+            System.out.println("⏺ Event: " + event.getName() 
+                    + " | Calendar: " + (event.getIdCalendar() != null ? event.getIdCalendar().getName() : "N/A")
+                    + " | Start: " + event.getStartDate());
+        }
+        
+        return events;
+    }
+
     public static void main(String[] args) {
         EventService service = new EventService();
 

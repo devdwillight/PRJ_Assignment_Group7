@@ -17,6 +17,32 @@
     <link rel="stylesheet" href="<%=request.getContextPath()%>/css/miniCalendar.css">
         <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet" />
         <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+        
+        <style>
+            .calendar-checkbox {
+                width: 16px;
+                height: 16px;
+                cursor: pointer;
+                accent-color: #3b82f6;
+            }
+            
+            .calendar-checkbox:checked {
+                background-color: #3b82f6;
+                border-color: #3b82f6;
+            }
+            
+            .calendar-color {
+                transition: opacity 0.2s ease;
+            }
+            
+            .calendar-checkbox:not(:checked) ~ .calendar-color {
+                opacity: 0.3;
+            }
+            
+            .calendar-checkbox:not(:checked) ~ label {
+                opacity: 0.6;
+            }
+        </style>
         <div class="sidebar-container h-screen w-64 bg-white border-r border-gray-200 flex flex-col p-4 transition-all duration-200" id="sidebarContainer">
             <!-- Nút tạo dropdown -->
             <div class="sidebar-create-dropdown relative mb-6">
@@ -46,14 +72,29 @@
             </div>
             <!-- My Calendar dropdown -->
             <div class="sidebar-section mb-4">
-                <button class="w-full flex items-center justify-between px-2 py-2 text-base font-semibold text-gray-700 focus:outline-none group" id="calendarDropdownBtn">
-                    My Calendar
-                    <svg class="h-4 w-4 ml-2 transition-transform duration-200 group-[.open]:rotate-180" fill="none" viewBox="0 0 20 20" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 8l4 4 4-4" /></svg>
-                </button>
+                <div class="flex items-center justify-between px-2 py-2">
+                    <button class="flex items-center justify-between text-base font-semibold text-gray-700 focus:outline-none group" id="calendarDropdownBtn">
+                        My Calendar
+                        <svg class="h-4 w-4 ml-2 transition-transform duration-200 group-[.open]:rotate-180" fill="none" viewBox="0 0 20 20" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 8l4 4 4-4" /></svg>
+                    </button>
+                    <div class="flex gap-1">
+                        <button id="selectAllCalendars" class="text-xs text-blue-600 hover:text-blue-800 px-1">All</button>
+                        <button id="deselectAllCalendars" class="text-xs text-gray-600 hover:text-gray-800 px-1">None</button>
+                    </div>
+                </div>
                 <ul id="calendarDropdownContent" class="sidebar-calendar-list space-y-1 pl-2 mt-2">
                     <% if (calendars != null)
                             for (Calendar c : calendars) {%>
-                    <li class="flex items-center gap-2 text-gray-700"><span class="inline-block w-3 h-3 rounded-full bg-blue-500"></span> <%= c.getName()%></li>
+                    <li class="flex items-center gap-2 text-gray-700">
+                        <input type="checkbox" 
+                               id="calendar_<%= c.getIdCalendar()%>" 
+                               class="calendar-checkbox mr-2" 
+                               data-calendar-id="<%= c.getIdCalendar()%>"
+                               checked>
+                        <span class="inline-block w-3 h-3 rounded-full calendar-color" 
+                              data-color="<%= c.getColor() != null ? c.getColor() : "#3b82f6" %>"></span> 
+                        <label for="calendar_<%= c.getIdCalendar()%>" class="cursor-pointer"><%= c.getName()%></label>
+                    </li>
                         <% } %>
                 </ul>
             </div>
@@ -129,6 +170,51 @@
                 setAccordion(todoBtn, todoContent, todoOpen);
             };
             document.addEventListener('DOMContentLoaded', function () {
+                // Set calendar colors
+                document.querySelectorAll('.calendar-color').forEach(function(element) {
+                    const color = element.getAttribute('data-color');
+                    if (color) {
+                        element.style.backgroundColor = color;
+                    }
+                });
+
+                // Calendar checkbox functionality
+                document.querySelectorAll('.calendar-checkbox').forEach(function(checkbox) {
+                    checkbox.addEventListener('change', function() {
+                        const calendarId = this.getAttribute('data-calendar-id');
+                        const isChecked = this.checked;
+                        
+                        console.log('Calendar checkbox changed:', calendarId, 'checked:', isChecked);
+                        
+                        // Call function in calendar.jsp to filter events
+                        if (window.filterCalendarEvents) {
+                            window.filterCalendarEvents(calendarId, isChecked);
+                        } else {
+                            console.log('filterCalendarEvents function not found in calendar.jsp');
+                        }
+                    });
+                });
+                
+                // Select All calendars
+                document.getElementById('selectAllCalendars').addEventListener('click', function() {
+                    document.querySelectorAll('.calendar-checkbox').forEach(function(checkbox) {
+                        if (!checkbox.checked) {
+                            checkbox.checked = true;
+                            checkbox.dispatchEvent(new Event('change'));
+                        }
+                    });
+                });
+                
+                // Deselect All calendars
+                document.getElementById('deselectAllCalendars').addEventListener('click', function() {
+                    document.querySelectorAll('.calendar-checkbox').forEach(function(checkbox) {
+                        if (checkbox.checked) {
+                            checkbox.checked = false;
+                            checkbox.dispatchEvent(new Event('change'));
+                        }
+                    });
+                });
+
                 var calendarEl = document.getElementById('miniCalendar');
                 var calendar = new FullCalendar.Calendar(calendarEl, {
                     initialView: 'dayGridMonth',

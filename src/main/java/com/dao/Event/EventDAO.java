@@ -6,6 +6,7 @@ package com.dao.Event;
 
 import com.dao.BaseDAO;
 import com.model.UserEvents;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 
 /**
@@ -51,6 +52,19 @@ public class EventDAO extends BaseDAO<UserEvents> implements IEventDAO {
     @Override
     public List<UserEvents> selectAllEventByCalendarId(int id) {
         return findAllById("idCalendar", id);
+    }
+
+    @Override
+    public List<UserEvents> selectAllEventsByUserId(int userId) {
+        EntityManager em = getEntityManager();
+        try {
+            String jpql = "SELECT e FROM UserEvents e WHERE e.idCalendar.idUser.idUser = :userId";
+            return em.createQuery(jpql, UserEvents.class)
+                    .setParameter("userId", userId)
+                    .getResultList();
+        } finally {
+            em.close();
+        }
     }
 
 }

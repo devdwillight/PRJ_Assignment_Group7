@@ -86,6 +86,9 @@ public class calendarServlet extends HttpServlet {
         if ("getEvents".equals(action)) {
             handleGetEvents(request, response, userId);
             return;
+        } else if ("getAllEvents".equals(action)) {
+            handleGetAllEvents(request, response, userId);
+            return;
         }
 
         // Lấy danh sách calendar của user
@@ -159,6 +162,39 @@ public class calendarServlet extends HttpServlet {
                     .append("\"start\":\"").append(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(e.getStartDate())).append("\",")
                     .append("\"end\":\"").append(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(e.getDueDate())).append("\",")
                     .append("\"color\":\"").append(e.getColor() != null ? e.getColor() : "#3b82f6").append("\"")
+                    .append("}");
+                if (i < events.size() - 1) jsonResponse.append(",");
+            }
+            jsonResponse.append("]");
+            
+            response.getWriter().write(jsonResponse.toString());
+            
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\":\"Không thể tải dữ liệu events\"}");
+        }
+    }
+
+    private void handleGetAllEvents(HttpServletRequest request, HttpServletResponse response, Integer userId) 
+            throws ServletException, IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        
+        try {
+            // Lấy tất cả events của user
+            List<UserEvents> events = eventService.getAllEventsByUserId(userId);
+
+            // Tạo JSON response với thông tin calendar
+            StringBuilder jsonResponse = new StringBuilder("[");
+            for (int i = 0; i < events.size(); i++) {
+                UserEvents e = events.get(i);
+                jsonResponse.append("{")
+                    .append("\"id\":").append(e.getIdEvent()).append(",")
+                    .append("\"title\":\"").append(e.getName()).append("\",")
+                    .append("\"start\":\"").append(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(e.getStartDate())).append("\",")
+                    .append("\"end\":\"").append(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(e.getDueDate())).append("\",")
+                    .append("\"color\":\"").append(e.getColor() != null ? e.getColor() : "#3b82f6").append("\",")
+                    .append("\"calendarId\":").append(e.getIdCalendar() != null ? e.getIdCalendar().getIdCalendar() : "null").append(",")
+                    .append("\"calendarName\":\"").append(e.getIdCalendar() != null ? e.getIdCalendar().getName() : "").append("\"")
                     .append("}");
                 if (i < events.size() - 1) jsonResponse.append(",");
             }

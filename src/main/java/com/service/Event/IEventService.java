@@ -26,5 +26,7 @@ public interface IEventService {
     List<UserEvents> getAllEvent();
 
     List<UserEvents> getAllEventsByCalendarId(int id);
+    
+    List<UserEvents> getAllEventsByUserId(int userId);
 
 }
