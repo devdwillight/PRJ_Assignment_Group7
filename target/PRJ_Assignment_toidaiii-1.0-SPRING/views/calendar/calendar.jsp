@@ -41,7 +41,7 @@
                     <ul>
                         <c:forEach var="calendar" items="${calendars}">
                             <li><c:out value="${calendar.name}"/> (ID: <c:out value="${calendar.idCalendar}"/>)</li>
-                        </c:forEach>
+                            </c:forEach>
                     </ul>
                 </c:if>
             </div>
@@ -261,13 +261,30 @@
             // Render calendar
             calendar.render();
 
+            // Load events from server on page load
+            <c:choose>
+                <c:when test="${calendarId != null}">
+            console.log('Loading initial events for calendar ID:', ${calendarId});
+            loadEvents(${calendarId});
+                </c:when>
+                <c:otherwise>
+            console.log('No calendar ID available for initial load');
+                </c:otherwise>
+            </c:choose>
+
             // Function để load events động
             function loadEvents(calendarId) {
+                console.log('Loading events for calendar ID:', calendarId);
                 fetch('calendar?action=getEvents&calendarId=' + calendarId)
-                        .then(response => response.json())
+                        .then(response => {
+                            console.log('Response status:', response.status);
+                            return response.json();
+                        })
                         .then(data => {
+                            console.log('Loaded events from server:', data);
                             events = data;
                             calendar.refetchEvents();
+                            console.log('Calendar refreshed with', events.length, 'events');
                         })
                         .catch(error => {
                             console.error('Error loading events:', error);
@@ -393,20 +410,27 @@
             function populateCalendarDropdown() {
                 const calendarSelect = $('#eventCalendar');
                 calendarSelect.empty();
-                
+
+                console.log('Populating calendar dropdown...');
+                console.log('Calendars from JSTL: ${calendars}');
+
                 // Use JSTL to populate calendar options
-                <c:choose>
-                    <c:when test="${not empty calendars}">
-                        <c:forEach var="calendar" items="${calendars}">
-                            calendarSelect.append('<option value="${calendar.idCalendar}">${calendar.name}</option>');
-                        </c:forEach>
-                    </c:when>
-                    <c:otherwise>
-                        calendarSelect.append('<option value="">Không có calendar</option>');
-                    </c:otherwise>
-                </c:choose>
-                
-                console.log('Calendar dropdown populated using JSTL');
+            <c:choose>
+                <c:when test="${not empty calendars}">
+                console.log('Found ${calendars.size()} calendars');
+                    <c:forEach var="calendar" items="${calendars}">
+                console.log('Adding calendar: ${calendar.name} (ID: ${calendar.idCalendar})');
+                calendarSelect.append('<option value="${calendar.idCalendar}">${calendar.name}</option>');
+                    </c:forEach>
+                </c:when>
+                <c:otherwise>
+                console.log('No calendars found');
+                calendarSelect.append('<option value="">Không có calendar</option>');
+                </c:otherwise>
+            </c:choose>
+
+                console.log('Calendar dropdown populated. Options count:', calendarSelect.find('option').length);
+                console.log('Selected value:', calendarSelect.val());
             }
 
             function hideCreateEventModal() {
@@ -467,6 +491,9 @@
                     calendarId: formData.get('calendarId')
                 };
 
+                console.log('Event data prepared:', eventData);
+                console.log('Calendar ID from form:', formData.get('calendarId'));
+
                 // Create start and end datetime
                 let startDateTime = eventData.startDate;
                 let endDateTime = eventData.endDate || eventData.startDate;
@@ -491,41 +518,42 @@
                 };
 
                 // Send to server via AJAX
+                const ajaxData = {
+                    action: 'create',
+                    title: eventData.title,
+                    description: eventData.description,
+                    location: eventData.location,
+                    startDate: eventData.startDate,
+                    startTime: eventData.startTime,
+                    endDate: eventData.endDate,
+                    endTime: eventData.endTime,
+                    allDay: eventData.allDay ? 'on' : 'off',
+                    color: eventData.color,
+                    calendarId: eventData.calendarId
+                };
+
+                console.log('AJAX data being sent:', ajaxData);
+
                 $.ajax({
                     url: 'event',
                     type: 'POST',
-                    data: {
-                        action: 'create',
-                        title: eventData.title,
-                        description: eventData.description,
-                        location: eventData.location,
-                        startDate: eventData.startDate,
-                        startTime: eventData.startTime,
-                        endDate: eventData.endDate,
-                        endTime: eventData.endTime,
-                        allDay: eventData.allDay ? 'on' : 'off',
-                        color: eventData.color,
-                        calendarId: eventData.calendarId
-                    },
+                    dataType: 'json',
+                    data: ajaxData,
                     success: function (response) {
-                        try {
-                            const result = JSON.parse(response);
-                            if (result.success) {
-                                // Add to events array
-                                events.push(newEvent);
+                        console.log('Response from server:', response);
 
-                                // Refresh calendar
-                                calendar.refetchEvents();
+                        if (response.success) {
+                            console.log('Event created successfully, reloading events from server...');
 
-                                // Hide modal and show success message
-                                hideCreateEventModal();
-                                alert('Event đã được tạo thành công!');
-                            } else {
-                                alert('Lỗi: ' + (result.error || 'Không thể tạo event'));
-                            }
-                        } catch (e) {
-                            console.error('Error parsing response:', e);
-                            alert('Lỗi khi xử lý phản hồi từ server');
+                            // Reload events from server instead of just adding to local array
+                            const calendarId = eventData.calendarId;
+                            loadEvents(calendarId);
+
+                            // Hide modal and show success message
+                            hideCreateEventModal();
+                            alert('Event đã được tạo thành công!');
+                        } else {
+                            alert('Lỗi: ' + (response.error || 'Không thể tạo event'));
                         }
                     },
                     error: function (xhr, status, error) {
