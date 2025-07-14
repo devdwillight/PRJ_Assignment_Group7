@@ -31,7 +31,7 @@
                     </h3>
                     <p style="font-size: 18px; margin-top: 15px;">Vui lòng để ý số điện thoại của nhân viên tư vấn:</p>
                     <strong style="color: red; font-size: 24px;">0383459560</strong>
-                    <a href="<%=request.getContextPath() %>/product-list">COMEBACK </a>
+                    <a href="<%=request.getContextPath() %>/Course">COMEBACK </a>
                 </div>
             </c:if>
 
@@ -44,7 +44,7 @@
                     <p style="font-size: 18px; margin-top: 15px;">Cảm ơn quý khách đã dùng dịch vụ của chúng tôi.</p>
                     <p style="font-size: 18px;">Liên hệ tổng đài để được tư vấn:</p>
                     <strong style="color: red; font-size: 24px;">0383456xxx</strong>
-                    <a href="<%=request.getContextPath() %>/product-list">COMEBACK </a>
+                    <a href="<%=request.getContextPath() %>/Course">COMEBACK </a>
 
                 </div>
             </c:if>

@@ -26,6 +26,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import com.model.Orders;
 import com.model.User;
+import com.service.Order.OrderService;
 import java.math.BigDecimal;
 
 /**
@@ -35,6 +36,8 @@ import java.math.BigDecimal;
 @WebServlet(name = "ajaxServlet", urlPatterns = {"/payment"})
 public class ajaxServlet extends HttpServlet {
 
+    OrderService orderService = new OrderService();
+    
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -51,22 +54,24 @@ public class ajaxServlet extends HttpServlet {
         User user = (User) session.getAttribute("user");
 
         if (user == null) {
-            resp.sendRedirect("login.jsp");
+            resp.sendRedirect("views/login/login.jsp");
             return;
         }
         
-        OrderDAO orderDao = new OrderDAO();
-
         Orders order = new Orders();
+        order.setPaymentTime(new java.util.Date());
+        order.setPaymentMethod("VNPAY"); 
         order.setIdUser(user);
+        order.setStatus("Processing");
         order.setTotalAmount(amountDouble);
 
-        if (!orderDao.insertOrder(order)) {
+        if (orderService.createOrder(order) == null) {
+            resp.getWriter().println("Không thể tạo đơn hàng");
             return;
         }
 
-        int orderId = order.getIdOrder();
-
+        int orderId = order.getIdOrder();     
+        
         if (orderId < 1) {
             resp.sendRedirect("Course");
             return;
@@ -75,8 +80,8 @@ public class ajaxServlet extends HttpServlet {
         String vnp_Command = "pay";
         String orderType = "other";
 
-        long amount = (long) (amountDouble * 100);
-        String vnp_TxnRef = orderId + "";//dky ma rieng
+        long amount = (long) (amountDouble * 100000);
+        String vnp_TxnRef = orderId + "_" + System.currentTimeMillis();
         String vnp_IpAddr = Config.getIpAddress(req);
 
         String vnp_TmnCode = Config.vnp_TmnCode;

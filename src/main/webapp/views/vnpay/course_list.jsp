@@ -7,16 +7,29 @@
 <html lang="vi">
 <head>
     <style>
-        /* ===== TOÀN TRANG SÁNG ===== */
+        /* ======= TONE MÀU CHUNG ======= */
+        :root{
+            --bg-page:     #f5f6fa;   /* xám rất nhạt (nền) */
+            --bg-card:     #ffffff;   /* nền thẻ khóa học */
+            --bg-popup:    #ffffff;   /* nền pop‑up */
+            --bg-thumb:    #e5e7eb;   /* màu chờ load ảnh */
+            --bg-tag:      #e3e6ff;   /* nền nhãn */
+            --tag-text:    #5263ff;   /* chữ nhãn */
+            --text-main:   #2d2d2d;   /* chữ chính */
+            --text-sub:    #6b7280;   /* chữ phụ xám */
+            --gold:        #facc15;   /* sao đánh giá */
+            --price-sale:  #ff4d4f;   /* giá đang bán */
+        }
+
         body{
             font-family: Arial, sans-serif;
             margin: 20px;
-            background: #FFF9F0;            /* trắng ngà – vàng rất nhạt */
-            color: #333333;                 /* chữ đen mềm */
+            background: var(--bg-page);
+            color: var(--text-main);
         }
         h1{
             text-align: center;
-            color: #333333;
+            color: var(--text-main);
             margin-bottom: 30px;
             font-size: 32px;
         }
@@ -24,35 +37,38 @@
         .product-list{
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            gap: 24px;
         }
 
-        /* ===== THẺ KHOÁ HỌC TỐI ===== */
+        /* ======= CARD ======= */
         .product-item{
-            background: #2f2f2f;            /* xám đậm */
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,.35);
-            transition: transform .3s ease;
+            background: var(--bg-card);
+            padding: 18px;
+            border-radius: 10px;
+            text-align: left;
+            box-shadow: 0 3px 8px rgba(0,0,0,.08);
+            border: 1px solid #e2e8f0;
+            transition: transform .25s ease, box-shadow .25s ease;
             position: relative;
             z-index: 1;
         }
         .product-item:hover{
-            transform: scale(1.05);
-            z-index: 100;                   /* đè lên card khác khi hover */
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,.15);
+            z-index: 100;
         }
 
-        /* ===== ẢNH ===== */
+        /* ======= ẢNH ======= */
         .thumb{
             width: 100%;
-            height: 200px;
+            height: 180px;
             border-radius: 8px;
             overflow: hidden;
-            background: #d1d5db;           /* màu chờ load ảnh */
+            background: var(--bg-thumb);
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-bottom: 14px;
         }
         .thumb img{
             width: 100%;
@@ -60,93 +76,111 @@
             object-fit: cover;
         }
 
-        /* ===== POP‑UP MÔ TẢ – SÁNG ===== */
+        /* ======= NHÃN “Khóa học” ======= */
+        .course-tag{
+            display: inline-block;
+            font-size: 12px;
+            background: var(--bg-tag);
+            color: var(--tag-text);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+        }
+
+        /* ======= POP‑UP ======= */
         .description{
-            text-align: left;
             position: absolute;
             top: 0;
-            width: 260px;
-            background: #fffbe6;           /* vàng nhạt sáng */
-            color: #000000;                /* chữ đen */
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 6px 16px rgba(0,0,0,.25);
+            width: 300px;
+            background: var(--bg-popup);
+            color: var(--text-main);
+            padding: 20px 22px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.18);
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
             transition: opacity .3s ease, visibility .3s ease;
             transition-delay: 0s;
-            z-index: 110;
         }
+        /* mũi tên (arrow) */
+        .description::after{
+            content: '';
+            position: absolute;
+            top: 40px;
+            width: 14px; height: 14px;
+            background: var(--bg-popup);
+            transform: rotate(45deg);
+            box-shadow: 0 2px 6px rgba(0,0,0,.12);
+        }
+
         .product-item:hover .description{
             opacity: 1;
             visibility: visible;
-            transition-delay: .5s;         /* xuất hiện sau 0.5 giây */
+            transition-delay: .4s;   /* hiện sau 0.4s */
         }
 
-        /* pop‑up cột 1 → bên phải ; các cột khác → bên trái */
+        /* Cột đầu (4n+1) → pop‑up bên phải */
         .product-item:nth-child(4n+1) .description{
-            left: 100%;
-            margin-left: 10px;
+            left: 100%; margin-left: 18px;
         }
-        .product-item:not(:nth-child(4n+1)) .description{
-            right: 100%;
-            margin-right: 10px;
+        .product-item:nth-child(4n+1) .description::after{
+            left: -7px;               /* arrow bên trái pop‑up */
         }
 
-        /* ===== NỘI DUNG TRONG CARD ===== */
-        .product-item h3{
-            font-size: 18px;
-            color: #f1f1f1;
-            margin-top: 15px;
+        /* Cột còn lại → pop‑up bên trái */
+        .product-item:not(:nth-child(4n+1)) .description{
+            right: 100%; margin-right: 18px;
         }
-        .product-item p{
-            font-size: 14px;
-            color: #cccccc;
-            margin: 5px 0;
+        .product-item:not(:nth-child(4n+1)) .description::after{
+            right: -7px;              /* arrow bên phải pop‑up */
         }
-        .product-item .price{
+
+        /* ======= TEXT ======= */
+        .title{
             font-size: 18px;
-            color: #facc15;                /* vàng nổi bật cho giá */
-            font-weight: bold;
-            margin-top: 10px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .sub{
+            font-size: 13px;
+            color: var(--text-sub);
+            margin-bottom: 12px;
+        }
+        .price{
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--price-sale);
+            margin: 12px 0 4px;
         }
         .rating{
-            margin-top: 10px;
-            color: #facc15;
+            font-size: 14px;
+            color: var(--gold);
+            margin-bottom: 10px;
         }
 
+        /* ======= NÚT ======= */
         .buy-button{
-            padding: 10px 15px;
-            background: #facc15;           /* nút vàng */
-            color: #000;
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 10px 0;
+            background: var(--tag-text);
+            color: #fff;
             border: none;
+            border-radius: 6px;
             cursor: pointer;
-            margin-top: 15px;
-            border-radius: 5px;
-            transition: background .3s;
+            font-weight: 600;
+            transition: background .25s;
         }
         .buy-button:hover{
-            background: #eab308;
-        }
-
-        /* ===== POP‑UP TEXT ===== */
-        .description h2{
-            font-size: 22px;
-            font-weight: bold;
-            color: #000;
-            margin-bottom: 8px;
+            background: #4351ff;
         }
 
         .star-container{
-            display: inline-block;
-            vertical-align: middle;
+            display:inline-block;vertical-align:middle;
         }
-        .star-container svg{
-            width: 14px;
-            height: 14px;
-            fill: #facc15;
-        }
+        .star-container svg{width:14px;height:14px;fill:var(--gold);}
     </style>
 </head>
 
@@ -156,43 +190,48 @@
     <div class="product-list">
         <c:forEach var="course" items="${courses}">
             <div class="product-item">
-                <!-- Ảnh -->
+
                 <div class="thumb">
                     <img src="${empty course.imageUrl ? 'images/placeholder.png' : course.imageUrl}"
                          alt="${course.name}">
                 </div>
 
-                <!-- Thông tin tóm tắt -->
-                <h3>${course.name}</h3>
-                <p>Chuyên mục: ${course.category}</p>
-                <p>Thời lượng: ${course.duration}</p>
-                <p class="price">
-                    <fmt:formatNumber value="${course.price}" type="currency"
-                                      currencySymbol="₫" groupingUsed="true"/>
-                </p>
+                <span class="course-tag">Khóa học</span>
 
-                <!-- Đánh giá (giả lập) -->
+                <div class="title">${course.name}</div>
+                <div 
+                    class="sub">Jikan/${course.category}
+                </div>
+
                 <div class="rating">
                     <span class="star-container">
                         <svg viewBox="0 0 28 27"><path d="M13.09 1.05c.35-.79 1.47-.79 1.82 0l3.27 7.34c.15.33.46.56.82.6l7.99.84c.86.09 1.21 1.15.57 1.72l-6 5.38c-.27.24-.4.6-.32.96l1.63 7.86c.18.85-.71 1.5-1.44 1.06l-6.73-3.9a1 1 0 0 0-.99 0l-6.73 3.9c-.73.44-1.62-.21-1.44-1.06l1.63-7.86a1 1 0 0 0-.32-.96l-6-5.38c-.64-.57-.29-1.63.57-1.72l7.99-.84c.36-.04.67-.27.82-.6l3.27-7.34Z"/></svg>
                     </span>
-                    <span>5.0</span>
+                    4.8
                 </div>
 
-                <!-- POP‑UP chi tiết -->
-                <div class="description">
-                    <h2>${course.name}</h2>
-                    <p>${course.description}</p>
-                    <p>Tần suất: ${course.frequency}</p>
+                <div class="price">
+                    <fmt:formatNumber value="${course.price}" type="currency"
+                                      currencySymbol="₫" groupingUsed="true"/>
                 </div>
 
-                <!-- Nút -->
-                <form action="payment.jsp" method="get">
+                <form action="views/vnpay/payment.jsp" method="get">
                     <input type="hidden" name="courseId"    value="${course.idCourse}">
                     <input type="hidden" name="courseName"  value="${course.name}">
+                    <input type="hidden" name="courseCategory"  value="${course.category}">
                     <input type="hidden" name="coursePrice" value="${course.price}">
-                    <button type="submit" class="buy-button">Đăng ký ngay</button>
+                    <button type="submit" class="buy-button">Mua ngay</button>
                 </form>
+
+                <!-- POP‑UP -->
+                <div class="description">
+                    <h3 style="margin-top:0;font-size:20px;font-weight:700;">${course.name}</h3>
+                    <p style="font-size:14px;line-height:1.6;margin-bottom:12px;">${course.description}</p>
+                    <ul style="padding-left:16px;margin:0 0 8px;">
+                        <li style="margin-bottom:6px;">Tần suất: ${course.frequency}</li>
+                        <li>Thời lượng: ${course.duration}</li>
+                    </ul>
+                </div>
             </div>
         </c:forEach>
     </div>

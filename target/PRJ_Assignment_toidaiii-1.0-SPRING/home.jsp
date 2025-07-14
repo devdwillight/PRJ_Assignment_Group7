@@ -19,6 +19,9 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
             </button>
             <span class="font-bold text-2xl text-blue-500 select-none">Jikan</span>
+            
+            <a href="Course" ">gio hang?</a>
+            
         </header>
         <!-- Main content: flex row, sidebar bên trái, content bên phải -->
         <div class="flex flex-row min-h-[calc(100vh-4rem)]">
@@ -47,5 +50,14 @@
                 setSidebar(!sidebarOpen);
             };
         </script>
+        
+        
+        
+        <!-- Logout Form -->
+        <form action="logout" method="POST">
+            <input type="hidden" name="action" value="logout" />
+            <input type="submit" value="Logout" class="btn btn-danger" />
+        </form>
+        
     </body>
 </html>
