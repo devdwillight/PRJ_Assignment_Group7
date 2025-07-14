@@ -36,7 +36,7 @@ public abstract class BaseDAO<T> {
         try {
             tx.begin();
             em.persist(entity);
-            em.flush(); // 👈 Đảm bảo entity có id sau khi persist
+            em.flush(); 
             tx.commit();
             return true;
         } catch (Exception e) {
