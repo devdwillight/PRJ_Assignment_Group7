@@ -28,4 +28,6 @@ public interface IUserCourseService {
     List<UserCourse> getAllUserCoursesByCourseId(int id);
 
     List<UserCourse> getAllUserCoursesByUserId(int id);
+    
+    boolean isUserEnrolled(int userId, int courseId);
 }

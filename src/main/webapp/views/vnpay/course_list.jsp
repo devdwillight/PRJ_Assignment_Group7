@@ -46,20 +46,51 @@
                 box-shadow: 0 2px 16px rgba(30, 34, 90, 0.10);
                 padding: 22px 18px 22px 18px;
                 margin-bottom: 16px;
+                position: sticky;
+                top: 30px;
+                z-index: 3;
+                /* Bỏ max-height và overflow-y để sidebar không cuộn riêng */
+                box-sizing: border-box;
+            }
+            /* Sticky cho search box */
+            .search-box {
+                position: sticky;
+                top: 0;
+                z-index: 2;
+                background: #fff;
+                padding-top: 4px;
+                padding-bottom: 8px;
+                margin-bottom: 14px;
             }
             .search-box input[type="text"] {
                 width: 100%;
                 padding: 10px 12px;
                 border: 1.5px solid #e2e8f0;
-                border-radius: 8px;       /* hoặc 6px nếu muốn ít bo hơn */
+                border-radius: 8px;
                 font-size: 15px;
                 background: #fafafd;
                 outline: none;
-                margin-bottom: 18px;      /* nhỏ hơn, để sát các section khác */
-                box-sizing: border-box;   /* Đảm bảo không bị tràn */
+                box-sizing: border-box;
                 transition: border 0.18s;
             }
             .search-box input[type="text"]:focus {
+                border: 1.5px solid #5263ff;
+            }
+            /* Chỉ dropdown sort, không tiêu đề Sort by */
+            .sort-select {
+                width: 100%;
+                padding: 9px 11px;
+                border-radius: 8px;
+                border: 1.5px solid #e2e8f0;
+                background: #fafafd;
+                font-size: 15px;
+                color: #23262f;
+                margin-bottom: 17px;
+                outline: none;
+                transition: border 0.18s;
+                display: block;
+            }
+            .sort-select:focus {
                 border: 1.5px solid #5263ff;
             }
             .filter-section {
@@ -71,21 +102,6 @@
                 margin-bottom: 9px;
                 color: #23262f;
                 letter-spacing: 0.01em;
-            }
-            .sort-select {
-                width: 100%;
-                padding: 9px 11px;
-                border-radius: 8px;
-                border: 1.5px solid #e2e8f0;
-                background: #fafafd;
-                font-size: 15px;
-                color: #23262f;
-                margin-bottom: 14px;
-                outline: none;
-                transition: border 0.18s;
-            }
-            .sort-select:focus {
-                border: 1.5px solid #5263ff;
             }
             .subcategory-item {
                 margin-bottom: 9px;
@@ -275,16 +291,14 @@
                     <div class="search-box">
                         <input type="text" name="search" id="searchInput" placeholder="Tìm kiếm sản phẩm..." value="${param.search}">
                     </div>
-                    <div class="filter-section">
-                        <div class="filter-title">Sort by:</div>
-                        <select class="sort-select" name="sort" id="sortSelect">
-                            <option value="name-asc" ${param.sort == 'name-asc' ? 'selected' : ''}>A-Z</option>
-                            <option value="name-desc" ${param.sort == 'name-desc' ? 'selected' : ''}>Z-A</option>
-                            <option value="price-asc" ${param.sort == 'price-asc' ? 'selected' : ''}>Giá tăng dần</option>
-                            <option value="price-desc" ${param.sort == 'price-desc' ? 'selected' : ''}>Giá giảm dần</option>
-                            <option value="newest" ${param.sort == 'newest' ? 'selected' : ''}>Mới nhất</option>
-                        </select>
-                    </div>
+                    <!-- Chỉ dropdown sắp xếp, không chữ Sort by -->
+                    <select class="sort-select" name="sort" id="sortSelect">
+                        <option value="name-asc" ${param.sort == 'name-asc' ? 'selected' : ''}>A-Z</option>
+                        <option value="name-desc" ${param.sort == 'name-desc' ? 'selected' : ''}>Z-A</option>
+                        <option value="price-asc" ${param.sort == 'price-asc' ? 'selected' : ''}>Giá tăng dần</option>
+                        <option value="price-desc" ${param.sort == 'price-desc' ? 'selected' : ''}>Giá giảm dần</option>
+                        <option value="newest" ${param.sort == 'newest' ? 'selected' : ''}>Mới nhất</option>
+                    </select>
                     <div class="filter-section">
                         <div class="filter-title">Categories</div>
                         <c:forEach var="cate" items="${allCategories}">
@@ -314,7 +328,7 @@
                                 <span class="star-container">
                                     <svg viewBox="0 0 28 27"><path d="M13.09 1.05c.35-.79 1.47-.79 1.82 0l3.27 7.34c.15.33.46.56.82.6l7.99.84c.86.09 1.21 1.15.57 1.72l-6 5.38c-.27.24-.4.6-.32.96l1.63 7.86c.18.85-.71 1.5-1.44 1.06l-6.73-3.9a1 1 0 0 0-.99 0l-6.73 3.9c-.73.44-1.62-.21-1.44-1.06l1.63-7.86a1 1 0 0 0-.32-.96l-6-5.38c-.64-.57-.29-1.63.57-1.72l7.99-.84c.36-.04.67-.27.82-.6l3.27-7.34Z"/></svg>
                                 </span>
-                                4.8
+                                5
                             </div>
                             <div class="price">
                                 <fmt:formatNumber value="${course.price}" type="currency"

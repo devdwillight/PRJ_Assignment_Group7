@@ -6,6 +6,9 @@
 package com.vnpay.common;
 
 import com.dao.Order.OrderDAO;
+import com.model.User;
+import com.service.Order.OrderService;
+import com.service.UserCourse.UserCourseService;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -37,11 +40,13 @@ import java.math.BigDecimal;
 public class ajaxServlet extends HttpServlet {
 
     OrderService orderService = new OrderService();
-    
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         String bankCode = req.getParameter("bankCode");
+        String courseIdStr = req.getParameter("courseId");
+
         if (req.getParameter("totalBill") == null) {
             resp.sendRedirect("cart");//create cart servlet
             return;
@@ -57,10 +62,21 @@ public class ajaxServlet extends HttpServlet {
             resp.sendRedirect("views/login/login.jsp");
             return;
         }
-        
+
+        // ====== BẮT ĐẦU CHÈN ĐOẠN CHECK USER ĐÃ MUA CHƯA ======
+        UserCourseService userCourseService = new UserCourseService();
+        int courseId = Integer.parseInt(courseIdStr);
+
+        if (userCourseService.isUserEnrolled(user.getIdUser(), courseId)) {
+            req.setAttribute("mess", "Bạn đã mua khóa học này rồi!");
+            req.getRequestDispatcher("views/vnpay/payment.jsp").forward(req, resp);
+            return;
+        }
+        // ====== KẾT THÚC ĐOẠN CHECK ======
+
         Orders order = new Orders();
         order.setPaymentTime(new java.util.Date());
-        order.setPaymentMethod("VNPAY"); 
+        order.setPaymentMethod("VNPAY");
         order.setIdUser(user);
         order.setStatus("Processing");
         order.setTotalAmount(amountDouble);
@@ -70,8 +86,8 @@ public class ajaxServlet extends HttpServlet {
             return;
         }
 
-        int orderId = order.getIdOrder();     
-        
+        int orderId = order.getIdOrder();
+
         if (orderId < 1) {
             resp.sendRedirect("Course");
             return;
@@ -81,7 +97,7 @@ public class ajaxServlet extends HttpServlet {
         String orderType = "other";
 
         long amount = (long) (amountDouble * 100000);
-        String vnp_TxnRef = orderId + "_" + System.currentTimeMillis();
+        String vnp_TxnRef = orderId + "_" + courseIdStr + "_" + System.currentTimeMillis();
         String vnp_IpAddr = Config.getIpAddress(req);
 
         String vnp_TmnCode = Config.vnp_TmnCode;

@@ -6,6 +6,7 @@ package com.dao.User_Course;
 
 import com.dao.BaseDAO;
 import com.model.UserCourse;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 
 /**
@@ -58,4 +59,14 @@ public class UserCourseDAO extends BaseDAO<UserCourse> implements IUserCourseDAO
         return findAllById("idCourse", id);
     }
 
+    @Override
+    public boolean isUserEnrolled(int userId, int courseId) {
+        EntityManager em = getEntityManager();
+        String jpql = "SELECT COUNT(uc) FROM UserCourse uc WHERE uc.idUser.idUser = :userId AND uc.idCourse.idCourse = :courseId";
+        Long count = em.createQuery(jpql, Long.class)
+                .setParameter("userId", userId)
+                .setParameter("courseId", courseId)
+                .getSingleResult();
+        return count != null && count > 0;
+    }
 }

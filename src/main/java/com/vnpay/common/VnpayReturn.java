@@ -5,6 +5,7 @@
 package com.vnpay.common;
 
 import com.dao.Order.OrderDAO;
+import com.model.Course;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -18,6 +19,12 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import com.model.Orders;
+import com.model.User;
+import com.model.UserCourse;
+import com.service.Course.CourseService;
+import com.service.UserCourse.UserCourseService;
+import jakarta.servlet.http.HttpSession;
+import static java.lang.System.out;
 
 /**
  *
@@ -27,6 +34,7 @@ import com.model.Orders;
 public class VnpayReturn extends HttpServlet {
 
     OrderDAO orderDao = new OrderDAO();
+    UserCourseService userCourseService = new UserCourseService();
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -41,51 +49,71 @@ public class VnpayReturn extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            Map fields = new HashMap();
-            for (Enumeration params = request.getParameterNames(); params.hasMoreElements();) {
-                String fieldName = URLEncoder.encode((String) params.nextElement(), StandardCharsets.US_ASCII.toString());
-                String fieldValue = URLEncoder.encode(request.getParameter(fieldName), StandardCharsets.US_ASCII.toString());
-                if ((fieldValue != null) && (fieldValue.length() > 0)) {
-                    fields.put(fieldName, fieldValue);
+            try {
+                Map fields = new HashMap();
+                for (Enumeration params = request.getParameterNames(); params.hasMoreElements();) {
+                    String fieldName = URLEncoder.encode((String) params.nextElement(), StandardCharsets.US_ASCII.toString());
+                    String fieldValue = URLEncoder.encode(request.getParameter(fieldName), StandardCharsets.US_ASCII.toString());
+                    if ((fieldValue != null) && (fieldValue.length() > 0)) {
+                        fields.put(fieldName, fieldValue);
+                    }
                 }
-            }
 
-            String vnp_SecureHash = request.getParameter("vnp_SecureHash");
-            if (fields.containsKey("vnp_SecureHashType")) {
-                fields.remove("vnp_SecureHashType");
-            }
-            if (fields.containsKey("vnp_SecureHash")) {
-                fields.remove("vnp_SecureHash");
-            }
-            String signValue = Config.hashAllFields(fields);
-            if (signValue.equals(vnp_SecureHash)) {
-                String paymentCode = request.getParameter("vnp_TransactionNo");
+                String vnp_SecureHash = request.getParameter("vnp_SecureHash");
+                if (fields.containsKey("vnp_SecureHashType")) {
+                    fields.remove("vnp_SecureHashType");
+                }
+                if (fields.containsKey("vnp_SecureHash")) {
+                    fields.remove("vnp_SecureHash");
+                }
+                String signValue = Config.hashAllFields(fields);
+                if (signValue.equals(vnp_SecureHash)) {
+                    String paymentCode = request.getParameter("vnp_TransactionNo");
 
-                String orderId = request.getParameter("vnp_TxnRef").split("_")[0];
-                Orders order = new Orders();
-                order.setIdOrder(Integer.parseInt(orderId));
+                    String vnp_TxnRef = request.getParameter("vnp_TxnRef");
+                    String[] parts = vnp_TxnRef.split("_");
+                    int orderId = Integer.parseInt(parts[0]);
+                    int courseId = Integer.parseInt(parts[1]);
 
-                boolean transSuccess = false;
-                if ("00".equals(request.getParameter("vnp_TransactionStatus"))) {
-                    //update banking system
-                    order.setStatus("Completed");
-                    transSuccess = true;
+                    Orders order = orderDao.selectOrderById(orderId);
 
-                    // đoạn này thì sẽ gọi hàm add user và course ở orderDao vào bảng user_course để map xem user nào có khóa nào
+                    User user = order.getIdUser();
+
+                    CourseService courseService = new CourseService();
+                    Course course = courseService.getCourseById(courseId);
+
+                    boolean transSuccess = false;
+                    if ("00".equals(request.getParameter("vnp_TransactionStatus"))) {
+                        //update banking system
+                        order.setStatus("Completed");
+                        transSuccess = true;
+
+                        UserCourse userCourse = new UserCourse();
+                        userCourse.setIdUser(user);
+                        userCourse.setIdCourse(course);
+                        userCourse.setEnrollDate(new java.util.Date());
+                        userCourseService.createUserCourse(userCourse);
+
+                        // đoạn này thì sẽ gọi hàm add user và course ở orderDao vào bảng user_course để map xem user nào có khóa nào
+                    } else {
+                        order.setStatus("Failed");
+                    }
+                    orderDao.updateOrderStatus(order);
+                    request.setAttribute("transResult", transSuccess);
+                    request.getRequestDispatcher("views/vnpay/paymentResult.jsp").forward(request, response);
                 } else {
-                    order.setStatus("Failed");
+                    //RETURN PAGE ERROR
+                    System.out.println("GD KO HOP LE (invalid signature)");
                 }
-                orderDao.updateOrderStatus(order);
-                request.setAttribute("transResult", transSuccess);
-                request.getRequestDispatcher("views/vnpay/paymentResult.jsp").forward(request, response);
-            } else {
-                //RETURN PAGE ERROR
-                System.out.println("GD KO HOP LE (invalid signature)");
+            } catch (Exception e) {
+                out.println("<pre>");
+                e.printStackTrace(out);   
+                out.println("</pre>");
             }
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</cod  e> method.
      *

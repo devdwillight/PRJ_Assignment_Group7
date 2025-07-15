@@ -13,6 +13,8 @@
             --border:      #e2e8f0;
             --btn:         #5263ff;
             --btn-hover:   #4351ff;
+            --btn-cancel:  #e74c3c;
+            --btn-cancel-hover: #c0392b;
         }
 
         body {
@@ -60,15 +62,15 @@
             text-align: right;
         }
 
-        form {
+        .form-buttons {
             margin-top: 30px;
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
         }
 
-        button {
+        .btn {
             padding: 12px 24px;
-            background-color: var(--btn);
-            color: white;
             border: none;
             cursor: pointer;
             border-radius: 6px;
@@ -77,18 +79,40 @@
             transition: background-color .3s;
         }
 
-        button:hover {
+        .btn-primary {
+            background-color: var(--btn);
+            color: white;
+        }
+
+        .btn-primary:hover {
             background-color: var(--btn-hover);
         }
 
-        button:focus {
-            outline: none;
+        .btn-cancel {
+            background-color: var(--btn-cancel);
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background-color: var(--btn-cancel-hover);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 18px;
+            margin: 20px 0 20px 0;
+            font-weight: bold;
+            text-align: left;
         }
     </style>
 </head>
 <body>
 
     <h2>Xác Nhận Thanh Toán Khóa Học</h2>
+
+    <c:if test="${not empty mess}">
+        <div class="error-message">${mess}</div>
+    </c:if>
 
     <table>
         <thead>
@@ -115,13 +139,16 @@
         </tfoot>
     </table>
 
-    <form action="<%= request.getContextPath() %>/payment" method="post">
-        <input type="hidden" name="totalBill" value="${param.coursePrice}">
-        <input type="hidden" name="courseId" value="${param.courseId}">
-        <input type="hidden" name="courseName" value="${param.courseName}">
-        <input type="hidden" name="courseCategory" value="${param.courseCategory}">
-        <button type="submit">Xác Nhận Đặt Mua</button>
-    </form>
+    <div class="form-buttons">
+        <a href="<%= request.getContextPath() %>/Course" class="btn btn-cancel">Quay lại danh sách</a>
+        <form action="<%= request.getContextPath() %>/payment" method="post" style="display:inline;">
+            <input type="hidden" name="totalBill" value="${param.coursePrice}">
+            <input type="hidden" name="courseId" value="${param.courseId}">
+            <input type="hidden" name="courseName" value="${param.courseName}">
+            <input type="hidden" name="courseCategory" value="${param.courseCategory}">
+            <button type="submit" class="btn btn-primary">Xác Nhận Đặt Mua</button>
+        </form>
+    </div>
 
 </body>
 </html>
