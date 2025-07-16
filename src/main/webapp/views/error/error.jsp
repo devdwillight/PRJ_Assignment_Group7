@@ -12,6 +12,7 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
+        <h1>Bạn đã mua khóa học này rồi</h1>
+        <a href="<%=request.getContextPath() %>/Course">COMEBACK </a>
     </body>
 </html>

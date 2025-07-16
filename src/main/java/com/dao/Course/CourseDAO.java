@@ -70,4 +70,52 @@ public class CourseDAO extends BaseDAO<Course> implements ICourseDAO {
         }
     }
 
+    @Override
+    public List<String> getAllCategoryNames() {
+        EntityManager em = getEntityManager();
+        try {
+            String jpql = "SELECT DISTINCT c.category FROM Course c";
+            return em.createQuery(jpql, String.class).getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<Course> filterCourses(String search, String sort, String[] categories) {
+        EntityManager em = getEntityManager();
+        try {
+            StringBuilder jpql = new StringBuilder("SELECT c FROM Course c WHERE 1=1");
+            if (search != null && !search.trim().isEmpty()) {
+                jpql.append(" AND LOWER(c.name) LIKE :search");
+            }
+            if (categories != null && categories.length > 0) {
+                jpql.append(" AND c.category IN :categories");
+            }
+
+            // Sắp xếp
+            if ("name-asc".equals(sort)) {
+                jpql.append(" ORDER BY c.name ASC");
+            } else if ("name-desc".equals(sort)) {
+                jpql.append(" ORDER BY c.name DESC");
+            } else if ("price-asc".equals(sort)) {
+                jpql.append(" ORDER BY c.price ASC");
+            } else if ("price-desc".equals(sort)) {
+                jpql.append(" ORDER BY c.price DESC");
+            } else if ("newest".equals(sort)) {
+                jpql.append(" ORDER BY c.idCourse DESC"); // hoặc c.createTime nếu có
+            }
+            var query = em.createQuery(jpql.toString(), Course.class);
+            if (search != null && !search.trim().isEmpty()) {
+                query.setParameter("search", "%" + search.trim().toLowerCase() + "%");
+            }
+            if (categories != null && categories.length > 0) {
+                query.setParameter("categories", java.util.Arrays.asList(categories));
+            }
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
 }

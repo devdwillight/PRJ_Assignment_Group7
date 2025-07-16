@@ -28,4 +28,6 @@ public interface IUserCourseDAO {
     public List<UserCourse> selectAllUserCoursesByUserId(int id);
     
     public List<UserCourse> selectAllUserCoursesByCourseId(int id);
+    
+    public boolean isUserEnrolled(int userId, int courseId);
 }

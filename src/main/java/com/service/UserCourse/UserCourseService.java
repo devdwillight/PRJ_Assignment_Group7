@@ -30,7 +30,8 @@ public class UserCourseService implements IUserCourseService {
 
     @Override
     public boolean updateUserCourse(UserCourse userCourse) {
-        System.out.printf("[Service] updateUserCourse → ID: %d\n", userCourse.getIdCourse());
+        int courseId = (userCourse.getIdCourse() != null) ? userCourse.getIdCourse().getIdCourse() : -1;
+        System.out.printf("[Service] updateUserCourse → ID: %d\n", courseId);
         boolean result = userCourseDAO.updateUserCourse(userCourse);
         System.out.printf("[Service] updateUserCourse result → %s\n", result ? "SUCCESS" : "FAIL");
         return result;
@@ -46,8 +47,9 @@ public class UserCourseService implements IUserCourseService {
 
     @Override
     public UserCourse createUserCourse(UserCourse userCourse) {
-        System.out.printf("[Service] createUserCourse → UserID: %d, CourseID: %d\n",
-                userCourse.getIdUser(), userCourse.getIdCourse());
+        int userId = (userCourse.getIdUser() != null) ? userCourse.getIdUser().getIdUser() : -1;
+        int courseId = (userCourse.getIdCourse() != null) ? userCourse.getIdCourse().getIdCourse() : -1;
+        System.out.printf("[Service] createUserCourse → UserID: %d, CourseID: %d\n", userId, courseId);
         if (userCourseDAO.insertUserCourse(userCourse)) {
             System.out.println("Create Complete");
         }
@@ -84,5 +86,13 @@ public class UserCourseService implements IUserCourseService {
         List<UserCourse> list = userCourseDAO.selectAllUserCoursesByUserId(id);
         System.out.printf("[Service] getAllUserCourses → total: %d\n", list.size());
         return list;
+    }
+
+    @Override
+    public boolean isUserEnrolled(int userId, int courseId) {
+        boolean result = userCourseDAO.isUserEnrolled(userId, courseId);
+        System.out.printf("[Service] isUserEnrolled → userId: %d, courseId: %d → %s\n",
+                userId, courseId, result ? "ENROLLED" : "NOT ENROLLED");
+        return result;
     }
 }

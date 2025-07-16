@@ -24,6 +24,7 @@ import java.util.List;
 public class CourseServlet extends HttpServlet {
 
     CourseService courseService = new CourseService();
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -61,17 +62,30 @@ public class CourseServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Lấy danh sách sản phẩm từ cơ sở dữ liệu
-        List<Course> courses = courseService.getAllCourses(); // Giả sử phương thức này trả về danh sách sản phẩm
+        String search = request.getParameter("search");
+        String sort = request.getParameter("sort");
+        String[] categories = request.getParameterValues("category");
 
-        // Đặt sản phẩm vào attribute của request
+        List<String> allCategories = courseService.getAllCategoryNames();
+        List<Course> courses = courseService.filterCourses(search, sort, categories);
+
+        request.setAttribute("allCategories", allCategories);
         request.setAttribute("courses", courses);
-
-        // Chuyển tiếp đến JSP
-        RequestDispatcher dispatcher = request.getRequestDispatcher("views/vnpay/course_list.jsp");
-        dispatcher.forward(request, response);
+        request.getRequestDispatcher("views/vnpay/course_list.jsp").forward(request, response);
     }
 
+//    @Override
+//    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+//        // Lấy danh sách sản phẩm từ cơ sở dữ liệu
+//        List<Course> courses = courseService.getAllCourses(); // Giả sử phương thức này trả về danh sách sản phẩm
+//
+//        // Đặt sản phẩm vào attribute của request
+//        request.setAttribute("courses", courses);
+//
+//        // Chuyển tiếp đến JSP
+//        RequestDispatcher dispatcher = request.getRequestDispatcher("views/vnpay/course_list.jsp");
+//        dispatcher.forward(request, response);
+//    }
     /**
      * Handles the HTTP <code>POST</code> method.
      *

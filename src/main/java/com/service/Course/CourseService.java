@@ -113,4 +113,12 @@ public class CourseService implements ICourseService {
         }
     }
 
+    public List<String> getAllCategoryNames() {
+        return courseDAO.getAllCategoryNames();
+    }
+
+    public List<Course> filterCourses(String search, String sort, String[] categories) {
+        return courseDAO.filterCourses(search, sort, categories);
+    }
+
 }

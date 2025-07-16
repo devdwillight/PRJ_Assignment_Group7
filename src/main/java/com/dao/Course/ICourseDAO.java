@@ -28,5 +28,9 @@ public interface ICourseDAO {
     public List<Course> selectCourseByCategory(String category);
 
     public List<Course> selectCourseByPage(int pageNumber, int pageSize);
+    
+    public List<String> getAllCategoryNames();
+    
+    public List<Course> filterCourses(String search, String sort, String[] categories);
 
 }

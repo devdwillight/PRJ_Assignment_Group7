@@ -35,6 +35,7 @@ public abstract class BaseDAO<T> {
         try {
             tx.begin();
             em.persist(entity);
+            em.flush();
             tx.commit();
             return true;
         } catch (Exception e) {
