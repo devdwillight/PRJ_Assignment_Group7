@@ -63,7 +63,7 @@ public class LoginServlet extends HttpServlet {
         String code = request.getParameter("code");
 
         if (code == null || code.isEmpty()) {
-            response.sendRedirect("views/login/login.jsp");
+             request.getRequestDispatcher("views/login/login.jsp").forward(request, response);
             return; // Không làm gì tiếp nếu không có code
         }
 
@@ -201,6 +201,6 @@ public class LoginServlet extends HttpServlet {
 //        passCookie.setMaxAge(0);
 //        response.addCookie(userCookie);
 //        response.addCookie(passCookie);
-        response.sendRedirect("views/login/login.jsp");
+       request.getRequestDispatcher("views/login/login.jsp").forward(request, response);
     }
 }

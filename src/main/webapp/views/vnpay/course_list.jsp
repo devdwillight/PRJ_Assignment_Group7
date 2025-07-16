@@ -280,6 +280,24 @@
             .product-item:not(:nth-child(4n+1)) .description::after{
                 right: -7px;
             }
+            .tab-btn {
+                background: #f5f6fa;
+                color: #23262f;
+                border: none;
+                border-bottom: 3px solid transparent;
+                font-size: 16px;
+                font-weight: 500;
+                padding: 10px 18px;
+                border-radius: 8px 8px 0 0;
+                margin-right: 2px;
+                cursor: pointer;
+                transition: background 0.18s, color 0.18s, border-bottom 0.18s;
+            }
+            .tab-btn.active, .tab-btn:hover {
+                background: #fff;
+                color: #5263ff;
+                border-bottom: 3px solid #5263ff;
+            }
         </style>
     </head>
     <body>
@@ -314,6 +332,10 @@
             </aside>
             <!-- DANH SÁCH KHÓA HỌC BÊN PHẢI -->
             <div class="course-content">
+                <div style="display: flex; align-items: center; gap: 18px; margin-bottom: 18px;">
+
+                    <a href="home" style="background: #ff4d4f; color: #fff; font-weight: 600; border: none; border-radius: 8px; padding: 10px 22px; font-size: 16px; text-decoration: none; transition: background 0.2s;" onmouseover="this.style.background = '#d9363e'" onmouseout="this.style.background = '#ff4d4f'">Quay lại Home </a>
+                </div>
                 <div class="product-list">
                     <c:forEach var="course" items="${courses}">
                         <div class="product-item">

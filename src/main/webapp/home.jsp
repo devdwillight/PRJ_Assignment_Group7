@@ -122,9 +122,15 @@
                 </h1>
             </div>
 
-            <!-- User Menu -->
+            <!-- Right Menu -->
             <div class="ml-auto flex items-center gap-4">
-
+                
+                <div class="relative mr-2">
+                    <a href="Course" title="Khoá học" class="flex items-center gap-2 text-gray-700 hover:text-blue-500 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                    </a>
+                </div>
+                
                 <!--nút dropdown content đổi Tháng Tuần Ngày Danh sách-->
                 <div class="relative">
                     <button id="viewDropdownBtn" class="flex items-center gap-2 text-gray-700 hover:text-blue-500 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors">
@@ -151,6 +157,8 @@
                         </div>
                     </div>
                 </div>
+
+
 
                 <div class="relative">
                     <button id="userDropdownBtn" class="flex items-center gap-2 text-gray-700 hover:text-blue-500 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors">

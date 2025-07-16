@@ -2,10 +2,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package com.controller.login;
+package com.controller.other;
 
-import com.model.User;
-import com.service.User.UserService;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -16,16 +14,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 /**
  *
- * @author ADMIN
+ * @author DELL
  */
-@WebServlet(name = "SignupServlet", urlPatterns = {"/signup"})
-public class SignUpServlet extends HttpServlet {
-
-    private UserService userService;
-
-    public void init() {
-        userService = new UserService();
-    }
+@WebServlet(name = "jikan", urlPatterns = {"/jikan"})
+public class jikan extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -44,10 +36,10 @@ public class SignUpServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet SignupServlet</title>");
+            out.println("<title>Servlet jikan</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet SignupServlet at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet jikan at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -65,7 +57,7 @@ public class SignUpServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("views/login/signUp.jsp").forward(request, response);
+        request.getRequestDispatcher("index.jsp").forward(request, response);
     }
 
     /**
@@ -77,29 +69,9 @@ public class SignUpServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String email = request.getParameter("email");
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-        String repass = request.getParameter("repass");
-
-        if (!password.equals(repass)) {
-            request.setAttribute("mess", "Password do not match");
-            request.getRequestDispatcher("views/login/signUp.jsp").forward(request, response);
-            return;
-        }
-
-        User user = new User();
-        user.setEmail(email);
-        user.setUsername(username);
-        user.setPassword(password);
-
-        if (userService.createUser(user) == null) {
-            request.setAttribute("mess", "Email have be used");
-            request.getRequestDispatcher("views/login/signUp.jsp").forward(request, response);
-            return;
-        }
-        request.getRequestDispatcher("views/login/login.jsp").forward(request, response);
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
     }
 
     /**

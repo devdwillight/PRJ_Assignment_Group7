@@ -108,6 +108,33 @@ public class EventServlet extends HttpServlet {
             }
             return;
         }
+        if ("editEvent".equals(action)) {
+            // Lấy danh sách calendar của user
+            List<Calendar> calendars = calendarService.getAllCalendarByUserId(userId);
+            request.setAttribute("calendars", calendars);
+            // Lấy eventId
+            String eventIdStr = request.getParameter("id");
+            boolean isEdit = false;
+            if (eventIdStr != null && !eventIdStr.isEmpty()) {
+                try {
+                    int eventId = Integer.parseInt(eventIdStr);
+                    UserEvents event = eventService.getEventById(eventId);
+                    if (event != null && event.getIdCalendar().getIdUser().getIdUser().equals(userId)) {
+                        request.setAttribute("event", event);
+                        isEdit = true;
+                    }
+                } catch (Exception e) {
+                    // ignore, chỉ tạo mới nếu lỗi
+                }
+            }
+            request.setAttribute("isEdit", isEdit);
+            if (isEdit) {
+                request.getRequestDispatcher("/views/calendar/editEvent.jsp").forward(request, response);
+            } else {
+                response.sendRedirect(request.getContextPath() + "/calendar");
+            }
+            return;
+        }
         // Mặc định
         processRequest(request, response);
     }
@@ -252,89 +279,52 @@ public class EventServlet extends HttpServlet {
                 Date startDateTime = null;
                 Date endDateTime = null;
                 
-                            // Debug logging for time fields
-            System.out.println("[EventServlet] Time field analysis:");
-            System.out.println("  startTime is null: " + (startTime == null));
-            System.out.println("  startTime is empty: " + (startTime != null && startTime.trim().isEmpty()));
-            System.out.println("  endTime is null: " + (endTime == null));
-            System.out.println("  endTime is empty: " + (endTime != null && endTime.trim().isEmpty()));
-            System.out.println("  allDay value: " + allDay);
-            System.out.println("  allDay equals 'on': " + "on".equals(allDay));
-            System.out.println("  allDay is null: " + (allDay == null));
-                
                 if ("on".equals(allDay)) {
-                    // All day event
-                    System.out.println("[EventServlet] Processing all-day event");
                     startDateTime = dateFormat.parse(startDate);
                     if (endDate != null && !endDate.trim().isEmpty()) {
                         endDateTime = dateFormat.parse(endDate);
                     } else {
                         endDateTime = startDateTime;
                     }
-                } else if ("off".equals(allDay) || allDay == null) {
-                    // Time-specific event
+                } else {
                     boolean hasStartTime = startTime != null && !startTime.trim().isEmpty();
                     boolean hasEndTime = endTime != null && !endTime.trim().isEmpty();
                     
-                    System.out.println("[EventServlet] Processing time-specific event");
-                    System.out.println("  hasStartTime: " + hasStartTime);
-                    System.out.println("  hasEndTime: " + hasEndTime);
-                    
-                    // Parse start date/time
                     if (hasStartTime) {
-                        // Ensure time format is HH:mm:ss
                         String timeStr = startTime;
-                        if (timeStr.length() == 5) { // HH:mm format
+                        if (timeStr.length() == 5) {
                             timeStr = timeStr + ":00";
                         }
-                        String startDateTimeStr = startDate + " " + timeStr;
-                        System.out.println("  Parsing start datetime: " + startDateTimeStr);
-                        startDateTime = dateTimeFormat.parse(startDateTimeStr);
+                        startDateTime = dateTimeFormat.parse(startDate + " " + timeStr);
                     } else {
-                        System.out.println("  Parsing start date only: " + startDate);
                         startDateTime = dateFormat.parse(startDate);
                     }
                     
-                    // Parse end date/time
                     if (endDate != null && !endDate.trim().isEmpty()) {
                         if (hasEndTime) {
-                            // Ensure time format is HH:mm:ss
                             String timeStr = endTime;
-                            if (timeStr.length() == 5) { // HH:mm format
+                            if (timeStr.length() == 5) {
                                 timeStr = timeStr + ":00";
                             }
-                            String endDateTimeStr = endDate + " " + timeStr;
-                            System.out.println("  Parsing end datetime: " + endDateTimeStr);
-                            endDateTime = dateTimeFormat.parse(endDateTimeStr);
+                            endDateTime = dateTimeFormat.parse(endDate + " " + timeStr);
                         } else {
-                            // If no end time but has start time, use start time for end
                             if (hasStartTime) {
                                 String timeStr = startTime;
-                                if (timeStr.length() == 5) { // HH:mm format
+                                if (timeStr.length() == 5) {
                                     timeStr = timeStr + ":00";
                                 }
-                                String endDateTimeStr = endDate + " " + timeStr;
-                                System.out.println("  Parsing end datetime with start time: " + endDateTimeStr);
-                                endDateTime = dateTimeFormat.parse(endDateTimeStr);
+                                endDateTime = dateTimeFormat.parse(endDate + " " + timeStr);
                             } else {
-                                System.out.println("  Parsing end date only: " + endDate);
                                 endDateTime = dateFormat.parse(endDate);
                             }
                         }
                     } else {
-                        // If no end date, use start date/time
-                        System.out.println("  No end date provided, using start date/time");
                         endDateTime = startDateTime;
                     }
                 }
                 
                 event.setStartDate(startDateTime);
                 event.setDueDate(endDateTime);
-                
-                // Debug logging for parsed dates
-                System.out.println("[EventServlet] Parsed dates:");
-                System.out.println("  Start DateTime: " + startDateTime);
-                System.out.println("  End DateTime: " + endDateTime);
                 
             } catch (Exception e) {
                 System.err.println("[EventServlet] Date parsing error: " + e.getMessage());
@@ -355,10 +345,8 @@ public class EventServlet extends HttpServlet {
             try {
                 int calendarIdInt = Integer.parseInt(calendarId);
                 for (Calendar cal : userCalendars) {
-                    System.out.println("[EventServlet] Checking calendar: " + cal.getName() + " (ID: " + cal.getIdCalendar() + ")");
                     if (cal.getIdCalendar().equals(calendarIdInt)) {
                         selectedCalendar = cal;
-                        System.out.println("[EventServlet] Calendar found and belongs to user: " + cal.getName());
                         break;
                     }
                 }
@@ -389,10 +377,8 @@ public class EventServlet extends HttpServlet {
             System.out.println("[EventServlet] Refreshing calendar object...");
             Calendar refreshedCalendar = calendarService.getCalendarById(selectedCalendar.getIdCalendar());
             if (refreshedCalendar != null) {
-                System.out.println("[EventServlet] Calendar refreshed successfully");
                 event.setIdCalendar(refreshedCalendar);
             } else {
-                System.out.println("[EventServlet] Failed to refresh calendar, using original");
                 event.setIdCalendar(selectedCalendar);
             }
             
@@ -454,10 +440,8 @@ public class EventServlet extends HttpServlet {
 
             try {
                 int eventId = Integer.parseInt(eventIdStr);
-                System.out.println("[EventServlet] Parsed eventId: " + eventId);
                 
                 // Get event to check ownership
-                System.out.println("[EventServlet] Getting event by ID: " + eventId);
                 UserEvents event = eventService.getEventById(eventId);
                 if (event == null) {
                     System.out.println("[EventServlet] Event not found for ID: " + eventId);
@@ -479,9 +463,7 @@ public class EventServlet extends HttpServlet {
                 }
                 
                 // Delete event
-                System.out.println("[EventServlet] Attempting to delete event with ID: " + eventId);
                 boolean deleted = eventService.removeEvent(eventId);
-                System.out.println("[EventServlet] Delete result: " + deleted);
                 
                 if (deleted) {
                     System.out.println("[EventServlet] Event deleted successfully");

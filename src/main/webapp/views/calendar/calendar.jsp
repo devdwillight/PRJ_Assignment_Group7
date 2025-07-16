@@ -46,24 +46,24 @@
                             </button>
                         </div>
                         <div class="p-6">
-                          <div class="flex items-center mb-2">
-                            <span id="modalColorDot" class="w-3 h-3 rounded-full mr-2 inline-block"></span>
-                            <span id="modalTitle" class="text-xl font-semibold text-gray-900"></span>
-                          </div>
-                          <div class="mb-2 text-gray-700 text-sm" id="modalTime"></div>
-                          <div class="mb-2 text-gray-700 text-sm" id="modalRRule"></div>
-                          <div class="flex items-center mb-2 text-gray-700 text-sm">
-                            <svg class="w-5 h-5 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                            </svg>
-                            <span id="modalRemindBefore"></span>
-                          </div>
-                          <div class="flex items-center text-gray-700 text-sm">
-                            <svg class="w-5 h-5 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <span id="modalCalendarName"></span>
-                          </div>
+                            <div class="flex items-center mb-2">
+                                <span id="modalColorDot" class="w-3 h-3 rounded-full mr-2 inline-block"></span>
+                                <span id="modalTitle" class="text-xl font-semibold text-gray-900"></span>
+                            </div>
+                            <div class="mb-2 text-gray-700 text-sm" id="modalTime"></div>
+                            <div class="mb-2 text-gray-700 text-sm" id="modalRRule"></div>
+                            <div class="flex items-center mb-2 text-gray-700 text-sm">
+                                <svg class="w-5 h-5 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                </svg>
+                                <span id="modalRemindBefore"></span>
+                            </div>
+                            <div class="flex items-center text-gray-700 text-sm">
+                                <svg class="w-5 h-5 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <span id="modalCalendarName"></span>
+                            </div>
                         </div>
                         <div class="flex justify-end p-6 border-t">
                             <button id="editEvent" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 mr-2">
@@ -96,18 +96,6 @@
                             <div class="mb-4">
                                 <label for="eventTitle" class="block text-sm font-medium text-gray-700 mb-1">Tiêu đề *</label>
                                 <input type="text" id="eventTitle" name="title" required 
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-
-                            <div class="mb-4">
-                                <label for="eventDescription" class="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
-                                <textarea id="eventDescription" name="description" rows="3"
-                                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                            </div>
-
-                            <div class="mb-4">
-                                <label for="eventLocation" class="block text-sm font-medium text-gray-700 mb-1">Địa điểm</label>
-                                <input type="text" id="eventLocation" name="location"
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
 
@@ -144,7 +132,18 @@
                                 </label>
                             </div>
 
+                            <div class="mb-4">
+                                <label for="eventLocation" class="block text-sm font-medium text-gray-700 mb-1">Địa điểm</label>
+                                <input type="text" id="eventLocation" name="location"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
 
+
+                            <div class="mb-4">
+                                <label for="eventDescription" class="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
+                                <textarea id="eventDescription" name="description" rows="1"
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            </div>
 
                             <div class="mb-4">
                                 <label for="eventColor" class="block text-sm font-medium text-gray-700 mb-1">Màu sắc</label>
@@ -300,6 +299,7 @@
                     today: 'Hôm nay', month: 'Tháng', week: 'Tuần', day: 'Ngày', list: 'Danh sách'
                 },
                 titleFormat: {year: 'numeric', month: 'long'},
+                nowIndicator:true,
                 initialDate: new Date(),
                 navLinks: true,
                 businessHours: false,
@@ -307,10 +307,14 @@
                 selectable: true,
                 droppable: true,
                 dayMaxEventRows: true,
-                eventClick: function (info) { showEventModal(info.event); },
+                eventClick: function (info) {
+                    showEventModal(info.event);
+                },
                 eventDrop: function (info) {},
                 eventResize: function (info) {},
-                dateClick: function (info) { showCreateEventModalWithDate(info.dateStr); },
+                dateClick: function (info) {
+                    showCreateEventModalWithDate(info.dateStr);
+                },
                 events: function (info, successCallback) {
                     let filtered = events;
                     if (visibleCalendars.size > 0) {
@@ -331,54 +335,50 @@
 
             // ====== LOAD EVENTS ======
             function loadAllEvents() {
-                console.log('[Calendar] Gọi loadAllEvents');
                 fetch('calendar?action=getAllEvents')
-                    .then(response => response.json())
-                    .then(data => {
-                        // Tự động nối DTSTART vào rrule nếu thiếu
-                        events = data.map(event => {
-                            if (event.rrule && !event.rrule.includes('DTSTART') && event.start) {
-                                const dt = new Date(event.start);
-                                const pad = n => n.toString().padStart(2, '0');
-                                const dtstart = dt.getUTCFullYear() +
-                                  pad(dt.getUTCMonth() + 1) +
-                                  pad(dt.getUTCDate()) + 'T' +
-                                  pad(dt.getUTCHours()) +
-                                  pad(dt.getUTCMinutes()) +
-                                  pad(dt.getUTCSeconds()) + 'Z';
-                                event.rrule = event.rrule + ';DTSTART=' + dtstart;
-                            }
-                            if (event.idEvent && !event.id) event.id = event.idEvent;
-                            return event;
+                        .then(response => response.json())
+                        .then(data => {
+                            events = data.map(event => {
+                                if (event.rrule && !event.rrule.includes('DTSTART') && event.start) {
+                                    const dt = new Date(event.start);
+                                    const pad = n => n.toString().padStart(2, '0');
+                                    const dtstart = dt.getUTCFullYear() +
+                                            pad(dt.getUTCMonth() + 1) +
+                                            pad(dt.getUTCDate()) + 'T' +
+                                            pad(dt.getUTCHours()) +
+                                            pad(dt.getUTCMinutes()) +
+                                            pad(dt.getUTCSeconds()) + 'Z';
+                                    event.rrule = event.rrule + ';DTSTART=' + dtstart;
+                                }
+                                if (event.idEvent && !event.id)
+                                    event.id = event.idEvent;
+                                return event;
+                            });
+                            calendar.refetchEvents();
                         });
-                        console.log('[Calendar] Đã load', events.length, 'events');
-                        calendar.refetchEvents();
-                    });
             }
             function loadEvents(calendarId) {
-                console.log('[Calendar] Gọi loadEvents cho calendarId:', calendarId);
                 fetch('calendar?action=getEvents&calendarId=' + calendarId)
-                    .then(response => response.json())
-                    .then(data => {
-                        // Tự động nối DTSTART vào rrule nếu thiếu
-                        events = data.map(event => {
-                            if (event.rrule && !event.rrule.includes('DTSTART') && event.start) {
-                                const dt = new Date(event.start);
-                                const pad = n => n.toString().padStart(2, '0');
-                                const dtstart = dt.getUTCFullYear() +
-                                  pad(dt.getUTCMonth() + 1) +
-                                  pad(dt.getUTCDate()) + 'T' +
-                                  pad(dt.getUTCHours()) +
-                                  pad(dt.getUTCMinutes()) +
-                                  pad(dt.getUTCSeconds()) + 'Z';
-                                event.rrule = event.rrule + ';DTSTART=' + dtstart;
-                            }
-                            if (event.idEvent && !event.id) event.id = event.idEvent;
-                            return event;
+                        .then(response => response.json())
+                        .then(data => {
+                            events = data.map(event => {
+                                if (event.rrule && !event.rrule.includes('DTSTART') && event.start) {
+                                    const dt = new Date(event.start);
+                                    const pad = n => n.toString().padStart(2, '0');
+                                    const dtstart = dt.getUTCFullYear() +
+                                            pad(dt.getUTCMonth() + 1) +
+                                            pad(dt.getUTCDate()) + 'T' +
+                                            pad(dt.getUTCHours()) +
+                                            pad(dt.getUTCMinutes()) +
+                                            pad(dt.getUTCSeconds()) + 'Z';
+                                    event.rrule = event.rrule + ';DTSTART=' + dtstart;
+                                }
+                                if (event.idEvent && !event.id)
+                                    event.id = event.idEvent;
+                                return event;
+                            });
+                            calendar.refetchEvents();
                         });
-                        console.log('[Calendar] Đã load', events.length, 'events cho calendarId:', calendarId);
-                        calendar.refetchEvents();
-                    });
             }
 
             // ====== FILTER CALENDAR ======
@@ -389,14 +389,13 @@
                 });
             }
             function filterCalendarEvents(calendarId, isVisible) {
-                console.log('[Calendar] filterCalendarEvents', {calendarId, isVisible, visibleCalendars: Array.from(visibleCalendars)});
                 if (calendarId) {
                     isVisible ? visibleCalendars.add(calendarId) : visibleCalendars.delete(calendarId);
                 }
                 calendar.refetchEvents();
             }
-            document.addEventListener('DOMContentLoaded', function() {
-                setTimeout(function() {
+            document.addEventListener('DOMContentLoaded', function () {
+                setTimeout(function () {
                     initializeVisibleCalendars();
                     filterCalendarEvents(null, true);
                 }, 500);
@@ -406,12 +405,14 @@
             // ====== MODAL & FORM ======
             // Hàm chuyển RRULE sang mô tả tiếng Việt thân thiện
             function parseRRuleToText(rruleStr) {
-                if (!rruleStr) return 'Không lặp lại';
+                if (!rruleStr)
+                    return 'Không lặp lại';
                 // Tách các phần của rrule
                 const parts = {};
                 rruleStr.split(';').forEach(pair => {
                     const [k, v] = pair.split('=');
-                    if (k && v) parts[k.toUpperCase()] = v;
+                    if (k && v)
+                        parts[k.toUpperCase()] = v;
                 });
 
                 let text = '';
@@ -453,7 +454,8 @@
             function showEventModal(event) {
                 // Tìm event gốc trong mảng events
                 let original = events.find(e => e.id == event.id);
-                if (!original) original = event;
+                if (!original)
+                    original = event;
 
                 $('#modalTitle').text(event.title);
                 $('#modalTime').text(formatEventTime(event));
@@ -462,11 +464,11 @@
                 // Hiển thị lặp lại thân thiện
                 $('#modalRRule').text(parseRRuleToText(original.rrule));
                 // Hiển thị remindBefore
-                if(original.remindBefore && original.remindBefore > 0) {
-                  let unit = original.remindUnit ? original.remindUnit : 'phút';
-                  $('#modalRemindBefore').text(original.remindBefore + ' ' + unit + ' trước');
+                if (original.remindBefore && original.remindBefore > 0) {
+                    let unit = original.remindUnit ? original.remindUnit : 'phút';
+                    $('#modalRemindBefore').text(original.remindBefore + ' ' + unit + ' trước');
                 } else {
-                  $('#modalRemindBefore').text('Không nhắc');
+                    $('#modalRemindBefore').text('Không nhắc');
                 }
                 // Hiển thị tên calendar
                 $('#modalCalendarName').text(original.calendarName || '');
@@ -487,7 +489,8 @@
                 var minute = start.getMinutes();
                 var ampm = hour >= 12 ? 'PM' : 'AM';
                 var hour12 = hour % 12;
-                if (hour12 === 0) hour12 = 12;
+                if (hour12 === 0)
+                    hour12 = 12;
                 var startTimeStr = hour12 + ':' + String(minute).padStart(2, '0') + ampm;
                 var result = weekday + ', ' + day + ' tháng ' + month;
                 if (end) {
@@ -495,7 +498,8 @@
                     var endMinute = end.getMinutes();
                     var endAmpm = endHour >= 12 ? 'PM' : 'AM';
                     var endHour12 = endHour % 12;
-                    if (endHour12 === 0) endHour12 = 12;
+                    if (endHour12 === 0)
+                        endHour12 = 12;
                     var endTimeStr = endHour12 + ':' + String(endMinute).padStart(2, '0') + endAmpm;
                     result += '⋅' + startTimeStr + ' – ' + endTimeStr;
                 } else {
@@ -503,8 +507,13 @@
                 }
                 return result;
             }
-            $('#closeModal, #closeModalBtn').on('click', function () { $('#eventModal').addClass('hidden'); });
-            $('#eventModal').on('click', function (e) { if (e.target === this) $(this).addClass('hidden'); });
+            $('#closeModal, #closeModalBtn').on('click', function () {
+                $('#eventModal').addClass('hidden');
+            });
+            $('#eventModal').on('click', function (e) {
+                if (e.target === this)
+                    $(this).addClass('hidden');
+            });
             $('#deleteEvent').on('click', function () {
                 var eventId = $(this).data('eventId');
                 if (confirm('Bạn có chắc chắn muốn xóa event này?')) {
@@ -517,9 +526,12 @@
                                 calendar.refetchEvents();
                                 $('#eventModal').addClass('hidden');
                                 alert('Event đã được xóa thành công!');
-                            } else alert('Lỗi: ' + (response.error || 'Không thể xóa event'));
+                            } else
+                                alert('Lỗi: ' + (response.error || 'Không thể xóa event'));
                         },
-                        error: function () { alert('Lỗi khi xóa event'); }
+                        error: function () {
+                            alert('Lỗi khi xóa event');
+                        }
                     });
                 }
             });
@@ -532,35 +544,28 @@
                 var endTime = $('#eventEndTime').val();
                 // Chuyển trang và truyền giá trị
                 window.location.href = 'event?action=addForm'
-                    + '&startDate=' + encodeURIComponent(startDate)
-                    + '&startTime=' + encodeURIComponent(startTime)
-                    + '&endDate=' + encodeURIComponent(endDate)
-                    + '&endTime=' + encodeURIComponent(endTime);
+                        + '&startDate=' + encodeURIComponent(startDate)
+                        + '&startTime=' + encodeURIComponent(startTime)
+                        + '&endDate=' + encodeURIComponent(endDate)
+                        + '&endTime=' + encodeURIComponent(endTime);
             });
 
             // Nút 'Sửa Event' trong modal chi tiết event
             $('#editEvent').on('click', function () {
                 var eventId = $(this).data('eventId');
                 if (eventId) {
-                    window.location.href = 'event?action=addForm&id=' + eventId;
+                    window.location.href = 'event?action=editEvent&id=' + eventId;
                 }
             });
 
             // ====== CREATE EVENT MODAL ======
             function showCreateEventModal() {
-                console.log('[Calendar] showCreateEventModal');
                 // Set default date to today
                 const today = new Date().toISOString().split('T')[0];
                 $('#eventStartDate').val(today);
                 $('#eventEndDate').val(today);
-
-                // Auto-fill default times
                 autoFillDefaultTimes();
-
-                // Populate calendar dropdown
                 populateCalendarDropdown();
-
-                // Show modal
                 $('#createEventModal').removeClass('hidden');
             }
 
@@ -570,17 +575,16 @@
                 const currentHour = now.getHours().toString().padStart(2, '0');
                 const currentMinute = now.getMinutes().toString().padStart(2, '0');
                 const defaultStartTime = currentHour + ':' + currentMinute;
-                
+
                 // Calculate end time (1 hour later)
                 const endTime = new Date(now.getTime() + 60 * 60 * 1000); // 1 hour later
                 const endHour = endTime.getHours().toString().padStart(2, '0');
                 const endMinute = endTime.getMinutes().toString().padStart(2, '0');
                 const defaultEndTime = endHour + ':' + endMinute;
-                
+
                 $('#eventStartTime').val(defaultStartTime);
                 $('#eventEndTime').val(defaultEndTime);
-                
-                console.log('Auto-filled times:', defaultStartTime, 'to', defaultEndTime);
+
             }
 
             // Show create event modal with specific date
@@ -601,24 +605,22 @@
 
             // Show edit event modal
             function showEditEventModal(event) {
-                console.log('[Calendar] showEditEventModal', event);
-                // Set event ID
                 $('#editEventId').val(event.id);
-                
+
                 // Fill form with event data
                 $('#editEventTitle').val(event.title);
                 $('#editEventDescription').val(event.description || '');
                 $('#editEventLocation').val(event.location || '');
                 $('#editEventColor').val(event.color || '#3b82f6');
-                
+
                 // Parse dates
                 const startDate = new Date(event.start);
                 const endDate = event.end ? new Date(event.end) : startDate;
-                
+
                 // Set dates
                 $('#editEventStartDate').val(startDate.toISOString().split('T')[0]);
                 $('#editEventEndDate').val(endDate.toISOString().split('T')[0]);
-                
+
                 // Set times (only if not all-day)
                 if (!event.allDay) {
                     $('#editEventStartTime').val(startDate.toTimeString().slice(0, 5));
@@ -626,21 +628,20 @@
                         $('#editEventEndTime').val(endDate.toTimeString().slice(0, 5));
                     }
                 }
-                
+
                 // Set all-day checkbox
                 $('#editEventAllDay').prop('checked', event.allDay);
-                
+
                 // Set calendar
                 $('#editEventCalendar').val(event.calendarId || '');
-                
+
                 // Populate calendar dropdown for edit
                 populateEditCalendarDropdown();
-                
+
                 // Show modal
                 $('#editEventModal').removeClass('hidden');
                 $('#eventModal').addClass('hidden'); // Hide detail modal
-                
-                console.log('Edit modal opened for event:', event);
+
             }
 
             function populateCalendarDropdown() {
@@ -719,7 +720,6 @@
                     // Auto-fill times when unchecking all-day
                     autoFillDefaultTimes();
                 }
-                console.log('Create all-day checkbox changed:', isAllDay);
             });
 
             // Handle all-day checkbox for edit modal
@@ -730,7 +730,6 @@
                 } else {
                     $('#editEventStartTime, #editEventEndTime').prop('disabled', false);
                 }
-                console.log('Edit all-day checkbox changed:', isAllDay);
             });
 
             // Handle end date auto-fill
@@ -766,8 +765,6 @@
                     calendarId: formData.get('calendarId')
                 };
 
-                console.log('Edit event data prepared:', eventData);
-
                 // Send to server via AJAX
                 const ajaxData = {
                     action: 'update',
@@ -784,23 +781,15 @@
                     calendarId: eventData.calendarId
                 };
 
-                console.log('Update AJAX data being sent:', ajaxData);
-
                 $.ajax({
                     url: 'event',
                     type: 'POST',
                     dataType: 'json',
                     data: ajaxData,
                     success: function (response) {
-                        console.log('Update response from server:', response);
-
                         if (response.success) {
-                            console.log('Event updated successfully, reloading events from server...');
-
                             // Reload all events from server
                             loadAllEvents();
-
-                            // Hide modal and show success message
                             hideEditEventModal();
                             alert('Event đã được cập nhật thành công!');
                         } else {
@@ -808,10 +797,6 @@
                         }
                     },
                     error: function (xhr, status, error) {
-                        console.error('Update AJAX Error:', error);
-                        console.error('Status:', status);
-                        console.error('Response Text:', xhr.responseText);
-                        
                         let errorMessage = 'Lỗi khi cập nhật event';
                         try {
                             const response = JSON.parse(xhr.responseText);
@@ -821,7 +806,7 @@
                         } catch (e) {
                             console.error('Could not parse error response:', e);
                         }
-                        
+
                         alert(errorMessage);
                     }
                 });
@@ -938,7 +923,7 @@
                         console.error('AJAX Error:', error);
                         console.error('Status:', status);
                         console.error('Response Text:', xhr.responseText);
-                        
+
                         let errorMessage = 'Lỗi khi gửi dữ liệu đến server';
                         try {
                             const response = JSON.parse(xhr.responseText);
@@ -948,7 +933,7 @@
                         } catch (e) {
                             console.error('Could not parse error response:', e);
                         }
-                        
+
                         alert(errorMessage);
                     }
                 });
@@ -956,8 +941,8 @@
         </script>
         <!-- Đóng modal tạo event khi click ra ngoài vùng modal -->
         <script>
-            $(function() {
-                $('#createEventModal').on('mousedown', function(e) {
+            $(function () {
+                $('#createEventModal').on('mousedown', function (e) {
                     if (e.target === this || $(e.target).hasClass('flex')) {
                         hideCreateEventModal();
                     }

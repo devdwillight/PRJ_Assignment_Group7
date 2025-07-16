@@ -13,7 +13,7 @@
     <%
         if (session != null && session.getAttribute("user_email") != null) {
             // Nếu đã đăng nhập thì chuyển hướng đến trang home.jsp
-            response.sendRedirect(request.getContextPath() + "/home.jsp");
+            response.sendRedirect(request.getContextPath() + "home");
             return; // Dừng lại, không cần tiếp tục xử lý trong trang login.jsp
         }
     %>
@@ -72,9 +72,12 @@
                                 <label for="remember_me" class="ml-2 block text-sm text-gray-700 select-none cursor-pointer">Remember me</label>
                             </div>
                             <!--Forgot Password-->
-                            <a href="requestPassword.jsp" class="text-blue-400 text-sm hover:underline">Forgot password?</a>
+                            <a href="requestPassword" class="text-blue-400 text-sm hover:underline">Forgot password?</a>
                         </div>
-                            <p class="text-red">${mess}</p>
+                           <%-- Hiển thị thông báo lỗi đẹp --%>
+                            <c:if test="${not empty mess}">
+                                <span class="block text-xs text-red-500 mt-1">${mess}</span>
+                            </c:if>
                         <!--Login-->
                         <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition mb-4">Log In</button>
                     </form>
@@ -88,19 +91,22 @@
                         profile openid&redirect_uri=http://localhost:9999/PRJ_Assignment_toidaiii/login&response_type=code&client_id=1097365484665-9av0b9o7gjpq7j5co0ecf8dbipsbpvkd.apps.googleusercontent.com&prompt=consent"
                         class="w-full flex items-center justify-center border py-3 rounded-lg hover:bg-gray-100 transition mb-6">
                         <!--Icon logo Google-->
-                        <img src="../../assets/Google.svg" alt="Google" class="w-5 h-5 mr-2">
+                        <img src="<%=request.getContextPath()%>/assets/Google.svg" alt="Google" class="w-5 h-5 mr-2">
                         Google
                     </a>
                     
                     <div class="text-center text-gray-500 text-sm">
                         Don’t have an account?
-                        <a href="signUp.jsp" class="text-blue-500 font-semibold hover:underline">Sign Up</a>
+                        <a href="signup" class="text-blue-500 font-semibold hover:underline">Sign Up</a>
                     </div>
+                        <div class="mt-6 text-center">
+                    <a href="jikan" class="text-gray-500 hover:text-blue-600 text-sm transition">&larr; Back to <span class="font-semibold">Jikan</span></a>
+                </div>
                 </div>
             </div>
             <!-- Right: Full Background Image with Quote -->
             <div class="hidden md:flex w-1/2 h-full relative items-center justify-center
-                 bg-[url('../../assets/table-bg.jpg')]
+                 bg-[url('<%=request.getContextPath()%>/assets/table-bg.jpg')]
                  bg-cover bg-center">
                 <div class="absolute inset-0 bg-white bg-opacity-20"></div>
                 <div class="relative z-10 w-4/5 mx-auto text-center">

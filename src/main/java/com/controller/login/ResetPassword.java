@@ -126,6 +126,13 @@ public class ResetPassword extends HttpServlet {
             return;
         }
 
+        if (password.length() < 8) {
+            request.setAttribute("mess", "Password must be at least 8 characters");
+            request.setAttribute("email", email);
+            request.getRequestDispatcher("views/login/resetPassword.jsp").forward(request, response);
+            return;
+        }
+
         HttpSession session = request.getSession();
         String tokenStr = (String) session.getAttribute("token");
 

@@ -42,7 +42,7 @@
                 </form>
                 <p class="text-red-500 text-center mt-3">${mess}</p>
                 <div class="mt-6 text-center">
-                    <a href="login.jsp" class="text-gray-500 hover:text-blue-600 text-sm transition">&larr; Back to <span class="font-semibold">Log In</span></a>
+                    <a href="login" class="text-gray-500 hover:text-blue-600 text-sm transition">&larr; Back to <span class="font-semibold">Log In</span></a>
                 </div>
             </div>
         </section>

@@ -61,6 +61,7 @@ public class RequestPassword extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.getRequestDispatcher("views/login/requestPassword.jsp").forward(request, response);
     }
 
     /**

@@ -181,7 +181,6 @@
             <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 mt-20">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-2xl font-bold text-gray-900">Lặp lại tuỳ chỉnh</h3>
-                    <button id="closeCustomModal" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
                 </div>
                 <div class="mb-6 flex items-center gap-2">
                     <span class="text-gray-700">Lặp lại mỗi</span>
@@ -323,10 +322,35 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Khai báo biến chung cho modal tuỳ chỉnh
             var recurrenceType = document.getElementById('recurrenceType');
             var startDateInput = document.querySelector('input[name="startDate"]');
             var customModal = document.getElementById('customRecurrenceModal');
             var customEndDate = document.getElementById('customEndDate');
+            var cancelBtn = document.getElementById('customCancelBtn');
+
+            // Đóng modal khi bấm Huỷ và reset select về 'none'
+            if (cancelBtn && customModal) {
+                cancelBtn.addEventListener('click', function () {
+                    customModal.classList.add('hidden');
+                    recurrenceType.value = "none";
+                });
+            }
+
+            // Sự kiện click cho option 'Tùy chỉnh...'
+            var settingOption = recurrenceType.querySelector('option[value="setting"]');
+            recurrenceType.addEventListener('mousedown', function (e) {
+                if (e.target === settingOption) {
+                    var date = startDateInput && startDateInput.value ? new Date(startDateInput.value) : new Date();
+                    date.setMonth(date.getMonth() + 1);
+                    var yyyy = date.getFullYear();
+                    var mm = String(date.getMonth() + 1).padStart(2, '0');
+                    var dd = String(date.getDate()).padStart(2, '0');
+                    customEndDate.value = yyyy + '-' + mm + '-' + dd;
+                    customModal.classList.remove('hidden');
+                    e.preventDefault();
+                }
+            });
 
             // Hiển thị thứ/ngày động cho option weekly/yearly
             function updateRecurrenceLabels() {
@@ -335,7 +359,7 @@
                     var weekdays = ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
                     var weekday = weekdays[date.getDay()];
                     document.querySelector('#recurrenceType option[value="weekly"]').textContent = 'Hằng tuần vào ' + weekday;
-                    document.querySelector('#recurrenceType option[value="yearly"]').textContent = 'Hằng năm vào ngày ' + date.getDate() + '/' + (date.getMonth() + 1) + ' ' + weekday;
+                    document.querySelector('#recurrenceType option[value="yearly"]').textContent = 'Hằng năm vào ngày ' + date.getDate() + '/' + (date.getMonth() + 1);
                 } else {
                     document.querySelector('#recurrenceType option[value="weekly"]').textContent = 'Hằng tuần vào ...';
                     document.querySelector('#recurrenceType option[value="yearly"]').textContent = 'Hằng năm vào ngày ...';
@@ -433,9 +457,6 @@
                 });
             }
             // Đóng modal tùy chỉnh
-            document.getElementById('closeCustomModal').addEventListener('click', function () {
-                customModal.classList.add('hidden');
-            });
             customModal.addEventListener('click', function (e) {
                 if (e.target === this)
                     customModal.classList.add('hidden');
@@ -641,6 +662,24 @@
                 observer.observe(modal, {attributes: true, attributeFilter: ['class']});
             }
         })();
+    </script>
+
+    <script>
+        // Đảm bảo nút Huỷ đóng được modal tuỳ chỉnh
+        document.addEventListener('DOMContentLoaded', function () {
+            var recurrenceType = document.getElementById('recurrenceType');
+            var startDateInput = document.querySelector('input[name="startDate"]');
+            var customModal = document.getElementById('customRecurrenceModal');
+            var customEndDate = document.getElementById('customEndDate');
+            var cancelBtn = document.getElementById('customCancelBtn');
+            if (cancelBtn && customModal) {
+                cancelBtn.addEventListener('click', function () {
+                    customModal.classList.add('hidden');
+                    // Reset select về "none" để lần sau chọn lại "Tùy chỉnh..." sẽ luôn kích hoạt
+                    recurrenceType.value = "none";
+                });
+            }
+        });
     </script>
 
 </html>

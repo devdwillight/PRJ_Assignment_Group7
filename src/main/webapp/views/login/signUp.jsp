@@ -10,7 +10,7 @@
     <body class="min-h-screen flex items-center justify-center bg-white">
         <div class="w-full h-screen flex">
             <!-- Left: Background Image with Quote -->
-            <div class="hidden md:flex w-1/2 h-full relative items-center justify-center bg-[url('../../assets/flower-bg.jpg')] bg-cover bg-center">
+            <div class="hidden md:flex w-1/2 h-full relative items-center justify-center bg-[url('<%=request.getContextPath()%>/assets/flower-bg.jpg')] bg-cover bg-center">
                 <div class="absolute inset-0 bg-white bg-opacity-20"></div>
                 <div class="relative z-10 w-4/5 mx-auto text-center">
                     <span class="text-6xl text-gray-200 absolute -mt-8 -ml-8 select-none left-0 top-0">“</span>
@@ -47,8 +47,9 @@
                             <div class="flex items-center border border-gray-300 rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-blue-400 gap-2">
                                 <!-- Lock Icon -->
                                 <jsp:include page="../../assets/Key.svg"/>
-                                <input type="password" name="password" id="password" placeholder="Password" class="w-full outline-none bg-transparent" required />
+                                <input type="password" name="password" id="password" placeholder="Password" class="w-full outline-none bg-transparent" required minlength="8"/>
                             </div>
+                                <span class="text-xs text-gray-400 ml-1">Must be at least 8 characters.</span>
                         </div>
                         <!-- Repeat Password -->
                         <div class="mb-4">
@@ -70,12 +71,12 @@
                         profile openid&redirect_uri=http://localhost:9999/PRJ_Assignment_toidaiii/login&response_type=code&client_id=1097365484665-9av0b9o7gjpq7j5co0ecf8dbipsbpvkd.apps.googleusercontent.com&prompt=consent"
                         class="w-full flex items-center justify-center border py-3 rounded-lg hover:bg-gray-100 transition mb-6">
                         <!--Icon logo Google-->
-                        <img src="../../assets/Google.svg" alt="Google" class="w-5 h-5 mr-2">
+                        <img src="<%=request.getContextPath()%>/assets/Google.svg" alt="Google" class="w-5 h-5 mr-2">
                         Google
                     </a>
                     <div class="text-center text-gray-500 text-sm">
                         Already have an account?
-                        <a href="login.jsp" class="text-blue-500 font-semibold hover:underline">Log In</a>
+                        <a href="login" class="text-blue-500 font-semibold hover:underline">Log In</a>
                     </div>
                 </div>
             </div>
