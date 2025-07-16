@@ -28,24 +28,6 @@
     </head>
     <body class="bg-gray-50">
         <div >
-            <!-- Debug: Hidden input để kiểm tra dữ liệu -->
-            <input type="hidden" id="debugEventsJson" value='<%= request.getAttribute("eventsJson") != null ? request.getAttribute("eventsJson") : "[]"%>' />
-
-            <!-- Debug: Hiển thị dữ liệu trực tiếp -->
-            <div style="display: none;">
-                <p>Debug - Events JSON: <%= request.getAttribute("eventsJson") != null ? request.getAttribute("eventsJson") : "NULL"%></p>
-                <p>Debug - Events JSON length: <%= request.getAttribute("eventsJson") != null ? ((String) request.getAttribute("eventsJson")).length() : "0"%></p>
-                <p>Debug - Calendars count: <c:out value="${calendars != null ? calendars.size() : 0}"/></p>
-                <c:if test="${not empty calendars}">
-                    <p>Debug - Calendar names:</p>
-                    <ul>
-                        <c:forEach var="calendar" items="${calendars}">
-                            <li><c:out value="${calendar.name}"/> (ID: <c:out value="${calendar.idCalendar}"/>)</li>
-                            </c:forEach>
-                    </ul>
-                </c:if>
-            </div>
-
             <!-- Calendar Container -->
             <div class=" rounded-lg shadow-md">
                 <div id="calendar" ></div>
@@ -64,18 +46,24 @@
                             </button>
                         </div>
                         <div class="p-6">
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Tiêu đề:</label>
-                                <p id="modalTitle" class="text-gray-900 font-medium"></p>
-                            </div>
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Thời gian:</label>
-                                <p id="modalTime" class="text-gray-900"></p>
-                            </div>
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Màu sắc:</label>
-                                <div id="modalColor" class="w-6 h-6 rounded border border-gray-300"></div>
-                            </div>
+                          <div class="flex items-center mb-2">
+                            <span id="modalColorDot" class="w-3 h-3 rounded-full mr-2 inline-block"></span>
+                            <span id="modalTitle" class="text-xl font-semibold text-gray-900"></span>
+                          </div>
+                          <div class="mb-2 text-gray-700 text-sm" id="modalTime"></div>
+                          <div class="mb-2 text-gray-700 text-sm" id="modalRRule"></div>
+                          <div class="flex items-center mb-2 text-gray-700 text-sm">
+                            <svg class="w-5 h-5 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            </svg>
+                            <span id="modalRemindBefore"></span>
+                          </div>
+                          <div class="flex items-center text-gray-700 text-sm">
+                            <svg class="w-5 h-5 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span id="modalCalendarName"></span>
+                          </div>
                         </div>
                         <div class="flex justify-end p-6 border-t">
                             <button id="editEvent" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 mr-2">
@@ -180,8 +168,8 @@
                             </div>
                         </form>
                         <div class="flex justify-end p-6 border-t">
-                            <button id="cancelCreateEvent" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 mr-2">
-                                Hủy
+                            <button id="otherOptionsBtn" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 mr-2">
+                                Tùy chọn Khác
                             </button>
                             <button id="saveEvent" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
                                 Tạo Event
@@ -292,35 +280,24 @@
 
         <!-- FullCalendar JS -->
         <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js"></script>
+        <!-- rrule lib -->
+        <script src='https://cdn.jsdelivr.net/npm/rrule@2.6.4/dist/es5/rrule.min.js'></script>
+        <!-- the rrule-to-fullcalendar connector. must go AFTER the rrule lib -->
+        <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/rrule@5.11.5/main.global.min.js'></script>
 
         <script>
 
-            // Debug: Kiểm tra dữ liệu từ server
-            var eventsJsonFromServer = document.getElementById('debugEventsJson').value;
-            console.log('Events JSON from server:', eventsJsonFromServer);
-
-            // Lấy dữ liệu events từ server
+            // ====== BIẾN TOÀN CỤC ======
             var events = [];
-            try {
-                events = JSON.parse(eventsJsonFromServer);
-                console.log('Parsed events successfully:', events);
-            } catch (e) {
-                console.error('Error parsing events JSON:', e);
-                console.log('Raw JSON string:', eventsJsonFromServer);
-                events = [];
-            }
+            var visibleCalendars = new Set();
 
-            // Calendar configuration
+            // ====== KHỞI TẠO CALENDAR ======
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 headerToolbar: false,
                 locale: 'vi',
                 buttonText: {
-                    today: 'Hôm nay',
-                    month: 'Tháng',
-                    week: 'Tuần',
-                    day: 'Ngày',
-                    list: 'Danh sách'
+                    today: 'Hôm nay', month: 'Tháng', week: 'Tuần', day: 'Ngày', list: 'Danh sách'
                 },
                 titleFormat: {year: 'numeric', month: 'long'},
                 initialDate: new Date(),
@@ -330,304 +307,248 @@
                 selectable: true,
                 droppable: true,
                 dayMaxEventRows: true,
-                // Event click handler
-                eventClick: function (info) {
-                    showEventModal(info.event);
-                },
-
-                // Event drop handler
-                eventDrop: function (info) {
-                    console.log('Event dropped:', info.event.title);
-                    // Có thể thêm AJAX call để cập nhật database
-                },
-
-                // Event resize handler
-                eventResize: function (info) {
-                    console.log('Event resized:', info.event.title);
-                    // Có thể thêm AJAX call để cập nhật database
-                },
-
-                // Date click handler
-                dateClick: function (info) {
-                    console.log('Date clicked:', info.dateStr);
-                    // Open create event modal with selected date
-                    showCreateEventModalWithDate(info.dateStr);
-                },
-
-                // Events source
-                events: function (info, successCallback, failureCallback) {
-                    successCallback(events);
+                eventClick: function (info) { showEventModal(info.event); },
+                eventDrop: function (info) {},
+                eventResize: function (info) {},
+                dateClick: function (info) { showCreateEventModalWithDate(info.dateStr); },
+                events: function (info, successCallback) {
+                    let filtered = events;
+                    if (visibleCalendars.size > 0) {
+                        filtered = events.filter(event => {
+                            const eventCalendarId = event.calendarId || event.idCalendar;
+                            return eventCalendarId && visibleCalendars.has(eventCalendarId.toString());
+                        });
+                    }
+                    successCallback(filtered);
                 }
             });
-
             calendar.setOption('height', 860);
-
-            // Render calendar
             calendar.render();
+            window.calendar = calendar;
 
-            // Load all events from server on page load
-            console.log('Loading all events for user on page load');
+            // GỌI NGAY SAU KHI RENDER
             loadAllEvents();
 
-            // Function để load tất cả events của user
+            // ====== LOAD EVENTS ======
             function loadAllEvents() {
-                console.log('Loading all events for user');
+                console.log('[Calendar] Gọi loadAllEvents');
                 fetch('calendar?action=getAllEvents')
-                        .then(response => {
-                            console.log('Response status:', response.status);
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('Loaded all events from server:', data);
-                            
-                            // Ensure events have proper ID field
-                            events = data.map(event => {
-                                // If server returns idEvent, map it to id for FullCalendar
-                                if (event.idEvent && !event.id) {
-                                    event.id = event.idEvent;
-                                }
-                                console.log('Mapped event:', event);
-                                return event;
-                            });
-                            
-                            // Apply current filter after loading events
-                            if (window.filterCalendarEvents) {
-                                // Re-apply current filter
-                                const filteredEvents = events.filter(function(event) {
-                                    // If no calendars are visible, show all events
-                                    if (visibleCalendars.size === 0) {
-                                        return true;
-                                    }
-                                    
-                                    // Check if event belongs to a visible calendar
-                                    const eventCalendarId = event.calendarId || event.idCalendar;
-                                    return visibleCalendars.has(eventCalendarId.toString());
-                                });
-                                
-                                calendar.removeAllEvents();
-                                calendar.addEventSource(filteredEvents);
-                            } else {
-                                calendar.refetchEvents();
+                    .then(response => response.json())
+                    .then(data => {
+                        // Tự động nối DTSTART vào rrule nếu thiếu
+                        events = data.map(event => {
+                            if (event.rrule && !event.rrule.includes('DTSTART') && event.start) {
+                                const dt = new Date(event.start);
+                                const pad = n => n.toString().padStart(2, '0');
+                                const dtstart = dt.getUTCFullYear() +
+                                  pad(dt.getUTCMonth() + 1) +
+                                  pad(dt.getUTCDate()) + 'T' +
+                                  pad(dt.getUTCHours()) +
+                                  pad(dt.getUTCMinutes()) +
+                                  pad(dt.getUTCSeconds()) + 'Z';
+                                event.rrule = event.rrule + ';DTSTART=' + dtstart;
                             }
-                            
-                            console.log('Calendar refreshed with', events.length, 'events');
-                        })
-                        .catch(error => {
-                            console.error('Error loading all events:', error);
+                            if (event.idEvent && !event.id) event.id = event.idEvent;
+                            return event;
                         });
+                        console.log('[Calendar] Đã load', events.length, 'events');
+                        calendar.refetchEvents();
+                    });
             }
-
-            // Function để load events động theo calendar
             function loadEvents(calendarId) {
-                console.log('Loading events for calendar ID:', calendarId);
+                console.log('[Calendar] Gọi loadEvents cho calendarId:', calendarId);
                 fetch('calendar?action=getEvents&calendarId=' + calendarId)
-                        .then(response => {
-                            console.log('Response status:', response.status);
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('Loaded events from server:', data);
-                            
-                            // Ensure events have proper ID field
-                            events = data.map(event => {
-                                // If server returns idEvent, map it to id for FullCalendar
-                                if (event.idEvent && !event.id) {
-                                    event.id = event.idEvent;
-                                }
-                                console.log('Mapped event:', event);
-                                return event;
-                            });
-                            
-                            // Apply current filter after loading events
-                            if (window.filterCalendarEvents) {
-                                // Re-apply current filter
-                                const filteredEvents = events.filter(function(event) {
-                                    // If no calendars are visible, show all events
-                                    if (visibleCalendars.size === 0) {
-                                        return true;
-                                    }
-                                    
-                                    // Check if event belongs to a visible calendar
-                                    const eventCalendarId = event.calendarId || event.idCalendar;
-                                    return visibleCalendars.has(eventCalendarId.toString());
-                                });
-                                
-                                calendar.removeAllEvents();
-                                calendar.addEventSource(filteredEvents);
-                            } else {
-                                calendar.refetchEvents();
+                    .then(response => response.json())
+                    .then(data => {
+                        // Tự động nối DTSTART vào rrule nếu thiếu
+                        events = data.map(event => {
+                            if (event.rrule && !event.rrule.includes('DTSTART') && event.start) {
+                                const dt = new Date(event.start);
+                                const pad = n => n.toString().padStart(2, '0');
+                                const dtstart = dt.getUTCFullYear() +
+                                  pad(dt.getUTCMonth() + 1) +
+                                  pad(dt.getUTCDate()) + 'T' +
+                                  pad(dt.getUTCHours()) +
+                                  pad(dt.getUTCMinutes()) +
+                                  pad(dt.getUTCSeconds()) + 'Z';
+                                event.rrule = event.rrule + ';DTSTART=' + dtstart;
                             }
-                            
-                            console.log('Calendar refreshed with', events.length, 'events');
-                        })
-                        .catch(error => {
-                            console.error('Error loading events:', error);
+                            if (event.idEvent && !event.id) event.id = event.idEvent;
+                            return event;
                         });
+                        console.log('[Calendar] Đã load', events.length, 'events cho calendarId:', calendarId);
+                        calendar.refetchEvents();
+                    });
             }
 
-            // Make calendar accessible globally
-            window.calendar = calendar;
-            window.loadEvents = loadEvents;
-
-            // Initialize view button state and title
-            if (window.updateViewButtons) {
-                window.updateViewButtons('month');
+            // ====== FILTER CALENDAR ======
+            function initializeVisibleCalendars() {
+                document.querySelectorAll('.calendar-checkbox:checked').forEach(checkbox => {
+                    const calendarId = checkbox.getAttribute('data-calendar-id');
+                    visibleCalendars.add(calendarId);
+                });
             }
-            if (window.updateCalendarTitle) {
-                window.updateCalendarTitle();
-            }
-
-            // Add event listeners for calendar navigation
-            calendar.on('datesSet', function () {
-                if (window.updateCalendarTitle) {
-                    window.updateCalendarTitle();
+            function filterCalendarEvents(calendarId, isVisible) {
+                console.log('[Calendar] filterCalendarEvents', {calendarId, isVisible, visibleCalendars: Array.from(visibleCalendars)});
+                if (calendarId) {
+                    isVisible ? visibleCalendars.add(calendarId) : visibleCalendars.delete(calendarId);
                 }
-            });
-
-            // Add event form handler
-            $('#addEventForm').on('submit', function (e) {
-                e.preventDefault();
-
-                var title = $('#eventTitle').val();
-                var start = $('#eventStart').val();
-                var color = $('#eventColor').val();
-
-                if (!title || !start) {
-                    alert('Vui lòng nhập đầy đủ thông tin!');
-                    return;
-                }
-
-                var newEvent = {
-                    id: Date.now(), // Simple ID generation
-                    title: title,
-                    start: start,
-                    color: color
-                };
-
-                events.push(newEvent);
                 calendar.refetchEvents();
-
-                // Reset form
-                $('#addEventForm')[0].reset();
-
-                alert('Event đã được thêm thành công!');
+            }
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(function() {
+                    initializeVisibleCalendars();
+                    filterCalendarEvents(null, true);
+                }, 500);
             });
+            window.filterCalendarEvents = filterCalendarEvents;
 
-            // Modal functions
+            // ====== MODAL & FORM ======
+            // Hàm chuyển RRULE sang mô tả tiếng Việt thân thiện
+            function parseRRuleToText(rruleStr) {
+                if (!rruleStr) return 'Không lặp lại';
+                // Tách các phần của rrule
+                const parts = {};
+                rruleStr.split(';').forEach(pair => {
+                    const [k, v] = pair.split('=');
+                    if (k && v) parts[k.toUpperCase()] = v;
+                });
+
+                let text = '';
+                switch (parts['FREQ']) {
+                    case 'DAILY':
+                        text = 'Lặp lại hàng ngày';
+                        break;
+                    case 'WEEKLY':
+                        if (parts['BYDAY']) {
+                            // Chuyển mã ngày sang tiếng Việt
+                            const days = {
+                                MO: 'Thứ 2', TU: 'Thứ 3', WE: 'Thứ 4', TH: 'Thứ 5', FR: 'Thứ 6', SA: 'Thứ 7', SU: 'Chủ nhật'
+                            };
+                            const byday = parts['BYDAY'].split(',').map(d => days[d] || d).join(', ');
+                            text = 'Lặp lại hàng tuần vào ' + byday;
+                        } else {
+                            text = 'Lặp lại hàng tuần';
+                        }
+                        break;
+                    case 'MONTHLY':
+                        if (parts['BYMONTHDAY']) {
+                            text = 'Lặp lại hàng tháng vào ngày ' + parts['BYMONTHDAY'];
+                        } else {
+                            text = 'Lặp lại hàng tháng';
+                        }
+                        break;
+                    case 'YEARLY':
+                        if (parts['BYMONTH'] && parts['BYMONTHDAY']) {
+                            text = `Lặp lại hàng năm vào ngày ${parts['BYMONTHDAY']}/${parts['BYMONTH']}`;
+                        } else {
+                            text = 'Lặp lại hàng năm';
+                        }
+                        break;
+                    default:
+                        text = 'Lặp lại';
+                }
+                return text;
+            }
             function showEventModal(event) {
+                // Tìm event gốc trong mảng events
+                let original = events.find(e => e.id == event.id);
+                if (!original) original = event;
+
                 $('#modalTitle').text(event.title);
                 $('#modalTime').text(formatEventTime(event));
-                $('#modalColor').css('background-color', event.backgroundColor || event.color);
-                $('#eventModal').removeClass('hidden');
+                $('#modalColorDot').css('background-color', event.backgroundColor || event.color);
 
-                // Store event ID for both delete and edit
+                // Hiển thị lặp lại thân thiện
+                $('#modalRRule').text(parseRRuleToText(original.rrule));
+                // Hiển thị remindBefore
+                if(original.remindBefore && original.remindBefore > 0) {
+                  let unit = original.remindUnit ? original.remindUnit : 'phút';
+                  $('#modalRemindBefore').text(original.remindBefore + ' ' + unit + ' trước');
+                } else {
+                  $('#modalRemindBefore').text('Không nhắc');
+                }
+                // Hiển thị tên calendar
+                $('#modalCalendarName').text(original.calendarName || '');
+
+                $('#eventModal').removeClass('hidden');
                 $('#deleteEvent').data('eventId', event.id);
                 $('#editEvent').data('eventId', event.id);
-                
-                console.log('Event modal opened for event:', event);
-                console.log('Event ID stored:', event.id);
             }
-
             function formatEventTime(event) {
-                if (event.allDay) {
-                    return 'Cả ngày';
-                }
-
+                // Format: 'Thứ hai, 14 tháng 7⋅10:00 – 10:30AM'
                 var start = new Date(event.start);
                 var end = event.end ? new Date(event.end) : null;
-
-                var startStr = start.toLocaleDateString('vi-VN') + ' ' + start.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'});
-
+                var weekdays = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
+                var weekday = weekdays[start.getDay()];
+                var day = start.getDate();
+                var month = start.getMonth() + 1;
+                var hour = start.getHours();
+                var minute = start.getMinutes();
+                var ampm = hour >= 12 ? 'PM' : 'AM';
+                var hour12 = hour % 12;
+                if (hour12 === 0) hour12 = 12;
+                var startTimeStr = hour12 + ':' + String(minute).padStart(2, '0') + ampm;
+                var result = weekday + ', ' + day + ' tháng ' + month;
                 if (end) {
-                    var endStr = end.toLocaleDateString('vi-VN') + ' ' + end.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'});
-                    return startStr + ' - ' + endStr;
+                    var endHour = end.getHours();
+                    var endMinute = end.getMinutes();
+                    var endAmpm = endHour >= 12 ? 'PM' : 'AM';
+                    var endHour12 = endHour % 12;
+                    if (endHour12 === 0) endHour12 = 12;
+                    var endTimeStr = endHour12 + ':' + String(endMinute).padStart(2, '0') + endAmpm;
+                    result += '⋅' + startTimeStr + ' – ' + endTimeStr;
+                } else {
+                    result += '⋅' + startTimeStr;
                 }
-
-                return startStr;
+                return result;
             }
-
-            // Close modal
-            $('#closeModal, #closeModalBtn').on('click', function () {
-                $('#eventModal').addClass('hidden');
-            });
-
-            // Delete event
+            $('#closeModal, #closeModalBtn').on('click', function () { $('#eventModal').addClass('hidden'); });
+            $('#eventModal').on('click', function (e) { if (e.target === this) $(this).addClass('hidden'); });
             $('#deleteEvent').on('click', function () {
                 var eventId = $(this).data('eventId');
-                
-                console.log('Attempting to delete event with ID:', eventId);
-                console.log('Event ID type:', typeof eventId);
-                
                 if (confirm('Bạn có chắc chắn muốn xóa event này?')) {
-                    // Send delete request to server
-                    const deleteData = {
-                        action: 'delete',
-                        eventId: eventId
-                    };
-                    
-                    console.log('Delete request data:', deleteData);
-                    console.log('Delete request URL:', 'event');
-                    
                     $.ajax({
-                        url: 'event',
-                        type: 'POST',
-                        dataType: 'json',
-                        data: deleteData,
+                        url: 'event', type: 'POST', dataType: 'json',
+                        data: {action: 'delete', eventId: eventId},
                         success: function (response) {
-                            console.log('Delete response:', response);
                             if (response.success) {
-                                // Remove from local events array
-                                var index = events.findIndex(e => e.id == eventId);
-                                if (index > -1) {
-                                    events.splice(index, 1);
-                                    calendar.refetchEvents();
-                                }
+                                events = events.filter(e => e.id != eventId);
+                                calendar.refetchEvents();
                                 $('#eventModal').addClass('hidden');
                                 alert('Event đã được xóa thành công!');
-                            } else {
-                                alert('Lỗi: ' + (response.error || 'Không thể xóa event'));
-                            }
+                            } else alert('Lỗi: ' + (response.error || 'Không thể xóa event'));
                         },
-                        error: function (xhr, status, error) {
-                            console.error('Delete AJAX Error:', error);
-                            console.error('Status:', status);
-                            console.error('Response Text:', xhr.responseText);
-                            
-                            let errorMessage = 'Lỗi khi xóa event';
-                            try {
-                                const response = JSON.parse(xhr.responseText);
-                                if (response.error) {
-                                    errorMessage = 'Lỗi: ' + response.error;
-                                }
-                            } catch (e) {
-                                console.error('Could not parse error response:', e);
-                            }
-                            
-                            alert(errorMessage);
-                        }
+                        error: function () { alert('Lỗi khi xóa event'); }
                     });
                 }
             });
+            // Nút 'Tùy chọn khác' trong modal tạo event
+            $('#otherOptionsBtn').on('click', function () {
+                // Lấy giá trị từ modal
+                var startDate = $('#eventStartDate').val();
+                var startTime = $('#eventStartTime').val();
+                var endDate = $('#eventEndDate').val();
+                var endTime = $('#eventEndTime').val();
+                // Chuyển trang và truyền giá trị
+                window.location.href = 'event?action=addForm'
+                    + '&startDate=' + encodeURIComponent(startDate)
+                    + '&startTime=' + encodeURIComponent(startTime)
+                    + '&endDate=' + encodeURIComponent(endDate)
+                    + '&endTime=' + encodeURIComponent(endTime);
+            });
 
-            // Edit event
+            // Nút 'Sửa Event' trong modal chi tiết event
             $('#editEvent').on('click', function () {
                 var eventId = $(this).data('eventId');
-                var event = events.find(e => e.id == eventId);
-                
-                if (event) {
-                    showEditEventModal(event);
+                if (eventId) {
+                    window.location.href = 'event?action=addForm&id=' + eventId;
                 }
             });
 
-            // Close modal when clicking outside
-            $('#eventModal').on('click', function (e) {
-                if (e.target === this) {
-                    $(this).addClass('hidden');
-                }
-            });
-
-            // Create Event Modal Functions
+            // ====== CREATE EVENT MODAL ======
             function showCreateEventModal() {
+                console.log('[Calendar] showCreateEventModal');
                 // Set default date to today
                 const today = new Date().toISOString().split('T')[0];
                 $('#eventStartDate').val(today);
@@ -680,6 +601,7 @@
 
             // Show edit event modal
             function showEditEventModal(event) {
+                console.log('[Calendar] showEditEventModal', event);
                 // Set event ID
                 $('#editEventId').val(event.id);
                 
@@ -725,50 +647,34 @@
                 const calendarSelect = $('#eventCalendar');
                 calendarSelect.empty();
 
-                console.log('Populating calendar dropdown...');
-                console.log('Calendars from JSTL: ${calendars}');
-
                 // Use JSTL to populate calendar options
             <c:choose>
                 <c:when test="${not empty calendars}">
-                console.log('Found ${calendars.size()} calendars');
                     <c:forEach var="calendar" items="${calendars}">
-                console.log('Adding calendar: ${calendar.name} (ID: ${calendar.idCalendar})');
                 calendarSelect.append('<option value="${calendar.idCalendar}">${calendar.name}</option>');
                     </c:forEach>
                 </c:when>
                 <c:otherwise>
-                console.log('No calendars found');
                 calendarSelect.append('<option value="">Không có calendar</option>');
                 </c:otherwise>
             </c:choose>
-
-                console.log('Calendar dropdown populated. Options count:', calendarSelect.find('option').length);
-                console.log('Selected value:', calendarSelect.val());
             }
 
             function populateEditCalendarDropdown() {
                 const calendarSelect = $('#editEventCalendar');
                 calendarSelect.empty();
 
-                console.log('Populating edit calendar dropdown...');
-
                 // Use JSTL to populate calendar options
             <c:choose>
                 <c:when test="${not empty calendars}">
-                console.log('Found ${calendars.size()} calendars for edit');
                     <c:forEach var="calendar" items="${calendars}">
-                console.log('Adding calendar for edit: ${calendar.name} (ID: ${calendar.idCalendar})');
                 calendarSelect.append('<option value="${calendar.idCalendar}">${calendar.name}</option>');
                     </c:forEach>
                 </c:when>
                 <c:otherwise>
-                console.log('No calendars found for edit');
                 calendarSelect.append('<option value="">Không có calendar</option>');
                 </c:otherwise>
             </c:choose>
-
-                console.log('Edit calendar dropdown populated. Options count:', calendarSelect.find('option').length);
             }
 
             function hideCreateEventModal() {
@@ -782,7 +688,7 @@
             }
 
             // Event handlers for create modal
-            $('#closeCreateModal, #cancelCreateEvent').on('click', function () {
+            $('#closeCreateModal').on('click', function () {
                 hideCreateEventModal();
             });
 
@@ -1047,71 +953,16 @@
                     }
                 });
             });
-
-            // Calendar filtering functionality
-            var visibleCalendars = new Set();
-            
-            // Initialize visible calendars from checked checkboxes
-            function initializeVisibleCalendars() {
-                const checkboxes = document.querySelectorAll('.calendar-checkbox:checked');
-                checkboxes.forEach(function(checkbox) {
-                    const calendarId = checkbox.getAttribute('data-calendar-id');
-                    visibleCalendars.add(calendarId);
+        </script>
+        <!-- Đóng modal tạo event khi click ra ngoài vùng modal -->
+        <script>
+            $(function() {
+                $('#createEventModal').on('mousedown', function(e) {
+                    if (e.target === this || $(e.target).hasClass('flex')) {
+                        hideCreateEventModal();
+                    }
                 });
-                console.log('Initial visible calendars:', Array.from(visibleCalendars));
-            }
-            
-            // Filter events based on calendar visibility
-            function filterCalendarEvents(calendarId, isVisible) {
-                console.log('Filtering calendar events:', calendarId, 'visible:', isVisible);
-                
-                if (calendarId) {
-                    if (isVisible) {
-                        visibleCalendars.add(calendarId);
-                    } else {
-                        visibleCalendars.delete(calendarId);
-                    }
-                }
-                
-                console.log('Current visible calendars:', Array.from(visibleCalendars));
-                
-                // Filter events and refresh calendar
-                const filteredEvents = events.filter(function(event) {
-                    // Nếu không có calendar nào được chọn, ẩn hết events
-                    if (visibleCalendars.size === 0) {
-                        return false;
-                    }
-                    
-                    // Check if event belongs to a visible calendar
-                    // Support both old format (idCalendar) and new format (calendarId)
-                    const eventCalendarId = event.calendarId || event.idCalendar;
-                    if (eventCalendarId && eventCalendarId !== 'null') {
-                        return visibleCalendars.has(eventCalendarId.toString());
-                    }
-                    return false; // Hide events without calendar ID
-                });
-                
-                console.log('Filtered events:', filteredEvents.length, 'out of', events.length);
-                
-                // Update calendar with filtered events
-                calendar.removeAllEvents();
-                calendar.addEventSource(filteredEvents);
-            }
-            
-            // Initialize visible calendars when page loads
-            document.addEventListener('DOMContentLoaded', function() {
-                // Wait a bit for sidebar to load
-                setTimeout(function() {
-                    initializeVisibleCalendars();
-                    // Show all events initially (all calendars are checked by default)
-                    filterCalendarEvents(null, true);
-                }, 500);
             });
-            
-            // Make functions globally accessible
-            window.showCreateEventModal = showCreateEventModal;
-            window.hideCreateEventModal = hideCreateEventModal;
-            window.filterCalendarEvents = filterCalendarEvents;
         </script>
     </body>
 </html>

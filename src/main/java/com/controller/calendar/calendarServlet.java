@@ -89,6 +89,24 @@ public class calendarServlet extends HttpServlet {
         } else if ("getAllEvents".equals(action)) {
             handleGetAllEvents(request, response, userId);
             return;
+        } else if ("create".equals(action)) {
+            // Hiển thị form thêm mới calendar
+            request.getRequestDispatcher("views/calendar/addCalendar.jsp").forward(request, response);
+            return;
+        } else if ("edit".equals(action)) {
+            // Hiển thị form chỉnh sửa calendar
+            String idParam = request.getParameter("id");
+            if (idParam != null) {
+                try {
+                    int calendarIdEdit = Integer.parseInt(idParam);
+                    Calendar calendar = calendarService.getCalendarById(calendarIdEdit);
+                    request.setAttribute("calendar", calendar);
+                } catch (Exception e) {
+                    // Có thể log lỗi hoặc xử lý thông báo
+                }
+            }
+            request.getRequestDispatcher("views/calendar/addCalendar.jsp").forward(request, response);
+            return;
         }
 
         // Lấy danh sách calendar của user
@@ -161,7 +179,17 @@ public class calendarServlet extends HttpServlet {
                     .append("\"title\":\"").append(e.getName()).append("\",")
                     .append("\"start\":\"").append(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(e.getStartDate())).append("\",")
                     .append("\"end\":\"").append(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(e.getDueDate())).append("\",")
-                    .append("\"color\":\"").append(e.getColor() != null ? e.getColor() : "#3b82f6").append("\"")
+                    .append("\"color\":\"").append(e.getColor() != null ? e.getColor() : "#3b82f6").append("\",")
+                    .append("\"calendarId\":").append(e.getIdCalendar() != null ? e.getIdCalendar().getIdCalendar() : "null").append(",")
+                    .append("\"calendarName\":\"").append(e.getIdCalendar() != null ? e.getIdCalendar().getName() : "").append("\",")
+                    .append("\"isAllDay\":").append(e.getIsAllDay() != null && e.getIsAllDay() ? "true" : "false").append(",")
+                    .append("\"isRecurring\":").append(e.getIsRecurring() != null && e.getIsRecurring() ? "true" : "false").append(",")
+                    .append("\"rrule\":").append(e.getRecurrenceRule() != null ? "\"" + e.getRecurrenceRule() + "\"" : "null").append(",")
+                    .append("\"remindMethod\":").append(e.getRemindMethod() != null ? e.getRemindMethod() : 0).append(",")
+                    .append("\"remindBefore\":").append(e.getRemindBefore() != null ? e.getRemindBefore() : 0).append(",")
+                    .append("\"remindUnit\":").append(e.getRemindUnit() != null ? "\"" + e.getRemindUnit() + "\"" : "null").append(",")
+                    .append("\"description\":\"").append(e.getDescription() != null ? e.getDescription().replace("\"", "\\\"") : "").append("\",")
+                    .append("\"location\":\"").append(e.getLocation() != null ? e.getLocation().replace("\"", "\\\"") : "").append("\"")
                     .append("}");
                 if (i < events.size() - 1) jsonResponse.append(",");
             }
@@ -194,7 +222,15 @@ public class calendarServlet extends HttpServlet {
                     .append("\"end\":\"").append(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(e.getDueDate())).append("\",")
                     .append("\"color\":\"").append(e.getColor() != null ? e.getColor() : "#3b82f6").append("\",")
                     .append("\"calendarId\":").append(e.getIdCalendar() != null ? e.getIdCalendar().getIdCalendar() : "null").append(",")
-                    .append("\"calendarName\":\"").append(e.getIdCalendar() != null ? e.getIdCalendar().getName() : "").append("\"")
+                    .append("\"calendarName\":\"").append(e.getIdCalendar() != null ? e.getIdCalendar().getName() : "").append("\",")
+                    .append("\"isAllDay\":").append(e.getIsAllDay() != null && e.getIsAllDay() ? "true" : "false").append(",")
+                    .append("\"isRecurring\":").append(e.getIsRecurring() != null && e.getIsRecurring() ? "true" : "false").append(",")
+                    .append("\"rrule\":").append(e.getRecurrenceRule() != null ? "\"" + e.getRecurrenceRule() + "\"" : "null").append(",")
+                    .append("\"remindMethod\":").append(e.getRemindMethod() != null ? e.getRemindMethod() : 0).append(",")
+                    .append("\"remindBefore\":").append(e.getRemindBefore() != null ? e.getRemindBefore() : 0).append(",")
+                    .append("\"remindUnit\":").append(e.getRemindUnit() != null ? "\"" + e.getRemindUnit() + "\"" : "null").append(",")
+                    .append("\"description\":\"").append(e.getDescription() != null ? e.getDescription().replace("\"", "\\\"") : "").append("\",")
+                    .append("\"location\":\"").append(e.getLocation() != null ? e.getLocation().replace("\"", "\\\"") : "").append("\"")
                     .append("}");
                 if (i < events.size() - 1) jsonResponse.append(",");
             }
@@ -219,7 +255,82 @@ public class calendarServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        HttpSession session = request.getSession();
+        Integer userId = (Integer) session.getAttribute("user_id");
+        if (userId == null) {
+            response.sendRedirect("views/login/login.jsp");
+            return;
+        }
+        String action = request.getParameter("action");
+        if (action == null) action = "";
+        switch (action) {
+            case "create": {
+                handleCreateCalendar(request, response, userId);
+                return;
+            }
+            case "edit": {
+                handleEditCalendar(request, response, userId);
+                return;
+            }
+            case "delete": {
+                handleDeleteCalendar(request, response, userId);
+                return;
+            }
+            default: {
+                // processRequest(request, response); // XÓA: Mọi chỗ gọi processRequest(request, response);
+            }
+        }
+    }
+
+    private void handleCreateCalendar(HttpServletRequest request, HttpServletResponse response, Integer userId) throws IOException {
+        String name = request.getParameter("name");
+        String color = request.getParameter("color");
+        com.model.Calendar calendar = new com.model.Calendar();
+        calendar.setName(name);
+        calendar.setColor(color);
+        com.model.User user = new com.model.User(userId);
+        calendar.setIdUser(user);
+        calendarService.createCalendar(calendar);
+        response.sendRedirect(request.getContextPath() + "/home");
+    }
+
+    private void handleEditCalendar(HttpServletRequest request, HttpServletResponse response, Integer userId) throws IOException {
+        String idParam = request.getParameter("id");
+        String name = request.getParameter("name");
+        String color = request.getParameter("color");
+        if (idParam != null) {
+            try {
+                int calendarId = Integer.parseInt(idParam);
+                com.model.Calendar calendar = calendarService.getCalendarById(calendarId);
+                if (calendar != null && calendar.getIdUser() != null && calendar.getIdUser().getIdUser().equals(userId)) {
+                    calendar.setName(name);
+                    calendar.setColor(color);
+                    calendarService.updateCalendar(calendar);
+                }
+            } catch (Exception e) {
+                // Có thể log lỗi hoặc xử lý thông báo
+            }
+        }
+        response.sendRedirect(request.getContextPath() + "/home");
+    }
+
+    private void handleDeleteCalendar(HttpServletRequest request, HttpServletResponse response, Integer userId) throws IOException {
+        String idParam = request.getParameter("id");
+        if (idParam != null) {
+            try {
+                int calendarId = Integer.parseInt(idParam);
+                com.model.Calendar calendar = calendarService.getCalendarById(calendarId);
+                if (calendar != null && calendar.getIdUser() != null && calendar.getIdUser().getIdUser().equals(userId)) {
+                    System.out.println("Bắt đầu gọi removeCalendar...");
+                    boolean result = calendarService.removeCalendar(calendarId);
+                    System.out.println("Kết quả xóa: " + result);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Lỗi khi xóa calendar: " + e.getMessage());
+            }
+        }
+        response.sendRedirect(request.getContextPath() + "/home");
     }
 
     /**

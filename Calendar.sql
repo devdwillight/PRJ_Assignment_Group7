@@ -1,6 +1,12 @@
 ﻿--create database Calendar;
 
-use Calendar
+--USE master;
+--GO
+--ALTER DATABASE Calendar SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+--GO
+--DROP DATABASE Calendar;
+
+--use Calendar
 
 CREATE TABLE Users (
     id_user INT IDENTITY(1,1) PRIMARY KEY,
@@ -416,14 +422,3 @@ VALUES
 (1, 1),
 (2, 1)
 
-INSERT INTO Calendar (id_user, name, color)
-VALUES (1, N'Test Calendar 3', N'Purple');
-
-INSERT INTO UserEvents (
-    id_calendar, name, Start_Date, Due_Date, description, location,
-    is_all_day, is_recurring, recurrence_rule, color, remind_method, remind_before, remind_unit, updated_at
-)
-VALUES
-(51, N'Event test 1', '2025-07-23 09:00:00', '2025-07-23 10:00:00', N'Mô tả event 1', N'Hà Nội', 0, 0, NULL, N'Purple', 0, 15, N'minutes', GETDATE()),
-(51, N'Event test 2', '2025-07-24 14:00:00', '2025-07-24 15:30:00', N'Mô tả event 2', N'HCM', 0, 0, NULL, N'Purple', 0, 30, N'minutes', GETDATE()),
-(51, N'Event test 3', '2025-07-25 08:00:00', '2025-07-25 09:30:00', N'Mô tả event 3', N'Đà Nẵng', 1, 0, NULL, N'Purple', 0, 10, N'minutes', GETDATE());

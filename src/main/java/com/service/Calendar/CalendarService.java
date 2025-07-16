@@ -91,7 +91,7 @@ public class CalendarService implements ICalendarService {
 
     public static void main(String[] args) {
         CalendarService service = new CalendarService();
-        List<Calendar> calendars = service.getAllCalendarByUserId(1);
+        service.removeCalendar(37);
     }
 
 }

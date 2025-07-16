@@ -74,6 +74,41 @@ public class EventServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String action = request.getParameter("action");
+        HttpSession session = request.getSession();
+        Integer userId = (Integer) session.getAttribute("user_id");
+        if (userId == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        if ("addForm".equals(action)) {
+            // Lấy danh sách calendar của user
+            List<Calendar> calendars = calendarService.getAllCalendarByUserId(userId);
+            request.setAttribute("calendars", calendars);
+            // Phân biệt tạo mới hay sửa
+            String eventIdStr = request.getParameter("id");
+            boolean isEdit = false;
+            if (eventIdStr != null && !eventIdStr.isEmpty()) {
+                try {
+                    int eventId = Integer.parseInt(eventIdStr);
+                    UserEvents event = eventService.getEventById(eventId);
+                    if (event != null && event.getIdCalendar().getIdUser().getIdUser().equals(userId)) {
+                        request.setAttribute("event", event);
+                        isEdit = true;
+                    }
+                } catch (Exception e) {
+                    // ignore, chỉ tạo mới nếu lỗi
+                }
+            }
+            request.setAttribute("isEdit", isEdit);
+            if (isEdit) {
+                request.getRequestDispatcher("/views/calendar/editEvent.jsp").forward(request, response);
+            } else {
+                request.getRequestDispatcher("/views/calendar/addEvent.jsp").forward(request, response);
+            }
+            return;
+        }
+        // Mặc định
         processRequest(request, response);
     }
 
@@ -135,8 +170,16 @@ public class EventServlet extends HttpServlet {
             HttpSession session = request.getSession();
             Integer userId = (Integer) session.getAttribute("user_id");
             if (userId == null) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("{\"error\":\"User not logged in\"}");
+                // Nếu là AJAX thì trả về JSON lỗi
+                String accept = request.getHeader("Accept");
+                String requestedWith = request.getHeader("X-Requested-With");
+                if ("XMLHttpRequest".equals(requestedWith) || (accept != null && accept.contains("application/json"))) {
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("{\"error\":\"User not logged in\"}");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/login");
+                }
                 return;
             }
             System.out.println("[EventServlet] User ID from session: " + userId);
@@ -187,6 +230,18 @@ public class EventServlet extends HttpServlet {
             event.setRemindUnit("minutes");
             event.setCreatedAt(new Date());
             event.setUpdatedAt(new Date());
+            
+            // Nhận recurrenceRule từ request và lưu vào event
+            String recurrenceRule = request.getParameter("recurrenceRule");
+            System.out.println("[EventServlet] recurrenceRule from request: '" + recurrenceRule + "'");
+            if (recurrenceRule == null || recurrenceRule.trim().isEmpty()) {
+                // Không lặp lại
+                event.setRecurrenceRule(null); // hoặc không set gì cả
+                event.setIsRecurring(false);
+            } else {
+                event.setRecurrenceRule(recurrenceRule);
+                event.setIsRecurring(true);
+            }
             
             // Parse dates
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -349,10 +404,16 @@ public class EventServlet extends HttpServlet {
             UserEvents savedEvent = eventService.createEvent(event);
             
             if (savedEvent != null) {
-                // Return success response
-                String jsonResponse = "{\"success\": true, \"message\": \"Event created successfully\", \"eventId\": " + savedEvent.getIdEvent() + "}";
-                System.out.println("[EventServlet] Success response: " + jsonResponse);
-                response.getWriter().write(jsonResponse);
+                // Kiểm tra nếu là request AJAX (application/json)
+                String accept = request.getHeader("Accept");
+                String requestedWith = request.getHeader("X-Requested-With");
+                if ("XMLHttpRequest".equals(requestedWith) || (accept != null && accept.contains("application/json"))) {
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.getWriter().write("{\"success\": true}");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/home");
+                }
+                return;
             } else {
                 System.out.println("[EventServlet] Failed to create event - savedEvent is null");
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -572,6 +633,17 @@ public class EventServlet extends HttpServlet {
                 return;
             }
             
+            // Cập nhật recurrenceRule khi update event
+            String recurrenceRule = request.getParameter("recurrenceRule");
+            if (recurrenceRule == null || recurrenceRule.trim().isEmpty()) {
+                // Không lặp lại
+                existingEvent.setRecurrenceRule(null); // hoặc không set gì cả
+                existingEvent.setIsRecurring(false);
+            } else {
+                existingEvent.setRecurrenceRule(recurrenceRule);
+                existingEvent.setIsRecurring(true);
+            }
+            
             // Update calendar if changed
             if (calendarId != null && !calendarId.trim().isEmpty()) {
                 try {
@@ -591,7 +663,15 @@ public class EventServlet extends HttpServlet {
             boolean updated = eventService.updateEvent(existingEvent);
             
             if (updated) {
-                response.getWriter().write("{\"success\": true, \"message\": \"Event updated successfully\", \"eventId\": " + existingEvent.getIdEvent() + "}");
+                // Kiểm tra nếu là request AJAX (application/json)
+                String accept = request.getHeader("Accept");
+                String requestedWith = request.getHeader("X-Requested-With");
+                if ("XMLHttpRequest".equals(requestedWith) || (accept != null && accept.contains("application/json"))) {
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.getWriter().write("{\"success\": true}");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/home");
+                }
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().write("{\"error\":\"Failed to update event\"}");

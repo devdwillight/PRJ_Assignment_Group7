@@ -83,13 +83,14 @@ public class EventService implements IEventService {
         System.out.println("[getAllEventsByUserId] Lấy tất cả events của user ID = " + userId);
         List<UserEvents> events = eventDAO.selectAllEventsByUserId(userId);
         System.out.println("[getAllEventsByUserId] ✔ Tìm thấy: " + events.size() + " events");
-        
+
         for (UserEvents event : events) {
-            System.out.println("⏺ Event: " + event.getName() 
+            System.out.println("⏺ Event: " + event.getName()
                     + " | Calendar: " + (event.getIdCalendar() != null ? event.getIdCalendar().getName() : "N/A")
-                    + " | Start: " + event.getStartDate());
+                    + " | Start: " + event.getStartDate()
+                    + "|Recurrent Rule " + event.getRecurrenceRule());
         }
-        
+
         return events;
     }
 
@@ -97,19 +98,10 @@ public class EventService implements IEventService {
         EventService service = new EventService();
 
         int userIdToTest = 1; // thay bằng ID user bạn muốn test
-        List<UserEvents> events = service.getAllEventsByCalendarId(userIdToTest);
+        List<UserEvents> events = service.getAllEventsByUserId(userIdToTest);
 
         System.out.println("Danh sách sự kiện của người dùng có ID = " + userIdToTest + ":");
-        if (events.isEmpty()) {
-            System.out.println("❌ Không có sự kiện nào được tìm thấy.");
-        } else {
-            for (UserEvents e : events) {
-                System.out.println("✔ Sự kiện: " + e.getName()
-                        + " | Bắt đầu: " + e.getStartDate()
-                        + " | Kết thúc: " + e.getDueDate()
-                        + " | Lịch: " + (e.getIdCalendar() != null ? e.getIdCalendar().getName() : "N/A"));
-            }
-        }
+        System.out.println(events);
     }
 
 }

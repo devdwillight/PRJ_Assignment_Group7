@@ -1,5 +1,5 @@
 <%-- 
-    Document   : addEvent
+    Document   : editEvent
     Created on : Jul 10, 2025, 11:11:25 PM
     Author     : DELL
 --%>
@@ -7,51 +7,53 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
 <%@ page import="com.model.Calendar" %>
+<%@ page import="com.model.UserEvents" %>
 <%
+    UserEvents event = (UserEvents) request.getAttribute("event");
     List<Calendar> calendars = (List<Calendar>) request.getAttribute("calendars");
 %>
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Thêm sự kiện mới</title>
+        <title>Chỉnh sửa sự kiện</title>
         <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body class="bg-gray-50 min-h-screen">
         <div class="w-full max-w-3xl mx-auto pt-6">
-
-            <form id="addEventForm" action="event" method="post" class="bg-white rounded-xl shadow p-8">
-                <input type="hidden" name="action" value="create" />
-                <input type="hidden" name="recurrenceRule" id="recurrenceRule" value="" />
-                <input type="hidden" id="isEditFlag" value="false" />
-
+            <form id="editEventForm" action="event" method="post" class="bg-white rounded-xl shadow p-8">
+                <input type="hidden" name="action" value="update" />
+                <input type="hidden" name="eventId" value="<%= event.getIdEvent()%>" />
+                <input type="hidden" name="recurrenceRule" id="recurrenceRule" value="<%= event.getRecurrenceRule() != null ? event.getRecurrenceRule() : ""%>" />
+                <input type="hidden" id="isEditFlag" value="true" />
                 <div class="flex items-center gap-3 mb-6">
-                    <!-- Tiêu đề + nút lưu -->
                     <a href="<%=request.getContextPath()%>/home" class="text-gray-500 hover:text-red-500 transition-colors" title="Quay lại">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </a>
-                    <input type="text" name="title" required placeholder="Thêm tiêu đề"
-                           class="border rounded px-4 py-2 flex-1 text-xl font-semibold focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100" />
+                    <input type="text" name="title" required placeholder="Tiêu đề"
+                           class="border rounded px-4 py-2 flex-1 text-xl font-semibold focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100"
+                           value="<%= event.getName()%>" />
                     <button type="submit"
-                            class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 font-semibold">Lưu</button>
+                            class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 font-semibold">Cập nhật</button>
                 </div>
                 <div class="mb-6">
-                    <!-- Ngày giờ -->
                     <div class="flex flex-wrap gap-2 px-10">
                         <div class="flex items-center gap-2">
                             <div>
                                 <label class="block text-sm font-medium mb-1">Ngày bắt đầu</label>
                                 <input type="date" name="startDate" required
-                                       class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100" />
+                                       class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100"
+                                       value="<%= event.getStartDate() != null ? new java.text.SimpleDateFormat("yyyy-MM-dd").format(event.getStartDate()) : ""%>" />
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
                             <div>
                                 <label class="block text-sm font-medium mb-1">Giờ bắt đầu</label>
                                 <input type="time" name="startTime"
-                                       class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100" />
+                                       class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100"
+                                       value="<%= event.getStartDate() != null ? new java.text.SimpleDateFormat("HH:mm").format(event.getStartDate()) : ""%>" />
                             </div>
                         </div>
                         <div class="flex items-center mt-6">
@@ -61,23 +63,24 @@
                             <div>
                                 <label class="block text-sm font-medium mb-1">Ngày kết thúc</label>
                                 <input type="date" name="endDate"
-                                       class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100" />
+                                       class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100"
+                                       value="<%= event.getDueDate() != null ? new java.text.SimpleDateFormat("yyyy-MM-dd").format(event.getDueDate()) : ""%>" />
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
                             <div>
                                 <label class="block text-sm font-medium mb-1">Giờ kết thúc</label>
                                 <input type="time" name="endTime"
-                                       class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100" />
+                                       class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100"
+                                       value="<%= event.getDueDate() != null ? new java.text.SimpleDateFormat("HH:mm").format(event.getDueDate()) : ""%>" />
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="mb-6">
-                    <!-- Cả ngày & lặp lại -->
                     <div class="flex items-center gap-6 px-10">
                         <label class="inline-flex items-center">
-                            <input type="checkbox" name="allDay" value="on" class="accent-blue-600 mr-2"> Cả ngày
+                            <input type="checkbox" name="allDay" value="on" class="accent-blue-600 mr-2" <%= event.getIsAllDay() ? "checked" : ""%>> Cả ngày
                         </label>
                         <div id="recurrenceOptions" class="flex items-center gap-2">
                             <label class="text-sm">Kiểu lặp:</label>
@@ -88,45 +91,43 @@
                                 <option value="monthly">Hằng tháng cùng ngày</option>
                                 <option value="yearly">Hằng năm vào ngày ...</option>
                                 <option value="setting">Tùy chỉnh...</option>
-                                <option value="custom" style="display:none"></option> <!-- Thêm option custom ẩn -->
+                                <option value="custom" style="display:none"></option>
                             </select>
                         </div>
                     </div>
                 </div>
                 <div class="mb-6">
-                    <!-- Vị trí -->
                     <div class="flex items-center gap-4">
                         <jsp:include page="../../assets/location_on.svg"/>
                         <input type="text" name="location" placeholder="Vị trí"
-                               class="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100" />
+                               class="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100"
+                               value="<%= event.getLocation()%>" />
                     </div>
                 </div>
                 <div class="mb-6">
-                    <!-- Nhắc nhở -->
                     <div class="flex items-center gap-4">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
                         <div class="flex-1">
                             <div class="flex gap-2 items-center">
                                 <select name="remindMethod"
                                         class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100">
-                                    <option value="0">Thông báo</option>
-                                    <option value="1">Email</option>
+                                    <option value="0" <%= !event.getRemindMethod() ? "selected" : ""%>>Thông báo</option>
+                                    <option value="1" <%= event.getRemindMethod() ? "selected" : ""%>>Email</option>
                                 </select>
-                                <input type="number" name="remindBefore" value="30" min="0"
+                                <input type="number" name="remindBefore" value="<%= event.getRemindBefore()%>" min="0"
                                        class="border rounded px-3 py-2 w-20 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100" />
                                 <select name="remindUnit"
                                         class="border rounded px-3 py-2 w-28 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100">
-                                    <option value="minutes">phút</option>
-                                    <option value="hours">giờ</option>
-                                    <option value="days">ngày</option>
-                                    <option value="weeks">tuần</option>
+                                    <option value="minutes" <%= "minutes".equals(event.getRemindUnit()) ? "selected" : ""%>>phút</option>
+                                    <option value="hours" <%= "hours".equals(event.getRemindUnit()) ? "selected" : ""%>>giờ</option>
+                                    <option value="days" <%= "days".equals(event.getRemindUnit()) ? "selected" : ""%>>ngày</option>
+                                    <option value="weeks" <%= "weeks".equals(event.getRemindUnit()) ? "selected" : ""%>>tuần</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="mb-6">
-                    <!-- Chọn lịch -->
                     <div class="flex items-center gap-4">
                         <jsp:include page="../../assets/Calendar_bl.svg"/>
                         <div class="flex-1">
@@ -135,7 +136,7 @@
                                     class="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100">
                                 <% if (calendars != null)
                                         for (Calendar c : calendars) {%>
-                                <option value="<%=c.getIdCalendar()%>"><%=c.getName()%></option>
+                                <option value="<%=c.getIdCalendar()%>" <%= event.getIdCalendar() != null && c.getIdCalendar().equals(event.getIdCalendar().getIdCalendar()) ? "selected" : ""%>><%=c.getName()%></option>
                                 <% }%>
                                 <option value="add_new">+ Thêm lịch mới...</option>
                             </select>
@@ -143,33 +144,31 @@
                     </div>
                 </div>
                 <div class="mb-6">
-                    <!-- Màu sắc -->
                     <div class="flex items-center gap-4">
                         <jsp:include page="../../assets/color_picker.svg"/>
                         <div class="flex-1">
                             <label class="block text-sm font-medium mb-1">Màu sắc</label>
                             <select name="color"
                                     class="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100">
-                                <option value="#3b82f6">Xanh dương</option>
-                                <option value="#ef4444">Đỏ</option>
-                                <option value="#10b981">Xanh lá</option>
-                                <option value="#f59e0b">Cam</option>
-                                <option value="#8b5cf6">Tím</option>
-                                <option value="#ec4899">Hồng</option>
-                                <option value="#f59e0b">Vàng</option>
-                                <option value="#6366f1">Xanh tím</option>
+                                <option value="#3b82f6" <%= "#3b82f6".equals(event.getColor()) ? "selected" : ""%>>Xanh dương</option>
+                                <option value="#ef4444" <%= "#ef4444".equals(event.getColor()) ? "selected" : ""%>>Đỏ</option>
+                                <option value="#10b981" <%= "#10b981".equals(event.getColor()) ? "selected" : ""%>>Xanh lá</option>
+                                <option value="#f59e0b" <%= "#f59e0b".equals(event.getColor()) ? "selected" : ""%>>Cam</option>
+                                <option value="#8b5cf6" <%= "#8b5cf6".equals(event.getColor()) ? "selected" : ""%>>Tím</option>
+                                <option value="#ec4899" <%= "#ec4899".equals(event.getColor()) ? "selected" : ""%>>Hồng</option>
+                                <option value="#f59e0b" <%= "#f59e0b".equals(event.getColor()) ? "selected" : ""%>>Vàng</option>
+                                <option value="#6366f1" <%= "#6366f1".equals(event.getColor()) ? "selected" : ""%>>Xanh tím</option>
                             </select>
                         </div>
                     </div>
                 </div>
                 <div>
-                    <!-- Mô tả -->
                     <div class="flex items-center gap-4">
                         <jsp:include page="../../assets/Status_list.svg"/>
                         <div class="flex-1">
                             <label class="block text-sm font-medium mb-1">Mô tả</label>
                             <textarea name="description" rows="3"
-                                      class="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100"></textarea>
+                                      class="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100"><%= event.getDescription()%></textarea>
                         </div>
                     </div>
                 </div>
@@ -251,61 +250,6 @@
             </div>
         </div>
     </body>
-
-    <script>
-        // Tự động điền ngày và giờ khi tạo mới
-        document.addEventListener('DOMContentLoaded', function () {
-            // Lấy ngày hiện tại
-            var now = new Date();
-            var yyyy = now.getFullYear();
-            var mm = String(now.getMonth() + 1).padStart(2, '0');
-            var dd = String(now.getDate()).padStart(2, '0');
-            var today = yyyy + '-' + mm + '-' + dd;
-
-            // Giờ hiện tại
-            var hh = String(now.getHours()).padStart(2, '0');
-            var min = String(now.getMinutes()).padStart(2, '0');
-            var startTime = hh + ':' + min;
-
-            // Giờ kết thúc (sau 1 tiếng)
-            var end = new Date(now.getTime() + 60 * 60 * 1000);
-            var endH = String(end.getHours()).padStart(2, '0');
-            var endM = String(end.getMinutes()).padStart(2, '0');
-            var endTime = endH + ':' + endM;
-
-            // Gán giá trị cho input
-            var startDateInput = document.querySelector('input[name="startDate"]');
-            var endDateInput = document.querySelector('input[name="endDate"]');
-            var startTimeInput = document.querySelector('input[name="startTime"]');
-            var endTimeInput = document.querySelector('input[name="endTime"]');
-            if (startDateInput)
-                startDateInput.value = today;
-            if (endDateInput)
-                endDateInput.value = today;
-            if (startTimeInput)
-                startTimeInput.value = startTime;
-            if (endTimeInput)
-                endTimeInput.value = endTime;
-
-            // --- Tự động lấy startDate, startTime, endDate, endTime từ URL nếu có ---
-            function getParam(name) {
-                const url = new URL(window.location.href);
-                return url.searchParams.get(name);
-            }
-            var startDate = getParam('startDate');
-            var startTime = getParam('startTime');
-            var endDate = getParam('endDate');
-            var endTime = getParam('endTime');
-            if (startDate)
-                document.querySelector('input[name="startDate"]').value = startDate;
-            if (startTime)
-                document.querySelector('input[name="startTime"]').value = startTime;
-            if (endDate)
-                document.querySelector('input[name="endDate"]').value = endDate;
-            if (endTime)
-                document.querySelector('input[name="endTime"]').value = endTime;
-        });
-    </script>
 
     <script>
         // Khi chọn '+ Thêm lịch mới...' thì chuyển qua trang addCalendar.jsp
@@ -395,7 +339,7 @@
                         input.name = 'recurrenceRule';
                         input.id = 'recurrenceRule';
                         input.value = rrule;
-                        document.getElementById('addEventForm').appendChild(input);
+                        document.getElementById('editEventForm').appendChild(input);
                     } else {
                         document.getElementById('recurrenceRule').value = rrule;
                     }
@@ -494,7 +438,7 @@
                 rruleInput.type = 'hidden';
                 rruleInput.name = 'recurrenceRule';
                 rruleInput.id = 'recurrenceRule';
-                document.getElementById('addEventForm').appendChild(rruleInput);
+                document.getElementById('editEventForm').appendChild(rruleInput);
             }
             rruleInput.value = rrule;
             console.log('[customRecurrenceModal] recurrenceRule:', rrule);
@@ -602,7 +546,7 @@
     </script>
 
     <script>
-        document.getElementById('addEventForm').addEventListener('submit', function (e) {
+        document.getElementById('editEventForm').addEventListener('submit', function (e) {
             var recurrenceType = document.getElementById('recurrenceType').value;
             if (recurrenceType === 'none') {
                 document.getElementById('recurrenceRule').value = '';
@@ -643,4 +587,157 @@
         })();
     </script>
 
-</html>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var recurrenceRuleInput = document.getElementById('recurrenceRule');
+            var recurrenceRule = recurrenceRuleInput ? recurrenceRuleInput.value : "";
+            var recurrenceTypeSelect = document.getElementById('recurrenceType');
+            var customOption = recurrenceTypeSelect.querySelector('option[value="custom"]');
+            if (recurrenceRule && recurrenceRule !== "") {
+                let desc = '';
+                if (recurrenceRule.includes('FREQ=DAILY')) {
+                    desc = 'Tùy chỉnh: Hằng ngày';
+                } else if (recurrenceRule.includes('FREQ=WEEKLY')) {
+                    const days = [];
+                    const byDays = recurrenceRule.match(/BYDAY=([A-Z,]+)/);
+                    if (byDays && byDays[1]) {
+                        byDays[1].split(',').forEach(day => {
+                            const dayMapVi = {'SU': 'CN', 'MO': 'T2', 'TU': 'T3', 'WE': 'T4', 'TH': 'T5', 'FR': 'T6', 'SA': 'T7'};
+                            if (dayMapVi[day])
+                                days.push(dayMapVi[day]);
+                        });
+                    }
+                    desc = 'Tùy chỉnh: Hằng tuần vào ' + days.join(', ');
+                } else if (recurrenceRule.includes('FREQ=MONTHLY')) {
+                    const matchMonthDay = recurrenceRule.match(/BYMONTHDAY=(\\d+)/);
+                    const matchByDay = recurrenceRule.match(/BYDAY=(\\d+)?([A-Z]{2})/);
+                    if (matchMonthDay) {
+                        desc = 'Tùy chỉnh: Hằng tháng ngày ' + matchMonthDay[1];
+                    } else if (matchByDay) {
+                        const week = matchByDay[1];
+                        const weekday = matchByDay[2];
+                        const dayMapVi = {'MO': 'Thứ 2', 'TU': 'Thứ 3', 'WE': 'Thứ 4', 'TH': 'Thứ 5', 'FR': 'Thứ 6', 'SA': 'Thứ 7', 'SU': 'Chủ nhật'};
+                        desc = `Tùy chỉnh: Hằng tháng thứ ${dayMapVi[weekday] || weekday} tuần ${week}`;
+                    } else {
+                        desc = 'Tùy chỉnh: Hằng tháng';
+                    }
+                } else if (recurrenceRule.includes('FREQ=YEARLY')) {
+                    const matchMonth = recurrenceRule.match(/BYMONTH=(\\d+)/);
+                    const matchDayOfMonth = recurrenceRule.match(/BYMONTHDAY=(\\d+)/);
+                    if (matchMonth && matchDayOfMonth) {
+                        desc = 'Tùy chỉnh: Hằng năm tháng ' + matchMonth[1] + ' ngày ' + matchDayOfMonth[1];
+                    } else {
+                        desc = 'Tùy chỉnh: Hằng năm';
+                    }
+                } else {
+                    desc = 'Tùy chỉnh: Không lặp lại';
+                }
+                customOption.textContent = desc;
+                customOption.style.display = '';
+                recurrenceTypeSelect.value = 'custom';
+            }
+        });
+    </script>
+
+    <script>
+    // Hàm parse RRULE và set lại các trường trong modal tùy chỉnh
+        function setCustomModalFromRRule(rrule) {
+            // INTERVAL
+            var matchInterval = rrule.match(/INTERVAL=(\d+)/);
+            var interval = matchInterval ? matchInterval[1] : "1";
+            document.getElementById('customRepeatInterval').value = interval;
+            // Đơn vị lặp
+            if (rrule.includes('FREQ=DAILY')) {
+                document.getElementById('customRepeatUnit').value = 'day';
+                document.getElementById('customWeekdays').style.display = 'none';
+                document.getElementById('customMonthOptions').style.display = 'none';
+            } else if (rrule.includes('FREQ=WEEKLY')) {
+                document.getElementById('customRepeatUnit').value = 'week';
+                document.getElementById('customWeekdays').style.display = 'block';
+                document.getElementById('customMonthOptions').style.display = 'none';
+                // BYDAY
+                var matchByDay = rrule.match(/BYDAY=([A-Z,]+)/);
+                var bydays = matchByDay ? matchByDay[1].split(',') : [];
+                document.querySelectorAll('.custom-day-btn').forEach(btn => {
+                    // Reset hết trạng thái
+                    btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+                    btn.removeAttribute('data-selected');
+                    var day = btn.getAttribute('data-day');
+                    if (bydays.includes(day)) {
+                        btn.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+                        btn.setAttribute('data-selected', 'true');
+                    }
+                });
+            } else if (rrule.includes('FREQ=MONTHLY')) {
+                document.getElementById('customRepeatUnit').value = 'month';
+                document.getElementById('customWeekdays').style.display = 'none';
+                document.getElementById('customMonthOptions').style.display = 'block';
+                // BYMONTHDAY
+                var matchByMonthDay = rrule.match(/BYMONTHDAY=(\d+)/);
+                if (matchByMonthDay) {
+                    document.querySelector('input[name="monthOption"][value="day"]').checked = true;
+                    document.getElementById('monthDay').value = matchByMonthDay[1];
+                }
+                // BYDAY + BYSETPOS (thứ trong tháng)
+                var matchByDay = rrule.match(/BYDAY=([A-Z]{2});BYSETPOS=([\-\d]+)/);
+                if (matchByDay) {
+                    document.querySelector('input[name="monthOption"][value="weekday"]').checked = true;
+                    document.getElementById('monthWeekday').value = matchByDay[1];
+                    document.getElementById('monthWeek').value = matchByDay[2];
+                }
+            } else if (rrule.includes('FREQ=YEARLY')) {
+                document.getElementById('customRepeatUnit').value = 'year';
+                document.getElementById('customWeekdays').style.display = 'none';
+                document.getElementById('customMonthOptions').style.display = 'none';
+                // Xử lý BYMONTH và BYMONTHDAY nếu có
+                var matchByMonth = rrule.match(/BYMONTH=(\d+)/);
+                var matchByMonthDay = rrule.match(/BYMONTHDAY=(\d+)/);
+                if (matchByMonth && matchByMonthDay) {
+                    // Có thể thêm logic để hiển thị thông tin ngày/tháng nếu cần
+                    console.log('Yearly recurrence: Month ' + matchByMonth[1] + ', Day ' + matchByMonthDay[1]);
+                }
+            }
+            // Kết thúc: UNTIL hoặc COUNT
+            var matchUntil = rrule.match(/UNTIL=(\d{8})/);
+            var matchCount = rrule.match(/COUNT=(\d+)/);
+            if (matchUntil) {
+                document.querySelector('input[name="customEndType"][value="ondate"]').checked = true;
+                var until = matchUntil[1];
+                document.getElementById('customEndDate').value = until.slice(0, 4) + '-' + until.slice(4, 6) + '-' + until.slice(6, 8);
+                document.getElementById('customEndDate').disabled = false;
+                document.getElementById('customEndCount').disabled = true;
+            } else if (matchCount) {
+                document.querySelector('input[name="customEndType"][value="after"]').checked = true;
+                document.getElementById('customEndCount').value = matchCount[1];
+                document.getElementById('customEndDate').disabled = true;
+                document.getElementById('customEndCount').disabled = false;
+            } else {
+                document.querySelector('input[name="customEndType"][value="never"]').checked = true;
+                document.getElementById('customEndDate').disabled = true;
+                document.getElementById('customEndCount').disabled = true;
+            }
+        }
+
+    // Khi mở modal tùy chỉnh, nếu đang edit event và có recurrenceRule, tự động set lại các trường
+        (function () {
+            var isEdit = document.getElementById('isEditFlag').value === 'true';
+            if (isEdit) {
+                var recurrenceRule = document.getElementById('recurrenceRule').value;
+                var modal = document.getElementById('customRecurrenceModal');
+                var recurrenceTypeSelect = document.getElementById('recurrenceType');
+                // Theo dõi khi modal được hiển thị
+                var observer = new MutationObserver(function (mutations) {
+                    mutations.forEach(function (mutation) {
+                        if (!modal.classList.contains('hidden') && recurrenceTypeSelect.value === 'setting' && recurrenceRule) {
+                            setTimeout(function () {
+                                setCustomModalFromRRule(recurrenceRule);
+                            }, 50); // Đảm bảo DOM đã render xong
+                        }
+                    });
+                });
+                observer.observe(modal, {attributes: true, attributeFilter: ['class']});
+            }
+        })();
+    </script>
+
+</html> 
