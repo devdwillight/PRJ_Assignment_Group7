@@ -8,6 +8,7 @@ import com.dao.BaseDAO;
 import com.model.ToDo;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
+import jakarta.persistence.TypedQuery;
 import java.util.Date;
 import java.util.List;
 
@@ -70,5 +71,18 @@ public class TodoDAO extends BaseDAO<ToDo> implements ITodoDAO {
     @Override
     public List<ToDo> selectAllToDoByTaskId(int id) {
         return findAllById("idTask", id);
+    }
+
+    @Override
+    public List<ToDo> selectAllTodoByUserId(int userId) {
+        EntityManager em = getEntityManager();
+        try {
+            String jpql = "SELECT t FROM ToDo t WHERE t.idTask.idUser.idUser = :userId";
+            TypedQuery<ToDo> query = em.createQuery(jpql, ToDo.class);
+            query.setParameter("userId", userId);
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
     }
 }

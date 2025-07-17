@@ -11,6 +11,12 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import com.service.Task.TaskService;
+import com.model.Task;
+import java.util.List;
+import jakarta.servlet.http.HttpSession;
+import com.model.ToDo;
+import com.service.Todo.TodoService;
 
 /**
  *
@@ -18,6 +24,15 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "taskServlet", urlPatterns = {"/task"})
 public class taskServlet extends HttpServlet {
+
+    private TaskService taskService;
+    private TodoService todoService;
+
+    @Override
+    public void init() throws ServletException {
+        taskService = new TaskService();
+        todoService = new TodoService();
+    }
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -57,7 +72,55 @@ public class taskServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Integer userId = (Integer) session.getAttribute("user_id");
+        if (userId == null) {
+            response.setContentType("application/json;charset=UTF-8");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\":\"not_logged_in\"}");
+            return;
+        }
+
+        String action = request.getParameter("action");
+        if ("getAllTodoByUser".equals(action)) {
+            handleGetAllTodoByUser(request, response, userId);
+            return;
+        }
+
         processRequest(request, response);
+    }
+
+    private void handleGetAllTodoByUser(HttpServletRequest request, HttpServletResponse response, Integer userId)
+            throws IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        try {
+            System.out.println("[TaskServlet] Bắt đầu load danh sách ToDo cho userId = " + userId);
+            List<ToDo> todos = todoService.getAllToDoByUserId(userId);
+            System.out.println("[TaskServlet] Số lượng ToDo lấy được: " + todos.size());
+            for (ToDo t : todos) {
+                System.out.println("  - ToDo: id=" + t.getIdTodo() + ", title=" + t.getTitle() + ", dueDate=" + t.getDueDate());
+            }
+            StringBuilder json = new StringBuilder("[");
+            for (int i = 0; i < todos.size(); i++) {
+                ToDo t = todos.get(i);
+                json.append("{")
+                    .append("\"idTodo\":").append(t.getIdTodo()).append(",")
+                    .append("\"title\":\"").append(t.getTitle().replace("\"", "\\\"")).append("\",")
+                    .append("\"description\":\"").append(t.getDescription() != null ? t.getDescription().replace("\"", "\\\"") : "").append("\",")
+                    .append("\"dueDate\":\"").append(t.getDueDate()).append("\",")
+                    .append("\"isAllDay\":").append(t.getIsAllDay() != null && t.getIsAllDay() ? "true" : "false").append(",")
+                    .append("\"isCompleted\":").append(t.getIsCompleted() != null && t.getIsCompleted() ? "true" : "false")
+                    .append("}");
+                if (i < todos.size() - 1) json.append(",");
+            }
+            json.append("]");
+            response.getWriter().write(json.toString());
+            System.out.println("[TaskServlet] Đã trả về JSON danh sách ToDo cho client.");
+        } catch (Exception e) {
+            System.out.println("[TaskServlet] Lỗi khi load ToDo: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\":\"Không thể tải dữ liệu todo\"}");
+        }
     }
 
     /**

@@ -30,4 +30,6 @@ public interface ITodoDAO {
 
     public List<ToDo> selectAllToDoByTaskId(int id);
 
+    public List<ToDo> selectAllTodoByUserId(int userId);
+
 }

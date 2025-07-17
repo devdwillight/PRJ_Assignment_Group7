@@ -7,6 +7,7 @@ package com.dao.Event;
 import com.dao.BaseDAO;
 import com.model.UserEvents;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import java.util.List;
 
 /**
@@ -62,6 +63,8 @@ public class EventDAO extends BaseDAO<UserEvents> implements IEventDAO {
             return em.createQuery(jpql, UserEvents.class)
                     .setParameter("userId", userId)
                     .getResultList();
+        } catch (NoResultException e) {
+            return null;
         } finally {
             em.close();
         }

@@ -91,9 +91,17 @@ public class TodoService implements ITodoService {
         return list;
     }
 
+    @Override
+    public List<ToDo> getAllToDoByUserId(int userId) {
+        System.out.println("[getAllToDoByUserId] Lấy tất cả ToDo của userId = " + userId);
+        List<ToDo> list = todoDAO.selectAllTodoByUserId(userId);
+        System.out.println("[getAllToDoByUserId] ✔ Tổng: " + list.size());
+        return list;
+    }
+
     public static void main(String[] args) {
         TodoService service = new TodoService();
-        List<ToDo> todos = service.getToDoByTaskId(1);
+        List<ToDo> todos = service.getAllToDoByUserId(1);
 
         System.out.println("📝 Danh sách tất cả ToDo:");
         for (ToDo t : todos) {

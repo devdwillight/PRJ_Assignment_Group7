@@ -288,6 +288,7 @@
 
             // ====== BIẾN TOÀN CỤC ======
             var events = [];
+            var todos = [];
             var visibleCalendars = new Set();
 
             // ====== KHỞI TẠO CALENDAR ======
@@ -323,7 +324,8 @@
                             return eventCalendarId && visibleCalendars.has(eventCalendarId.toString());
                         });
                     }
-                    successCallback(filtered);
+                    // Gộp thêm ToDo vào danh sách event
+                    successCallback([...filtered, ...todos]);
                 }
             });
             calendar.setOption('height', 860);
@@ -332,6 +334,7 @@
 
             // GỌI NGAY SAU KHI RENDER
             loadAllEvents();
+            loadAllTodos();
 
             // ====== LOAD EVENTS ======
             function loadAllEvents() {
@@ -379,6 +382,24 @@
                             });
                             calendar.refetchEvents();
                         });
+            }
+
+            // ====== LOAD TODOS ======
+            function loadAllTodos() {
+                fetch('task?action=getAllTodoByUser')
+                    .then(response => response.json())
+                    .then(data => {
+                        todos = data.map(todo => ({
+                            id: 'todo-' + todo.idTodo,
+                            title: '[ToDo] ' + todo.title,
+                            start: todo.dueDate,
+                            allDay: todo.isAllDay,
+                            color: todo.isCompleted ? '#10b981' : '#f59e0b',
+                            description: todo.description || '',
+                            // Có thể bổ sung các trường khác nếu muốn
+                        }));
+                        calendar.refetchEvents();
+                    });
             }
 
             // ====== FILTER CALENDAR ======
