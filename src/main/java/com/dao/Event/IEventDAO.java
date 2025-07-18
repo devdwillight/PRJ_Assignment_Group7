@@ -5,6 +5,7 @@
 package com.dao.Event;
 
 import com.model.UserEvents;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,4 +30,5 @@ public interface IEventDAO {
     
     public List<UserEvents> selectAllEventsByUserId(int userId);
 
+    public boolean updateEventTime(int eventId, Date start, Date end, boolean allDay);
 }

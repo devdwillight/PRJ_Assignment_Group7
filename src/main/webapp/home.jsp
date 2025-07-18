@@ -358,12 +358,6 @@
                 }
             });
 
-            // Log thông tin từ server
-            console.log('Server data loaded:');
-            console.log('- Current date:', document.getElementById('currentDate').value);
-            console.log('- User ID:', document.getElementById('userId').value);
-            console.log('- Calendar count:', document.getElementById('calendarCount').value);
-            console.log('- Todo count:', document.getElementById('todoCount').value);
 
             // Nếu có lỗi từ server, hiển thị notification
             var serverError = '<%= request.getAttribute("error") != null ? request.getAttribute("error") : ""%>';

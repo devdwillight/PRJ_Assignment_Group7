@@ -78,9 +78,11 @@ public class TodoDAO extends BaseDAO<ToDo> implements ITodoDAO {
         EntityManager em = getEntityManager();
         try {
             String jpql = "SELECT t FROM ToDo t WHERE t.idTask.idUser.idUser = :userId";
-            TypedQuery<ToDo> query = em.createQuery(jpql, ToDo.class);
-            query.setParameter("userId", userId);
-            return query.getResultList();
+            return em.createQuery(jpql, ToDo.class)
+                    .setParameter("userId", userId)
+                    .getResultList();
+        } catch (NoResultException e) {
+            return null;
         } finally {
             em.close();
         }

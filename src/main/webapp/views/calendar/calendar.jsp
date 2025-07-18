@@ -28,6 +28,64 @@
     </head>
     <body class="bg-gray-50">
         <div >
+            <!-- Add ToDo Modal -->
+            <div id="addTodoModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+                <div class="flex items-center justify-center min-h-screen p-4">
+                    <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+                        <div class="flex justify-between items-center p-6 border-b">
+                            <h3 class="text-lg font-semibold text-gray-900">Tạo ToDo mới</h3>
+                            <button id="closeAddTodoModal" class="text-gray-400 hover:text-gray-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <form id="addTodoForm" class="p-6">
+                            <div class="mb-4">
+                                <label for="todoTitle" class="block text-sm font-medium text-gray-700 mb-1">Tiêu đề *</label>
+                                <input type="text" id="todoTitle" name="title" required class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Nhập tiêu đề">
+                            </div>
+                            <div class="mb-4">
+                                <label for="todoDescription" class="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
+                                <textarea id="todoDescription" name="description" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md"></textarea>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label for="todoDueDate" class="block text-sm font-medium text-gray-700 mb-1">Ngày đến hạn *</label>
+                                    <input type="date" id="todoDueDate" name="dueDate" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                </div>
+                                <div>
+                                    <label for="todoDueTime" class="block text-sm font-medium text-gray-700 mb-1">Giờ đến hạn</label>
+                                    <input type="time" id="todoDueTime" name="dueTime" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="todoAllDay" name="isAllDay" class="mr-2">
+                                    <span class="text-sm text-gray-700">Cả ngày</span>
+                                </label>
+                            </div>
+                            <div class="mb-4">
+                                <label for="todoTaskId" class="block text-sm font-medium text-gray-700 mb-1">Task liên quan *</label>
+                                <select id="todoTaskId" name="taskId" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
+                                    <option value="">-- Chọn Task --</option>
+                                    <c:forEach var="task" items="${tasks}">
+                                        <option value="${task.idTask}">${task.name}</option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                        </form>
+                        <div class="flex justify-end p-6 border-t">
+                            <button id="swapToEvent" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 mr-2">
+                                Tạo Event
+                            </button>
+                            <button id="saveTodo" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                                Thêm ToDo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!-- Calendar Container -->
             <div class=" rounded-lg shadow-md">
                 <div id="calendar" ></div>
@@ -167,6 +225,9 @@
                             </div>
                         </form>
                         <div class="flex justify-end p-6 border-t">
+                            <button id="swapToTodo" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 mr-2">
+                                Tạo ToDo
+                            </button>
                             <button id="otherOptionsBtn" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 mr-2">
                                 Tùy chọn Khác
                             </button>
@@ -290,6 +351,21 @@
             var events = [];
             var todos = [];
             var visibleCalendars = new Set();
+            // Biến lưu ngày/giờ cuối cùng được chọn từ dateClick
+            var lastClickedDate = null;
+            var lastClickedTime = null;
+
+            // ====== FILTER TODO EVENTS ======
+            var visibleTodos = new Set();
+            function filterTodoEvents(taskId, isVisible) {
+                if (isVisible) {
+                    visibleTodos.add(taskId);
+                } else {
+                    visibleTodos.delete(taskId);
+                }
+                calendar.refetchEvents();
+            }
+            window.filterTodoEvents = filterTodoEvents;
 
             // ====== KHỞI TẠO CALENDAR ======
             var calendarEl = document.getElementById('calendar');
@@ -300,7 +376,7 @@
                     today: 'Hôm nay', month: 'Tháng', week: 'Tuần', day: 'Ngày', list: 'Danh sách'
                 },
                 titleFormat: {year: 'numeric', month: 'long'},
-                nowIndicator:true,
+                nowIndicator: true,
                 initialDate: new Date(),
                 navLinks: true,
                 businessHours: false,
@@ -311,10 +387,73 @@
                 eventClick: function (info) {
                     showEventModal(info.event);
                 },
-                eventDrop: function (info) {},
+                eventDrop: function (info) {
+                    // Lấy thông tin mới
+                    const eventId = info.event.id;
+                    const newStart = info.event.start ? info.event.start.toISOString() : null;
+                    const newEnd = info.event.end ? info.event.end.toISOString() : null;
+                    const allDay = info.event.allDay;
+
+                    // Gửi AJAX cập nhật lên server
+                    $.ajax({
+                        url: 'event', // Đúng servlet xử lý update event
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            action: 'updateTime',
+                            eventId: eventId,
+                            start: newStart,
+                            end: newEnd,
+                            allDay: allDay
+                        },
+                        success: function (response) {
+                            if (response.success) {
+                                console.log('Cập nhật thời gian event thành công!');
+                            } else {
+                                alert('Lỗi: ' + (response.error || 'Không thể cập nhật event'));
+                                info.revert(); // Quay lại vị trí cũ nếu lỗi
+                            }
+                        },
+                        error: function () {
+                            alert('Lỗi khi gửi dữ liệu cập nhật event!');
+                            info.revert(); // Quay lại vị trí cũ nếu lỗi
+                        }
+                    });
+                },
                 eventResize: function (info) {},
                 dateClick: function (info) {
-                    showCreateEventModalWithDate(info.dateStr);
+                    console.log('dateStr:', info.dateStr, 'timeStr:', info.timeStr);
+                    // Lấy ngày đúng định dạng yyyy-MM-dd
+                    let dateOnly = info.dateStr ? info.dateStr.substring(0, 10) : '';
+                    // Nếu info.timeStr có thì lấy, nếu không thì tách từ dateStr (nếu có dạng yyyy-MM-ddTHH:mm:ss)
+                    let timeOnly;
+                    let isAllDay = info.allDay || false;
+
+                    if (info.timeStr && info.timeStr !== "") {
+                        timeOnly = info.timeStr;
+                        isAllDay = false;
+                    } else if (info.dateStr && info.dateStr.length > 10 && info.dateStr.includes('T')) {
+                        // Tách phần giờ từ dateStr
+                        let timePart = info.dateStr.split('T')[1]; // "13:00:00+07:00"
+                        if (timePart) {
+                            let h_m = timePart.split(':'); // ["13", "00", "00+07:00"]
+                            if (h_m.length >= 2) {
+                                timeOnly = h_m[0] + ":" + h_m[1];
+                            } else {
+                                timeOnly = "08:00";
+                            }
+                        } else {
+                            timeOnly = "08:00";
+                        }
+                    } else {
+                        // Nếu ở view tháng (dateStr không có phần T), lấy giờ hiện tại
+                        const now = new Date();
+                        timeOnly = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+                        isAllDay = true; // Click vào all-day cell
+                    }
+                    lastClickedDate = dateOnly;
+                    lastClickedTime = timeOnly;
+                    showCreateEventModalWithDate(lastClickedDate, lastClickedTime, isAllDay);
                 },
                 events: function (info, successCallback) {
                     let filtered = events;
@@ -325,7 +464,17 @@
                         });
                     }
                     // Gộp thêm ToDo vào danh sách event
-                    successCallback([...filtered, ...todos]);
+                    let filteredTodos = todos;
+                    if (visibleTodos.size > 0) {
+                        filteredTodos = todos.filter(todo => {
+                            // todo.id dạng 'todo-123', todo.taskId là id của task
+                            return todo.taskId && visibleTodos.has(todo.taskId.toString());
+                        });
+                    } else if (visibleTodos.size === 0 && document.querySelectorAll('.todo-checkbox').length > 0) {
+                        // Nếu có todo-checkbox nhưng không có cái nào được check, ẩn hết ToDo
+                        filteredTodos = [];
+                    }
+                    successCallback([...filtered, ...filteredTodos]);
                 }
             });
             calendar.setOption('height', 860);
@@ -342,24 +491,59 @@
                         .then(response => response.json())
                         .then(data => {
                             events = data.map(event => {
+                                // SỬA DTSTART dùng giờ địa phương
                                 if (event.rrule && !event.rrule.includes('DTSTART') && event.start) {
                                     const dt = new Date(event.start);
                                     const pad = n => n.toString().padStart(2, '0');
-                                    const dtstart = dt.getUTCFullYear() +
-                                            pad(dt.getUTCMonth() + 1) +
-                                            pad(dt.getUTCDate()) + 'T' +
-                                            pad(dt.getUTCHours()) +
-                                            pad(dt.getUTCMinutes()) +
-                                            pad(dt.getUTCSeconds()) + 'Z';
+                                    const dtstart = dt.getFullYear() +
+                                            pad(dt.getMonth() + 1) +
+                                            pad(dt.getDate()) + 'T' +
+                                            pad(dt.getHours()) +
+                                            pad(dt.getMinutes()) +
+                                            pad(dt.getSeconds());
                                     event.rrule = event.rrule + ';DTSTART=' + dtstart;
                                 }
                                 if (event.idEvent && !event.id)
                                     event.id = event.idEvent;
+                                // ĐẢM BẢO allDay là boolean và đúng tên trường
+                                event.allDay = (event.allDay === true || event.isAllDay === true || event.allDay === "true" || event.isAllDay === "true");
+                                // ĐẢM BẢO backgroundColor đúng cho FullCalendar
+                                if (event.color)
+                                    event.backgroundColor = event.color;
+                                // THÊM TRƯỜNG DURATION
+                                if (event.start && event.end) {
+                                    const start = new Date(event.start);
+                                    const end = new Date(event.end);
+                                    const durationMs = end - start;
+                                    if (durationMs > 0) {
+                                        const totalSeconds = Math.floor(durationMs / 1000);
+                                        const hours = Math.floor(totalSeconds / 3600);
+                                        const minutes = Math.floor((totalSeconds % 3600) / 60);
+                                        if (event.rrule) {
+                                            // Dùng ISO 8601 cho event lặp lại
+                                            let durationStr = 'PT';
+                                            if (hours > 0)
+                                                durationStr += hours + 'H';
+                                            if (minutes > 0)
+                                                durationStr += minutes + 'M';
+                                            event.duration = durationStr;
+                                        } else {
+                                            // Dùng HH:mm cho event thường (nếu muốn)
+                                            const hh = hours.toString().padStart(2, '0');
+                                            const mm = minutes.toString().padStart(2, '0');
+                                            event.duration = hh + ':' + mm;
+                                        }
+                                    }
+                                }
+                                console.log('[LOG] Danh sách events hiện tại:', event); // <-- Thêm dòng này
                                 return event;
                             });
+
                             calendar.refetchEvents();
                         });
             }
+
+
             function loadEvents(calendarId) {
                 fetch('calendar?action=getEvents&calendarId=' + calendarId)
                         .then(response => response.json())
@@ -378,28 +562,34 @@
                                 }
                                 if (event.idEvent && !event.id)
                                     event.id = event.idEvent;
+                                console.log('[LOG] Event thêm vào FullCalendar:', event);
                                 return event;
                             });
                             calendar.refetchEvents();
                         });
             }
 
+
             // ====== LOAD TODOS ======
             function loadAllTodos() {
-                fetch('task?action=getAllTodoByUser')
-                    .then(response => response.json())
-                    .then(data => {
-                        todos = data.map(todo => ({
-                            id: 'todo-' + todo.idTodo,
-                            title: '[ToDo] ' + todo.title,
-                            start: todo.dueDate,
-                            allDay: todo.isAllDay,
-                            color: todo.isCompleted ? '#10b981' : '#f59e0b',
-                            description: todo.description || '',
-                            // Có thể bổ sung các trường khác nếu muốn
-                        }));
-                        calendar.refetchEvents();
-                    });
+                fetch('task?action=getAllTodos')
+                        .then(response => response.json())
+                        .then(data => {
+                            todos = data.map(todo => {
+                                const mapped = {
+                                    id: 'todo-' + todo.idTodo,
+                                    title: '[ToDo] ' + todo.title,
+                                    start: todo.dueDate,
+                                    allDay: todo.isAllDay,
+                                    color: todo.isCompleted ? '#10b981' : '#f59e0b',
+                                    description: todo.description || '',
+                                    taskId: todo.taskId // <-- Đảm bảo có trường này!
+                                };
+                                console.log('[LOG] ToDo thêm vào FullCalendar:', todo);
+                                return mapped;
+                            });
+                            calendar.refetchEvents();
+                        });
             }
 
             // ====== FILTER CALENDAR ======
@@ -494,12 +684,64 @@
                 // Hiển thị tên calendar
                 $('#modalCalendarName').text(original.calendarName || '');
 
+                // Phân biệt Event hay ToDo
+                if (event.id && (typeof event.id === 'string') && event.id.startsWith('todo-')) {
+                    // Là ToDo
+                    $('#deleteEvent').text('Xóa ToDo');
+                    $('#deleteEvent').off('click').on('click', function () {
+                        if (confirm('Bạn có chắc chắn muốn xóa ToDo này?')) {
+                            $.ajax({
+                                url: 'todo',
+                                type: 'POST',
+                                dataType: 'json',
+                                data: {action: 'deleteTodo', id: event.id.replace('todo-', '')},
+                                success: function (response) {
+                                    if (response.success) {
+                                        todos = todos.filter(t => t.id !== event.id);
+                                        calendar.refetchEvents();
+                                        $('#eventModal').addClass('hidden');
+                                        alert('ToDo đã được xóa thành công!');
+                                    } else {
+                                        alert('Lỗi: ' + (response.error || 'Không thể xóa ToDo'));
+                                    }
+                                },
+                                error: function () {
+                                    alert('Lỗi khi gửi yêu cầu xóa ToDo');
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    // Là Event
+                    $('#deleteEvent').text('Xóa Event');
+                    $('#deleteEvent').off('click').on('click', function () {
+                        var eventId = event.id;
+                        if (confirm('Bạn có chắc chắn muốn xóa event này?')) {
+                            $.ajax({
+                                url: 'event', type: 'POST', dataType: 'json',
+                                data: {action: 'delete', eventId: eventId},
+                                success: function (response) {
+                                    if (response.success) {
+                                        events = events.filter(e => e.id != eventId);
+                                        calendar.refetchEvents();
+                                        $('#eventModal').addClass('hidden');
+                                        alert('Event đã được xóa thành công!');
+                                    } else
+                                        alert('Lỗi: ' + (response.error || 'Không thể xóa event'));
+                                },
+                                error: function () {
+                                    alert('Lỗi khi xóa event');
+                                }
+                            });
+                        }
+                    });
+                }
+
                 $('#eventModal').removeClass('hidden');
                 $('#deleteEvent').data('eventId', event.id);
                 $('#editEvent').data('eventId', event.id);
             }
             function formatEventTime(event) {
-                // Format: 'Thứ hai, 14 tháng 7⋅10:00 – 10:30AM'
                 var start = new Date(event.start);
                 var end = event.end ? new Date(event.end) : null;
                 var weekdays = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
@@ -534,27 +776,6 @@
             $('#eventModal').on('click', function (e) {
                 if (e.target === this)
                     $(this).addClass('hidden');
-            });
-            $('#deleteEvent').on('click', function () {
-                var eventId = $(this).data('eventId');
-                if (confirm('Bạn có chắc chắn muốn xóa event này?')) {
-                    $.ajax({
-                        url: 'event', type: 'POST', dataType: 'json',
-                        data: {action: 'delete', eventId: eventId},
-                        success: function (response) {
-                            if (response.success) {
-                                events = events.filter(e => e.id != eventId);
-                                calendar.refetchEvents();
-                                $('#eventModal').addClass('hidden');
-                                alert('Event đã được xóa thành công!');
-                            } else
-                                alert('Lỗi: ' + (response.error || 'Không thể xóa event'));
-                        },
-                        error: function () {
-                            alert('Lỗi khi xóa event');
-                        }
-                    });
-                }
             });
             // Nút 'Tùy chọn khác' trong modal tạo event
             $('#otherOptionsBtn').on('click', function () {
@@ -609,18 +830,27 @@
             }
 
             // Show create event modal with specific date
-            function showCreateEventModalWithDate(selectedDate) {
-                // Set the selected date
+            function showCreateEventModalWithDate(selectedDate, selectedTime, isAllDay) {
                 $('#eventStartDate').val(selectedDate);
                 $('#eventEndDate').val(selectedDate);
 
-                // Auto-fill default times
-                autoFillDefaultTimes();
-
-                // Populate calendar dropdown
+                if (isAllDay) {
+                    $('#eventAllDay').prop('checked', true);
+                    $('#eventStartTime, #eventEndTime').prop('disabled', true).val('');
+                } else {
+                    $('#eventAllDay').prop('checked', false);
+                    if (selectedTime) {
+                        $('#eventStartTime').val(selectedTime);
+                        // Set end time mặc định sau 1 tiếng
+                        let [h, m] = selectedTime.split(':');
+                        let endHour = (parseInt(h) + 1) % 24;
+                        $('#eventEndTime').val(endHour.toString().padStart(2, '0') + ':' + m);
+                    } else {
+                        autoFillDefaultTimes();
+                    }
+                    $('#eventStartTime, #eventEndTime').prop('disabled', false);
+                }
                 populateCalendarDropdown();
-
-                // Show modal
                 $('#createEventModal').removeClass('hidden');
             }
 
@@ -959,6 +1189,19 @@
                     }
                 });
             });
+
+            // Swap từ Create Event sang Create Todo
+            $('#swapToTodo').on('click', function () {
+                $('#createEventModal').addClass('hidden');
+                // Khi chuyển sang modal ToDo, truyền ngày/giờ cuối cùng được chọn nếu có
+                showAddTodoModal(lastClickedDate, lastClickedTime);
+            });
+            // Swap từ Create Todo sang Create Event
+            $('#swapToEvent').on('click', function () {
+                $('#addTodoModal').addClass('hidden');
+                $('#createEventModal').removeClass('hidden');
+                // Nếu muốn truyền ngày/giờ, có thể lấy giá trị từ form todo và set cho form event ở đây
+            });
         </script>
         <!-- Đóng modal tạo event khi click ra ngoài vùng modal -->
         <script>
@@ -969,6 +1212,111 @@
                     }
                 });
             });
+        </script>
+        <script>
+            function showAddTodoModal(selectedDate, selectedTime) {
+                // Gọi API lấy tasks
+                fetch('task?action=getAllTasks')
+                        .then(response => response.json())
+                        .then(tasks => {
+                            var $taskSelect = $('#todoTaskId');
+                            $taskSelect.empty();
+                            $taskSelect.append('<option value="">-- Chọn Task --</option>');
+                            tasks.forEach(function (task) {
+                                $taskSelect.append('<option value="' + task.idTask + '">' + task.name + '</option>');
+                            });
+                            // Tự động chọn task đầu tiên nếu muốn
+                            if ($taskSelect.find('option').length > 1) {
+                                $taskSelect.val($taskSelect.find('option').eq(1).val());
+                            }
+                        });
+
+                $('#addTodoModal').removeClass('hidden');
+                if (selectedDate) {
+                    $('#todoDueDate').val(selectedDate);
+                } else {
+                    $('#todoDueDate').val(new Date().toISOString().split('T')[0]);
+                }
+                if (selectedTime) {
+                    $('#todoDueTime').val(selectedTime);
+                } else {
+                    const now = new Date();
+                    $('#todoDueTime').val(now.toTimeString().slice(0, 5));
+                }
+            }
+        </script>
+        <!-- Đóng modal khi bấm nút X -->
+        <script>
+            $('#closeAddTodoModal').on('click', function () {
+                $('#addTodoModal').addClass('hidden');
+                $('#addTodoForm')[0].reset();
+            });
+
+            // Đóng modal khi click ra ngoài vùng modal
+            $('#addTodoModal').on('mousedown', function (e) {
+                if (e.target === this || $(e.target).hasClass('flex')) {
+                    $('#addTodoModal').addClass('hidden');
+                    $('#addTodoForm')[0].reset();
+                }
+            });
+        </script>
+        <!-- Đóng modal xem chi tiết event khi click overlay hoặc vùng flex -->
+        <script>
+            $('#eventModal').on('mousedown', function (e) {
+                if (e.target === this || $(e.target).hasClass('flex')) {
+                    $('#eventModal').addClass('hidden');
+                }
+            });
+        </script>
+        <script>
+            $('#saveTodo').on('click', function () {
+                // Lấy dữ liệu từ form
+                const formData = {
+                    title: $('#todoTitle').val(),
+                    description: $('#todoDescription').val(),
+                    dueDate: $('#todoDueDate').val(),
+                    dueTime: $('#todoDueTime').val(),
+                    isAllDay: $('#todoAllDay').is(':checked'),
+                    taskId: $('#todoTaskId').val()
+                };
+
+                // Kiểm tra dữ liệu bắt buộc
+                if (!formData.title || !formData.dueDate || !formData.taskId) {
+                    alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
+                    return;
+                }
+
+                // Gửi AJAX lên server để tạo ToDo mới
+                $.ajax({
+                    url: 'todo', // <-- Đúng servlet xử lý createTodo
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        action: 'createTodo',
+                        title: formData.title,
+                        description: formData.description,
+                        dueDate: formData.dueDate,
+                        dueTime: formData.dueTime,
+                        isAllDay: formData.isAllDay ? 'on' : 'off',
+                        taskId: formData.taskId
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            alert('ToDo đã được tạo thành công!');
+                            $('#addTodoModal').addClass('hidden');
+                            $('#addTodoForm')[0].reset();
+                            loadAllTodos(); // <--- Thêm dòng này để reload danh sách ToDo
+                        } else {
+                            alert('Lỗi: ' + (response.error || 'Không thể tạo ToDo'));
+                        }
+                    },
+                    error: function () {
+                        alert('Lỗi khi gửi dữ liệu đến server');
+                    }
+                });
+            });
+
+
         </script>
     </body>
 </html>

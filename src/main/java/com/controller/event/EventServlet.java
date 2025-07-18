@@ -19,6 +19,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.PrintWriter;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
 
 /**
  *
@@ -175,6 +177,9 @@ public class EventServlet extends HttpServlet {
             } else if ("update".equals(action)) {
                 System.out.println("[EventServlet] Handling update action");
                 handleUpdateEvent(request, response);
+            } else if ("updateTime".equals(action)) {
+                System.out.println("[EventServlet] Handling updateTime action");
+                handleUpdateEventTime(request, response);
             } else {
                 System.out.println("[EventServlet] Invalid action: " + action);
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -643,6 +648,122 @@ public class EventServlet extends HttpServlet {
             
             // Save updated event
             boolean updated = eventService.updateEvent(existingEvent);
+            
+            if (updated) {
+                // Kiểm tra nếu là request AJAX (application/json)
+                String accept = request.getHeader("Accept");
+                String requestedWith = request.getHeader("X-Requested-With");
+                if ("XMLHttpRequest".equals(requestedWith) || (accept != null && accept.contains("application/json"))) {
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.getWriter().write("{\"success\": true}");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/home");
+                }
+            } else {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("{\"error\":\"Failed to update event\"}");
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error updating event: " + e.getMessage());
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\":\"Failed to update event\"}");
+        }
+    }
+
+    private void handleUpdateEventTime(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        try {
+            // Get user session
+            HttpSession session = request.getSession();
+            Integer userId = (Integer) session.getAttribute("user_id");
+            if (userId == null) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("{\"error\":\"User not logged in\"}");
+                return;
+            }
+
+            // Get event ID
+            String eventIdStr = request.getParameter("eventId");
+            if (eventIdStr == null || eventIdStr.trim().isEmpty()) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("{\"error\":\"Missing event ID\"}");
+                return;
+            }
+
+            int eventId = Integer.parseInt(eventIdStr);
+            
+            // Get new start and end dates from request
+            String start = request.getParameter("start"); // VD: "2025-07-18T08:00:00Z" hoặc "2025-07-18"
+            String end = request.getParameter("end");
+            boolean allDay = Boolean.parseBoolean(request.getParameter("allDay"));
+
+            // Validate required fields
+            if (start == null || start.trim().isEmpty()) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("{\"error\":\"Missing required fields\"}");
+                return;
+            }
+
+            // Get existing event
+            UserEvents existingEvent = eventService.getEventById(eventId);
+            if (existingEvent == null) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.getWriter().write("{\"error\":\"Event not found\"}");
+                return;
+            }
+            
+            // Check if user owns the event
+            if (!existingEvent.getIdCalendar().getIdUser().getIdUser().equals(userId)) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.getWriter().write("{\"error\":\"Not authorized to update this event\"}");
+                return;
+            }
+
+            // Parse dates
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            
+            Date startDateTime = null;
+            Date endDateTime = null;
+            try {
+                if (start != null && !start.trim().isEmpty()) {
+                    String s = start;
+                    if (s.length() == 10) s += "T00:00:00Z"; // Nếu chỉ có ngày, thêm giờ mặc định
+                    startDateTime = Date.from(OffsetDateTime.parse(s).toInstant());
+                }
+                if (end != null && !end.trim().isEmpty()) {
+                    String e = end;
+                    if (e.length() == 10) e += "T00:00:00Z";
+                    endDateTime = Date.from(OffsetDateTime.parse(e).toInstant());
+                } else {
+                    endDateTime = startDateTime;
+                }
+            } catch (DateTimeParseException e) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("{\"error\":\"Invalid date format: " + e.getMessage() + "\"}");
+                return;
+            }
+            
+            // Cập nhật recurrenceRule khi update event
+            String recurrenceRule = request.getParameter("recurrenceRule");
+            if (recurrenceRule == null || recurrenceRule.trim().isEmpty()) {
+                // Không lặp lại
+                existingEvent.setRecurrenceRule(null); // hoặc không set gì cả
+                existingEvent.setIsRecurring(false);
+            } else {
+                existingEvent.setRecurrenceRule(recurrenceRule);
+                existingEvent.setIsRecurring(true);
+            }
+            
+            // Save updated event
+            System.out.println("[DEBUG] eventId=" + eventId);
+            System.out.println("[DEBUG] startDateTime=" + startDateTime);
+            System.out.println("[DEBUG] endDateTime=" + endDateTime);
+            System.out.println("[DEBUG] allDay=" + allDay);
+            boolean updated = eventService.updateEventTime(eventId, startDateTime, endDateTime, allDay);
             
             if (updated) {
                 // Kiểm tra nếu là request AJAX (application/json)

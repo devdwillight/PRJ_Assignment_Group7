@@ -71,6 +71,86 @@ public class todoServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String action = request.getParameter("action");
+        System.out.println("todoServlet: action=" + action);
+        response.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+
+        if ("createTodo".equals(action)) {
+            // Lấy dữ liệu từ request
+            String title = request.getParameter("title");
+            String description = request.getParameter("description");
+            String dueDateStr = request.getParameter("dueDate");
+            String dueTime = request.getParameter("dueTime");
+            String isAllDayStr = request.getParameter("isAllDay");
+            String taskIdStr = request.getParameter("taskId");
+
+            // Validate
+            if (title == null || dueDateStr == null || taskIdStr == null) {
+                out.print("{\"success\":false, \"error\":\"Thiếu thông tin bắt buộc\"}");
+                return;
+            }
+
+            // Parse ngày và giờ
+            java.sql.Timestamp dueDateTime;
+            try {
+                String dateTimeStr = dueDateStr;
+                if (dueTime != null && !dueTime.isEmpty()) {
+                    dateTimeStr += " " + dueTime + ":00";
+                } else {
+                    dateTimeStr += " 00:00:00";
+                }
+                dueDateTime = java.sql.Timestamp.valueOf(dateTimeStr.replace("T", " "));
+            } catch (Exception e) {
+                out.print("{\"success\":false, \"error\":\"Định dạng ngày/giờ không hợp lệ\"}");
+                return;
+            }
+
+            // Tạo ToDo object
+            com.model.ToDo todo = new com.model.ToDo();
+            todo.setTitle(title);
+            todo.setDescription(description);
+            todo.setDueDate(dueDateTime);
+            todo.setIsAllDay("on".equals(isAllDayStr));
+            com.model.Task task = new com.model.Task();
+            task.setIdTask(Integer.parseInt(taskIdStr));
+            todo.setIdTask(task);
+            // TODO: set userId nếu cần
+
+            // Gọi service
+            com.service.Todo.TodoService service = new com.service.Todo.TodoService();
+            com.model.ToDo created = service.createTodo(todo);
+
+            if (created != null) {
+                out.print("{\"success\":true}");
+            } else {
+                out.print("{\"success\":false, \"error\":\"Không thể thêm ToDo\"}");
+            }
+            return;
+        }
+
+        if ("deleteTodo".equals(action)) {
+            String idStr = request.getParameter("id");
+            if (idStr == null) {
+                out.print("{\"success\":false, \"error\":\"Thiếu id\"}");
+                return;
+            }
+            try {
+                int id = Integer.parseInt(idStr);
+                com.service.Todo.TodoService service = new com.service.Todo.TodoService();
+                boolean deleted = service.removeTodo(id);
+                if (deleted) {
+                    out.print("{\"success\":true}");
+                } else {
+                    out.print("{\"success\":false, \"error\":\"Không thể xóa ToDo\"}");
+                }
+            } catch (Exception e) {
+                out.print("{\"success\":false, \"error\":\"Lỗi xóa ToDo\"}");
+            }
+            return;
+        }
+
+        // ... các action khác ...
         processRequest(request, response);
     }
 

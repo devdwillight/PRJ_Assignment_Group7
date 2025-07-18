@@ -6,6 +6,7 @@ package com.service.Event;
 
 import com.dao.Event.EventDAO;
 import com.model.UserEvents;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -104,4 +105,11 @@ public class EventService implements IEventService {
         System.out.println(events);
     }
 
+    @Override
+    public boolean updateEventTime(int eventId, Date start, Date end, boolean allDay) {
+        System.out.println("[updateEventTime] Cập nhật thời gian sự kiện ID = " + eventId);
+        boolean success = eventDAO.updateEventTime(eventId, start, end, allDay);
+        System.out.println("[updateEventTime] " + (success ? "✔ Thành công" : "✖ Thất bại"));
+        return success;
+    }
 }

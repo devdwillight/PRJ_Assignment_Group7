@@ -7,7 +7,10 @@ package com.dao.Event;
 import com.dao.BaseDAO;
 import com.model.UserEvents;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
+import jakarta.persistence.Query;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -70,4 +73,28 @@ public class EventDAO extends BaseDAO<UserEvents> implements IEventDAO {
         }
     }
 
+    @Override
+    public boolean updateEventTime(int eventId, Date start, Date end, boolean allDay) {
+        EntityManager em = getEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            String jpql = "UPDATE UserEvents e SET e.startDate = :start, e.dueDate = :end, e.isAllDay = :allDay WHERE e.idEvent = :eventId";
+            Query q = em.createQuery(jpql);
+            q.setParameter("start", start);
+            q.setParameter("end", end);
+            q.setParameter("allDay", allDay);
+            q.setParameter("eventId", eventId);
+            int updated = q.executeUpdate();
+            tx.commit();
+            return updated > 0;
+        } catch (Exception e) {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
 }

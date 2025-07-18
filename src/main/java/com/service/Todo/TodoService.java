@@ -96,6 +96,13 @@ public class TodoService implements ITodoService {
         System.out.println("[getAllToDoByUserId] Lấy tất cả ToDo của userId = " + userId);
         List<ToDo> list = todoDAO.selectAllTodoByUserId(userId);
         System.out.println("[getAllToDoByUserId] ✔ Tổng: " + list.size());
+        for (ToDo t : list) {
+            System.out.println("ID  : " + t.getIdTodo() 
+                    + "Tiêu đề    : " + t.getTitle()
+                    + "Nội dung   : " + t.getDescription()
+                    + "Hạn chót   : "   + t.getDueDate() 
+                    + "Trạng thái : "+ (t.getIsCompleted() ? "Đã hoàn thành ✅" : "Chưa hoàn thành ❌"));
+        }
         return list;
     }
 

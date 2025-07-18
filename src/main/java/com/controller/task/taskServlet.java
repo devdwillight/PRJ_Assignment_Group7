@@ -17,6 +17,7 @@ import java.util.List;
 import jakarta.servlet.http.HttpSession;
 import com.model.ToDo;
 import com.service.Todo.TodoService;
+import java.util.ArrayList;
 
 /**
  *
@@ -75,35 +76,61 @@ public class taskServlet extends HttpServlet {
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("user_id");
         if (userId == null) {
-            response.setContentType("application/json;charset=UTF-8");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("{\"error\":\"not_logged_in\"}");
+            response.sendRedirect("views/login/login.jsp");
             return;
         }
 
         String action = request.getParameter("action");
-        if ("getAllTodoByUser".equals(action)) {
-            handleGetAllTodoByUser(request, response, userId);
+        if ("getTodos".equals(action)) {
+            handleGetTodos(request, response, userId);
+            return;
+        } else if ("getAllTodos".equals(action)) {
+            handleGetAllTodos(request, response, userId);
+            return;
+        } else if ("getAllTasks".equals(action)) {
+            handleGetAllTasks(request, response, userId);
+            return;
+        } else if ("create".equals(action)) {
+            request.getRequestDispatcher("views/task/addTask.jsp").forward(request, response);
+            return;
+        } else if ("edit".equals(action)) {
+            String idParam = request.getParameter("id");
+            if (idParam != null) {
+                try {
+                    int taskIdEdit = Integer.parseInt(idParam);
+                    Task task = taskService.getTaskById(taskIdEdit);
+                    request.setAttribute("task", task);
+                } catch (Exception e) {
+                    // Có thể log lỗi hoặc xử lý thông báo
+                }
+            }
+            request.getRequestDispatcher("views/task/addTask.jsp").forward(request, response);
             return;
         }
 
-        processRequest(request, response);
-    }
+        // Lấy danh sách Task của user
+        List<Task> tasks = taskService.getAllTasksByUserId(userId);
+        request.setAttribute("tasks", tasks);
 
-    private void handleGetAllTodoByUser(HttpServletRequest request, HttpServletResponse response, Integer userId)
-            throws IOException {
-        response.setContentType("application/json;charset=UTF-8");
-        try {
-            System.out.println("[TaskServlet] Bắt đầu load danh sách ToDo cho userId = " + userId);
-            List<ToDo> todos = todoService.getAllToDoByUserId(userId);
-            System.out.println("[TaskServlet] Số lượng ToDo lấy được: " + todos.size());
-            for (ToDo t : todos) {
-                System.out.println("  - ToDo: id=" + t.getIdTodo() + ", title=" + t.getTitle() + ", dueDate=" + t.getDueDate());
-            }
-            StringBuilder json = new StringBuilder("[");
-            for (int i = 0; i < todos.size(); i++) {
-                ToDo t = todos.get(i);
-                json.append("{")
+        // Lấy taskId từ request (nếu có), mặc định lấy task đầu tiên
+        String taskIdParam = request.getParameter("taskId");
+        Integer taskId = null;
+        if (taskIdParam != null && !taskIdParam.isEmpty()) {
+            taskId = Integer.parseInt(taskIdParam);
+        } else if (!tasks.isEmpty()) {
+            taskId = tasks.get(0).getIdTask();
+        }
+
+        // Lấy ToDo theo taskId
+        List<ToDo> todos = (taskId != null)
+                ? todoService.getToDoByTaskId(taskId)
+                : new ArrayList<>();
+
+        // Chuyển todos sang JSON cho client nếu cần
+        StringBuilder todosJson = new StringBuilder("[");
+        for (int i = 0; i < todos.size(); i++) {
+            ToDo t = todos.get(i);
+            todosJson.append("{")
                     .append("\"idTodo\":").append(t.getIdTodo()).append(",")
                     .append("\"title\":\"").append(t.getTitle().replace("\"", "\\\"")).append("\",")
                     .append("\"description\":\"").append(t.getDescription() != null ? t.getDescription().replace("\"", "\\\"") : "").append("\",")
@@ -111,30 +138,197 @@ public class taskServlet extends HttpServlet {
                     .append("\"isAllDay\":").append(t.getIsAllDay() != null && t.getIsAllDay() ? "true" : "false").append(",")
                     .append("\"isCompleted\":").append(t.getIsCompleted() != null && t.getIsCompleted() ? "true" : "false")
                     .append("}");
-                if (i < todos.size() - 1) json.append(",");
+            if (i < todos.size() - 1) {
+                todosJson.append(",");
+            }
+        }
+        todosJson.append("]");
+
+        // Truyền dữ liệu sang JSP
+        request.setAttribute("taskId", taskId);
+        request.setAttribute("todosJson", todosJson.toString());
+        request.getRequestDispatcher("views/calendar/calendar.jsp").forward(request, response);
+    }
+
+    private void handleGetTodos(HttpServletRequest request, HttpServletResponse response, Integer userId)
+            throws IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        try {
+            String taskIdParam = request.getParameter("taskId");
+            Integer taskId = null;
+            if (taskIdParam != null && !taskIdParam.isEmpty()) {
+                taskId = Integer.parseInt(taskIdParam);
+            } else {
+                List<Task> tasks = taskService.getAllTasksByUserId(userId);
+                if (!tasks.isEmpty()) {
+                    taskId = tasks.get(0).getIdTask();
+                }
+            }
+            List<ToDo> todos = (taskId != null)
+                    ? todoService.getToDoByTaskId(taskId)
+                    : new ArrayList<>();
+            StringBuilder json = new StringBuilder("[");
+            for (int i = 0; i < todos.size(); i++) {
+                ToDo t = todos.get(i);
+                json.append("{")
+                        .append("\"idTodo\":").append(t.getIdTodo()).append(",")
+                        .append("\"title\":\"").append(t.getTitle().replace("\"", "\\\"")).append("\",")
+                        .append("\"description\":\"").append(t.getDescription() != null ? t.getDescription().replace("\"", "\\\"") : "").append("\",")
+                        .append("\"dueDate\":\"").append(t.getDueDate()).append("\",")
+                        .append("\"isAllDay\":").append(t.getIsAllDay() != null && t.getIsAllDay() ? "true" : "false").append(",")
+                        .append("\"isCompleted\":").append(t.getIsCompleted() != null && t.getIsCompleted() ? "true" : "false")
+                        .append("}");
+                if (i < todos.size() - 1) {
+                    json.append(",");
+                }
             }
             json.append("]");
             response.getWriter().write(json.toString());
-            System.out.println("[TaskServlet] Đã trả về JSON danh sách ToDo cho client.");
         } catch (Exception e) {
-            System.out.println("[TaskServlet] Lỗi khi load ToDo: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("{\"error\":\"Không thể tải dữ liệu todo\"}");
         }
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    private void handleGetAllTodos(HttpServletRequest request, HttpServletResponse response, Integer userId)
+            throws IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        try {
+            List<ToDo> todos = todoService.getAllToDoByUserId(userId);
+
+            StringBuilder jsonResponse = new StringBuilder("[");
+            for (int i = 0; i < todos.size(); i++) {
+                ToDo t = todos.get(i);
+                jsonResponse.append("{")
+                        .append("\"idTodo\":").append(t.getIdTodo()).append(",")
+                        .append("\"title\":\"").append(t.getTitle().replace("\"", "\\\"")).append("\",")
+                        .append("\"description\":\"").append(t.getDescription() != null ? t.getDescription().replace("\"", "\\\"") : "").append("\",")
+                        .append("\"dueDate\":\"").append(t.getDueDate()).append("\",")
+                        .append("\"isAllDay\":").append(t.getIsAllDay() != null && t.getIsAllDay() ? "true" : "false").append(",")
+                        .append("\"isCompleted\":").append(t.getIsCompleted() != null && t.getIsCompleted() ? "true" : "false").append(",")
+                        .append("\"taskId\":").append((t.getIdTask() != null && t.getIdTask().getIdTask() != null) ? t.getIdTask().getIdTask() : "null")
+                        .append("}");
+                if (i < todos.size() - 1) {
+                    jsonResponse.append(",");
+                }
+            }
+            jsonResponse.append("]");
+
+            response.getWriter().write(jsonResponse.toString());
+
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\":\"Không thể tải dữ liệu todo\"}");
+        }
+    }
+
+    private void handleGetAllTasks(HttpServletRequest request, HttpServletResponse response, Integer userId) throws IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        try {
+            List<Task> tasks = taskService.getAllTasksByUserId(userId);
+            StringBuilder json = new StringBuilder("[");
+            for (int i = 0; i < tasks.size(); i++) {
+                Task t = tasks.get(i);
+                json.append("{")
+                        .append("\"idTask\":").append(t.getIdTask()).append(",")
+                        .append("\"name\":\"").append(t.getName().replace("\"", "\\\"")).append("\"")
+                        .append("}");
+                if (i < tasks.size() - 1) {
+                    json.append(",");
+                }
+            }
+            json.append("]");
+            response.getWriter().write(json.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\":\"Không thể tải dữ liệu tasks\"}");
+        }
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        HttpSession session = request.getSession();
+        Integer userId = (Integer) session.getAttribute("user_id");
+        if (userId == null) {
+            response.sendRedirect("views/login/login.jsp");
+            return;
+        }
+        String action = request.getParameter("action");
+        if (action == null) {
+            action = "";
+        }
+        switch (action) {
+            case "create": {
+                handleCreateTask(request, response, userId);
+                return;
+            }
+            case "edit": {
+                handleEditTask(request, response, userId);
+                return;
+            }
+            case "delete": {
+                handleDeleteTask(request, response, userId);
+                return;
+            }
+            case "createTodo": {
+                // Gọi hàm xử lý tạo ToDo ở đây (tương tự như bạn đã làm ở todoServlet)
+                // Ví dụ: handleCreateTodo(request, response, userId);
+                return;
+            }
+            default: {
+                // Không làm gì
+            }
+        }
+    }
+
+    private void handleCreateTask(HttpServletRequest request, HttpServletResponse response, Integer userId) throws IOException {
+        String name = request.getParameter("name");
+        String color = request.getParameter("color");
+        Task task = new Task();
+        task.setName(name);
+        task.setColor(color);
+        com.model.User user = new com.model.User(userId);
+        task.setIdUser(user);
+        taskService.createTask(task);
+        response.sendRedirect(request.getContextPath() + "/home");
+    }
+
+    private void handleEditTask(HttpServletRequest request, HttpServletResponse response, Integer userId) throws IOException {
+        String idParam = request.getParameter("id");
+        String name = request.getParameter("name");
+        String color = request.getParameter("color");
+        if (idParam != null) {
+            try {
+                int taskId = Integer.parseInt(idParam);
+                Task task = taskService.getTaskById(taskId);
+                if (task != null && task.getIdUser() != null && task.getIdUser().getIdUser().equals(userId)) {
+                    task.setName(name);
+                    task.setColor(color);
+                    taskService.updateTask(task);
+                }
+            } catch (Exception e) {
+                // Có thể log lỗi hoặc xử lý thông báo
+            }
+        }
+        response.sendRedirect(request.getContextPath() + "/home");
+    }
+
+    private void handleDeleteTask(HttpServletRequest request, HttpServletResponse response, Integer userId) throws IOException {
+        String idParam = request.getParameter("id");
+        if (idParam != null) {
+            try {
+                int taskId = Integer.parseInt(idParam);
+                Task task = taskService.getTaskById(taskId);
+                if (task != null && task.getIdUser() != null && task.getIdUser().getIdUser().equals(userId)) {
+                    boolean result = taskService.removeTask(taskId);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        response.sendRedirect(request.getContextPath() + "/home");
     }
 
     /**
