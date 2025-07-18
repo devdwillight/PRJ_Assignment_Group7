@@ -26,7 +26,9 @@ public interface IEventDAO {
     public List<UserEvents> selectAllEvent();
 
     public List<UserEvents> selectAllEventByCalendarId(int id);
-    
+
     public List<UserEvents> selectAllEventsByUserId(int userId);
+
+    public List<UserEvents> getEventsToRemind();
 
 }

@@ -7,6 +7,8 @@ package com.dao.Event;
 import com.dao.BaseDAO;
 import com.model.UserEvents;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -67,4 +69,58 @@ public class EventDAO extends BaseDAO<UserEvents> implements IEventDAO {
         }
     }
 
+    @Override
+    public List<UserEvents> getEventsToRemind() {
+        EntityManager em = getEntityManager();
+        try {
+            Date now = new Date();
+
+            // Lấy tất cả event cần nhắc (remindMethod = true) có startDate >= hiện tại
+            String jpql
+                    = "SELECT e FROM UserEvents e "
+                    + "WHERE e.remindMethod = true "
+                    + "AND e.startDate >= :now";
+            TypedQuery<UserEvents> query = em.createQuery(jpql, UserEvents.class);
+            query.setParameter("now", now);
+
+            List<UserEvents> result = query.getResultList();
+
+            // Lọc lại ở Java để đảm bảo nhắc đúng thời điểm, tránh gửi lặp
+            List<UserEvents> toRemind = new java.util.ArrayList<>();
+            long current = now.getTime();
+
+            for (UserEvents event : result) {
+                if (event.getStartDate() == null || event.getRemindBefore() == null || event.getRemindUnit() == null) {
+                    continue;
+                }
+
+                long remindMs = 0;
+                switch (event.getRemindUnit()) {
+                    case "minutes":
+                        remindMs = event.getRemindBefore() * 60L * 1000L;
+                        break;
+                    case "hours":
+                        remindMs = event.getRemindBefore() * 60L * 60L * 1000L;
+                        break;
+                    case "days":
+                        remindMs = event.getRemindBefore() * 24L * 60L * 60L * 1000L;
+                        break;
+                    case "weeks":
+                        remindMs = event.getRemindBefore() * 7L * 24L * 60L * 60L * 1000L;
+                        break;
+                    default:
+                        remindMs = 0;
+                }
+
+                long remindTime = event.getStartDate().getTime() - remindMs;
+                // Cho phép nhắc trong vòng 1 phút quanh thời điểm chính xác (cửa sổ gửi)
+                if (current >= remindTime && current < remindTime + 60 * 1000L) {
+                    toRemind.add(event);
+                }
+            }
+            return toRemind;
+        } finally {
+            em.close();
+        }
+    }
 }

@@ -13,5 +13,5 @@ public interface DBinformation {
     String driverName = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     String dbURL = "jdbc:sqlserver://localhost:1433;databaseName=Calendar;trustServerCertificate=true";
     String userDB = "sa";
-    String passDB = "123456";
+    String passDB = "123";
 }
