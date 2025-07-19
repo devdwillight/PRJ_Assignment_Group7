@@ -1,20 +1,26 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@ page session="true" %>
-<%@ page import="java.util.List" %>
-<%@ page import="com.model.Calendar" %>
-<%@ page import="com.model.Task" %>
-<%
-    List<Calendar> calendars = (List<Calendar>) request.getAttribute("calendars");
-    List<Task> todos = (List<Task>) request.getAttribute("todos");
-    String userName = (String) session.getAttribute("googleName");
-    if (userName == null) {
-        userName = (String) session.getAttribute("user_email");
-    }
-    if (userName == null)
-        userName = "Guest";
-%>
-<!-- Thêm FullCalendar CDN vào đầu file -->
-<link rel="stylesheet" href="<%=request.getContextPath()%>/css/miniCalendar.css">
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar Sidebar</title>
+    <%@page contentType="text/html" pageEncoding="UTF-8"%>
+    <%@ page session="true" %>
+    <%@ page import="java.util.List" %>
+    <%@ page import="com.model.Calendar" %>
+    <%@ page import="com.model.Task" %>
+    <%
+        List<Calendar> calendars = (List<Calendar>) request.getAttribute("calendars");
+        List<Task> todos = (List<Task>) request.getAttribute("todos");
+        String userName = (String) session.getAttribute("googleName");
+        if (userName == null) {
+            userName = (String) session.getAttribute("user_email");
+        }
+        if (userName == null)
+            userName = "Guest";
+    %>
+    <!-- Thêm FullCalendar CDN vào đầu file -->
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/css/miniCalendar.css">
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
@@ -31,6 +37,18 @@
             border-color: #3b82f6;
         }
 
+        .todo-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #10b981;
+        }
+
+        .todo-checkbox:checked {
+            background-color: #10b981;
+            border-color: #10b981;
+        }
+
         .calendar-color {
             transition: opacity 0.2s ease;
         }
@@ -43,6 +61,8 @@
             opacity: 0.6;
         }
     </style>
+</head>
+<body>
     <div class="sidebar-container h-screen w-64 bg-white border-r border-gray-200 flex flex-col p-4 transition-all duration-200" id="sidebarContainer">
         <!-- Nút tạo dropdown -->
         <div class="sidebar-create-dropdown relative mb-6">
@@ -90,7 +110,7 @@
                            class="calendar-checkbox mr-2" 
                            data-calendar-id="<%= c.getIdCalendar()%>"
                            checked
-                           style='accent-color: <%= c.getColor() != null ? c.getColor() : "#3b82f6" %>;'>
+                           style="accent-color: <%= c.getColor() != null ? c.getColor() : "#3b82f6" %>;">
                     <label for="calendar_<%= c.getIdCalendar()%>" class="cursor-pointer"><%= c.getName()%></label>
                     <button class="calendar-setting-btn hidden group-hover:inline absolute right-0 top-1/2 -translate-y-1/2 px-2" 
                             data-calendar-id="<%= c.getIdCalendar()%>" 
@@ -111,13 +131,18 @@
                 <% if (todos != null)
                         for (Task t : todos) {%>
                 <li class="flex items-center gap-2 text-gray-700">
-                    <input type="checkbox" class="todo-checkbox" data-task-id="<%= t.getIdTask() %>" checked>
+                    <input type="checkbox" 
+                           class="todo-checkbox" 
+                           data-task-id="<%= t.getIdTask() %>" 
+                           checked
+                           style="accent-color: <%= t.getColor() != null ? t.getColor() : "#10b981" %>;">
                     <%= t.getName() %>
                 </li>
                 <% }%>
             </ul>
         </div>
     </div>
+
     <script>
         // Dropdown tạo
         const createBtn = document.getElementById('createDropdownBtn');
@@ -275,13 +300,15 @@
         });
 
         document.querySelectorAll('.todo-checkbox').forEach(function (checkbox) {
-    checkbox.addEventListener('change', function () {
-        const taskId = this.getAttribute('data-task-id');
-        const isChecked = this.checked;
-        // Gọi hàm filterTodoEvents trong calendar.jsp
-        if (window.filterTodoEvents) {
-            window.filterTodoEvents(taskId, isChecked);
-        }
-    });
-});
-    </script> 
+            checkbox.addEventListener('change', function () {
+                const taskId = this.getAttribute('data-task-id');
+                const isChecked = this.checked;
+                // Gọi hàm filterTodoEvents trong calendar.jsp
+                if (window.filterTodoEvents) {
+                    window.filterTodoEvents(taskId, isChecked);
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

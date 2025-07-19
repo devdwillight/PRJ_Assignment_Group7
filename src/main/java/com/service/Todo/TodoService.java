@@ -106,6 +106,31 @@ public class TodoService implements ITodoService {
         return list;
     }
 
+    @Override
+    public boolean completeTodo(int id) {
+        System.out.println("[completeTodo] Hoàn thành ToDo ID = " + id);
+        try {
+            // Lấy ToDo hiện tại
+            ToDo todo = todoDAO.selectTodoById(id);
+            if (todo == null) {
+                System.out.println("[completeTodo] ✖ Không tìm thấy ToDo với ID: " + id);
+                return false;
+            }
+            
+            // Cập nhật trạng thái thành hoàn thành
+            todo.setIsCompleted(true);
+            todo.setUpdatedAt(new Date());
+            
+            // Lưu vào database
+            boolean result = todoDAO.updateTodo(todo);
+            System.out.println("[completeTodo] " + (result ? "✔ Đã hoàn thành" : "✖ Thất bại"));
+            return result;
+        } catch (Exception e) {
+            System.out.println("[completeTodo] ✖ Lỗi: " + e.getMessage());
+            return false;
+        }
+    }
+
     public static void main(String[] args) {
         TodoService service = new TodoService();
         List<ToDo> todos = service.getAllToDoByUserId(1);

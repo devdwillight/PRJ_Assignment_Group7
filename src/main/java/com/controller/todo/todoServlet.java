@@ -85,6 +85,14 @@ public class todoServlet extends HttpServlet {
             String isAllDayStr = request.getParameter("isAllDay");
             String taskIdStr = request.getParameter("taskId");
 
+            System.out.println("[todoServlet] Tạo todo với dữ liệu:");
+            System.out.println("  - Title: " + title);
+            System.out.println("  - Description: " + description);
+            System.out.println("  - DueDate: " + dueDateStr);
+            System.out.println("  - DueTime: " + dueTime);
+            System.out.println("  - IsAllDay: " + isAllDayStr);
+            System.out.println("  - TaskId: " + taskIdStr);
+
             // Validate
             if (title == null || dueDateStr == null || taskIdStr == null) {
                 out.print("{\"success\":false, \"error\":\"Thiếu thông tin bắt buộc\"}");
@@ -101,7 +109,9 @@ public class todoServlet extends HttpServlet {
                     dateTimeStr += " 00:00:00";
                 }
                 dueDateTime = java.sql.Timestamp.valueOf(dateTimeStr.replace("T", " "));
+                System.out.println("[todoServlet] DueDateTime parsed: " + dueDateTime);
             } catch (Exception e) {
+                System.out.println("[todoServlet] Lỗi parse datetime: " + e.getMessage());
                 out.print("{\"success\":false, \"error\":\"Định dạng ngày/giờ không hợp lệ\"}");
                 return;
             }
@@ -112,18 +122,33 @@ public class todoServlet extends HttpServlet {
             todo.setDescription(description);
             todo.setDueDate(dueDateTime);
             todo.setIsAllDay("on".equals(isAllDayStr));
+            
+            // Set các giá trị mặc định
+            todo.setIsCompleted(false);
+            todo.setCreatedAt(new java.util.Date());
+            todo.setUpdatedAt(new java.util.Date());
+            
             com.model.Task task = new com.model.Task();
             task.setIdTask(Integer.parseInt(taskIdStr));
             todo.setIdTask(task);
             // TODO: set userId nếu cần
+
+            System.out.println("[todoServlet] Todo object đã tạo:");
+            System.out.println("  - Title: " + todo.getTitle());
+            System.out.println("  - TaskId: " + todo.getIdTask().getIdTask());
+            System.out.println("  - IsCompleted: " + todo.getIsCompleted());
+            System.out.println("  - CreatedAt: " + todo.getCreatedAt());
+            System.out.println("  - UpdatedAt: " + todo.getUpdatedAt());
 
             // Gọi service
             com.service.Todo.TodoService service = new com.service.Todo.TodoService();
             com.model.ToDo created = service.createTodo(todo);
 
             if (created != null) {
-                out.print("{\"success\":true}");
+                System.out.println("[todoServlet] ✅ Tạo thành công với ID: " + created.getIdTodo());
+                out.print("{\"success\":true, \"id\":" + created.getIdTodo() + "}");
             } else {
+                System.out.println("[todoServlet] ❌ Tạo thất bại");
                 out.print("{\"success\":false, \"error\":\"Không thể thêm ToDo\"}");
             }
             return;
@@ -146,6 +171,28 @@ public class todoServlet extends HttpServlet {
                 }
             } catch (Exception e) {
                 out.print("{\"success\":false, \"error\":\"Lỗi xóa ToDo\"}");
+            }
+            return;
+        }
+
+        if ("completeTodo".equals(action)) {
+            String idStr = request.getParameter("id");
+            if (idStr == null) {
+                out.print("{\"success\":false, \"error\":\"Thiếu id\"}");
+                return;
+            }
+            try {
+                int id = Integer.parseInt(idStr);
+                com.service.Todo.TodoService service = new com.service.Todo.TodoService();
+                boolean completed = service.completeTodo(id);
+                if (completed) {
+                    out.print("{\"success\":true}");
+                } else {
+                    out.print("{\"success\":false, \"error\":\"Không thể hoàn thành ToDo\"}");
+                }
+            } catch (Exception e) {
+                System.out.println("[todoServlet] Lỗi hoàn thành ToDo: " + e.getMessage());
+                out.print("{\"success\":false, \"error\":\"Lỗi hoàn thành ToDo\"}");
             }
             return;
         }

@@ -20,16 +20,18 @@ public interface ITodoService {
 
     boolean removeTodo(int id);
 
+    boolean completeTodo(int id);
+
     ToDo createTodo(ToDo todo);
 
     ToDo getToDoById(int id);
 
     List<ToDo> getAllToDo();
-    
-     List<ToDo> getToDoByTaskId(int id);
+
+    List<ToDo> getToDoByTaskId(int id);
 
     List<ToDo> getByDateRange(Date startDate, Date endDate);
-    
+
     List<ToDo> getAllToDoByUserId(int userId);
 
 }

@@ -23,7 +23,7 @@ import java.util.ArrayList;
  *
  * @author DELL
  */
-@WebServlet(name = "taskServlet", urlPatterns = {"/task"})
+@WebServlet(name = "taskServlet", urlPatterns = { "/task" })
 public class taskServlet extends HttpServlet {
 
     private TaskService taskService;
@@ -39,10 +39,10 @@ public class taskServlet extends HttpServlet {
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -61,14 +61,15 @@ public class taskServlet extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the
+    // + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -133,10 +134,13 @@ public class taskServlet extends HttpServlet {
             todosJson.append("{")
                     .append("\"idTodo\":").append(t.getIdTodo()).append(",")
                     .append("\"title\":\"").append(t.getTitle().replace("\"", "\\\"")).append("\",")
-                    .append("\"description\":\"").append(t.getDescription() != null ? t.getDescription().replace("\"", "\\\"") : "").append("\",")
+                    .append("\"description\":\"")
+                    .append(t.getDescription() != null ? t.getDescription().replace("\"", "\\\"") : "").append("\",")
                     .append("\"dueDate\":\"").append(t.getDueDate()).append("\",")
-                    .append("\"isAllDay\":").append(t.getIsAllDay() != null && t.getIsAllDay() ? "true" : "false").append(",")
-                    .append("\"isCompleted\":").append(t.getIsCompleted() != null && t.getIsCompleted() ? "true" : "false")
+                    .append("\"isAllDay\":").append(t.getIsAllDay() != null && t.getIsAllDay() ? "true" : "false")
+                    .append(",")
+                    .append("\"isCompleted\":")
+                    .append(t.getIsCompleted() != null && t.getIsCompleted() ? "true" : "false")
                     .append("}");
             if (i < todos.size() - 1) {
                 todosJson.append(",");
@@ -173,10 +177,14 @@ public class taskServlet extends HttpServlet {
                 json.append("{")
                         .append("\"idTodo\":").append(t.getIdTodo()).append(",")
                         .append("\"title\":\"").append(t.getTitle().replace("\"", "\\\"")).append("\",")
-                        .append("\"description\":\"").append(t.getDescription() != null ? t.getDescription().replace("\"", "\\\"") : "").append("\",")
+                        .append("\"description\":\"")
+                        .append(t.getDescription() != null ? t.getDescription().replace("\"", "\\\"") : "")
+                        .append("\",")
                         .append("\"dueDate\":\"").append(t.getDueDate()).append("\",")
-                        .append("\"isAllDay\":").append(t.getIsAllDay() != null && t.getIsAllDay() ? "true" : "false").append(",")
-                        .append("\"isCompleted\":").append(t.getIsCompleted() != null && t.getIsCompleted() ? "true" : "false")
+                        .append("\"isAllDay\":").append(t.getIsAllDay() != null && t.getIsAllDay() ? "true" : "false")
+                        .append(",")
+                        .append("\"isCompleted\":")
+                        .append(t.getIsCompleted() != null && t.getIsCompleted() ? "true" : "false")
                         .append("}");
                 if (i < todos.size() - 1) {
                     json.append(",");
@@ -202,11 +210,17 @@ public class taskServlet extends HttpServlet {
                 jsonResponse.append("{")
                         .append("\"idTodo\":").append(t.getIdTodo()).append(",")
                         .append("\"title\":\"").append(t.getTitle().replace("\"", "\\\"")).append("\",")
-                        .append("\"description\":\"").append(t.getDescription() != null ? t.getDescription().replace("\"", "\\\"") : "").append("\",")
+                        .append("\"description\":\"")
+                        .append(t.getDescription() != null ? t.getDescription().replace("\"", "\\\"") : "")
+                        .append("\",")
                         .append("\"dueDate\":\"").append(t.getDueDate()).append("\",")
-                        .append("\"isAllDay\":").append(t.getIsAllDay() != null && t.getIsAllDay() ? "true" : "false").append(",")
-                        .append("\"isCompleted\":").append(t.getIsCompleted() != null && t.getIsCompleted() ? "true" : "false").append(",")
-                        .append("\"taskId\":").append((t.getIdTask() != null && t.getIdTask().getIdTask() != null) ? t.getIdTask().getIdTask() : "null")
+                        .append("\"isAllDay\":").append(t.getIsAllDay() != null && t.getIsAllDay() ? "true" : "false")
+                        .append(",")
+                        .append("\"isCompleted\":")
+                        .append(t.getIsCompleted() != null && t.getIsCompleted() ? "true" : "false").append(",")
+                        .append("\"taskId\":")
+                        .append((t.getIdTask() != null && t.getIdTask().getIdTask() != null) ? t.getIdTask().getIdTask()
+                                : "null")
                         .append("}");
                 if (i < todos.size() - 1) {
                     jsonResponse.append(",");
@@ -222,7 +236,8 @@ public class taskServlet extends HttpServlet {
         }
     }
 
-    private void handleGetAllTasks(HttpServletRequest request, HttpServletResponse response, Integer userId) throws IOException {
+    private void handleGetAllTasks(HttpServletRequest request, HttpServletResponse response, Integer userId)
+            throws IOException {
         response.setContentType("application/json;charset=UTF-8");
         try {
             List<Task> tasks = taskService.getAllTasksByUserId(userId);
@@ -272,18 +287,15 @@ public class taskServlet extends HttpServlet {
                 handleDeleteTask(request, response, userId);
                 return;
             }
-            case "createTodo": {
-                // Gọi hàm xử lý tạo ToDo ở đây (tương tự như bạn đã làm ở todoServlet)
-                // Ví dụ: handleCreateTodo(request, response, userId);
-                return;
-            }
+
             default: {
                 // Không làm gì
             }
         }
     }
 
-    private void handleCreateTask(HttpServletRequest request, HttpServletResponse response, Integer userId) throws IOException {
+    private void handleCreateTask(HttpServletRequest request, HttpServletResponse response, Integer userId)
+            throws IOException {
         String name = request.getParameter("name");
         String color = request.getParameter("color");
         Task task = new Task();
@@ -295,7 +307,8 @@ public class taskServlet extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/home");
     }
 
-    private void handleEditTask(HttpServletRequest request, HttpServletResponse response, Integer userId) throws IOException {
+    private void handleEditTask(HttpServletRequest request, HttpServletResponse response, Integer userId)
+            throws IOException {
         String idParam = request.getParameter("id");
         String name = request.getParameter("name");
         String color = request.getParameter("color");
@@ -315,7 +328,8 @@ public class taskServlet extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/home");
     }
 
-    private void handleDeleteTask(HttpServletRequest request, HttpServletResponse response, Integer userId) throws IOException {
+    private void handleDeleteTask(HttpServletRequest request, HttpServletResponse response, Integer userId)
+            throws IOException {
         String idParam = request.getParameter("id");
         if (idParam != null) {
             try {

@@ -66,7 +66,7 @@
                                 </label>
                             </div>
                             <div class="mb-4">
-                                <label for="todoTaskId" class="block text-sm font-medium text-gray-700 mb-1">Task liên quan *</label>
+                                <label for="todoTaskId" class="block text-sm font-medium text-gray-700 mb-1">Task</label>
                                 <select id="todoTaskId" name="taskId" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
                                     <option value="">-- Chọn Task --</option>
                                     <c:forEach var="task" items="${tasks}">
@@ -129,6 +129,9 @@
                             </button>
                             <button id="deleteEvent" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 mr-2">
                                 Xóa Event
+                            </button>
+                            <button id="completeTodo" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 mr-2 hidden">
+                                Hoàn thành
                             </button>
                             <button id="closeModalBtn" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400">
                                 Đóng
@@ -508,33 +511,30 @@
                                 // ĐẢM BẢO allDay là boolean và đúng tên trường
                                 event.allDay = (event.allDay === true || event.isAllDay === true || event.allDay === "true" || event.isAllDay === "true");
                                 // ĐẢM BẢO backgroundColor đúng cho FullCalendar
+                                
                                 if (event.color)
                                     event.backgroundColor = event.color;
-                                // THÊM TRƯỜNG DURATION
+                                // THÊM TRƯỜNG DURATION theo chuẩn FullCalendar
                                 if (event.start && event.end) {
                                     const start = new Date(event.start);
                                     const end = new Date(event.end);
                                     const durationMs = end - start;
                                     if (durationMs > 0) {
+                                        // Tạo duration object theo chuẩn FullCalendar
                                         const totalSeconds = Math.floor(durationMs / 1000);
                                         const hours = Math.floor(totalSeconds / 3600);
                                         const minutes = Math.floor((totalSeconds % 3600) / 60);
-                                        if (event.rrule) {
-                                            // Dùng ISO 8601 cho event lặp lại
-                                            let durationStr = 'PT';
-                                            if (hours > 0)
-                                                durationStr += hours + 'H';
-                                            if (minutes > 0)
-                                                durationStr += minutes + 'M';
-                                            event.duration = durationStr;
-                                        } else {
-                                            // Dùng HH:mm cho event thường (nếu muốn)
-                                            const hh = hours.toString().padStart(2, '0');
-                                            const mm = minutes.toString().padStart(2, '0');
-                                            event.duration = hh + ':' + mm;
-                                        }
+                                        const seconds = totalSeconds % 60;
+                                        
+                                        // Format 1: Object với milliseconds (chuẩn FullCalendar)
+                                        event.duration = {
+                                            milliseconds: durationMs
+                                        };
+                                        
                                     }
                                 }
+
+                                
                                 console.log('[LOG] Danh sách events hiện tại:', event); // <-- Thêm dòng này
                                 return event;
                             });
@@ -688,6 +688,10 @@
                 if (event.id && (typeof event.id === 'string') && event.id.startsWith('todo-')) {
                     // Là ToDo
                     $('#deleteEvent').text('Xóa ToDo');
+                    $('#editEvent').addClass('hidden'); // Ẩn nút sửa cho ToDo
+                    $('#completeTodo').removeClass('hidden'); // Hiển thị nút hoàn thành
+                    $('#closeModalBtn').addClass('hidden'); // Ẩn nút đóng
+                    
                     $('#deleteEvent').off('click').on('click', function () {
                         if (confirm('Bạn có chắc chắn muốn xóa ToDo này?')) {
                             $.ajax({
@@ -711,9 +715,42 @@
                             });
                         }
                     });
+                    
+                    // Xử lý nút hoàn thành ToDo
+                    $('#completeTodo').off('click').on('click', function () {
+                        if (confirm('Bạn có chắc chắn muốn hoàn thành ToDo này?')) {
+                            $.ajax({
+                                url: 'todo',
+                                type: 'POST',
+                                dataType: 'json',
+                                data: {action: 'completeTodo', id: event.id.replace('todo-', '')},
+                                success: function (response) {
+                                    if (response.success) {
+                                        // Cập nhật trạng thái ToDo trong mảng todos
+                                        const todoIndex = todos.findIndex(t => t.id === event.id);
+                                        if (todoIndex !== -1) {
+                                            todos[todoIndex].color = '#10b981'; // Màu xanh lá cho ToDo đã hoàn thành
+                                        }
+                                        calendar.refetchEvents();
+                                        $('#eventModal').addClass('hidden');
+                                        alert('ToDo đã được hoàn thành thành công!');
+                                    } else {
+                                        alert('Lỗi: ' + (response.error || 'Không thể hoàn thành ToDo'));
+                                    }
+                                },
+                                error: function () {
+                                    alert('Lỗi khi gửi yêu cầu hoàn thành ToDo');
+                                }
+                            });
+                        }
+                    });
                 } else {
                     // Là Event
                     $('#deleteEvent').text('Xóa Event');
+                    $('#editEvent').removeClass('hidden'); // Hiển thị nút sửa cho Event
+                    $('#completeTodo').addClass('hidden'); // Ẩn nút hoàn thành
+                    $('#closeModalBtn').removeClass('hidden'); // Hiển thị nút đóng
+                    
                     $('#deleteEvent').off('click').on('click', function () {
                         var eventId = event.id;
                         if (confirm('Bạn có chắc chắn muốn xóa event này?')) {

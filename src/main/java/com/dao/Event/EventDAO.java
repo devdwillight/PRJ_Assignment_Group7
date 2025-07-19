@@ -7,6 +7,11 @@ package com.dao.Event;
 import com.dao.BaseDAO;
 import com.model.UserEvents;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
+import java.util.Date;
 import java.util.List;
 
 /**
