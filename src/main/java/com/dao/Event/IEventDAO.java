@@ -27,8 +27,10 @@ public interface IEventDAO {
     public List<UserEvents> selectAllEvent();
 
     public List<UserEvents> selectAllEventByCalendarId(int id);
-    
+
     public List<UserEvents> selectAllEventsByUserId(int userId);
 
     public boolean updateEventTime(int eventId, Date start, Date end, boolean allDay);
+    public List<UserEvents> getEventsToRemind();
+
 }

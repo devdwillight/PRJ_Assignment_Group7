@@ -1,12 +1,6 @@
 ﻿--create database Calendar;
 
---USE master;
---GO
---ALTER DATABASE Calendar SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
---GO
---DROP DATABASE Calendar;
-
---use Calendar
+use Calendar
 
 CREATE TABLE Users (
     id_user INT IDENTITY(1,1) PRIMARY KEY,
@@ -153,6 +147,27 @@ VALUES
 ('xara_harris', 'hashed_pwd26', 'Xara', 'Harris', '1993-07-27', 'xara.harris@email.com', '5553851729', 'Female', 1, 0),
 ('yuki_clark', 'hashed_pwd27', 'Yuki', 'Clark', '1991-11-04', 'yuki.clark@email.com', '5556294817', 'Non-binary', 1, 0),
 ('zoe_lewis', 'hashed_pwd28', 'Zoe', 'Lewis', '1989-03-11', 'zoe.lewis@email.com', '5559517283', 'Female', 1, 0),
+('aaron_robinson', 'hashed_pwd29', 'Aaron', 'Robinson', '1986-07-18', 'aaron.robinson@email.com', '5552748139', 'Male', 1, 0),
+('bella_walker', 'hashed_pwd30', 'Bella', 'Walker', '1994-11-25', 'bella.walker@email.com', '5558361749', 'Female', 1, 0),
+('carlos_hall', 'hashed_pwd31', 'Carlos', 'Hall', '1992-04-01', 'carlos.hall@email.com', '5554927183', 'Male', 0, 0),
+('diana_allen', 'hashed_pwd32', 'Diana', 'Allen', '1988-08-08', 'diana.allen@email.com', '5557183629', 'Female', 1, 0),
+('ethan_young', 'hashed_pwd33', 'Ethan', 'Young', '1990-12-15', 'ethan.young@email.com', '5553641829', 'Male', 1, 0),
+('fiona_hernandez', 'hashed_pwd34', 'Fiona', 'Hernandez', '1987-05-22', 'fiona.hernandez@email.com', '5559274163', 'Female', 1, 1),
+('gavin_king', 'hashed_pwd35', 'Gavin', 'King', '1995-09-29', 'gavin.king@email.com', '5552817439', 'Male', 1, 0),
+('hanna_wright', 'hashed_pwd36', 'Hanna', 'Wright', '1993-01-05', 'hanna.wright@email.com', '5556394817', 'Female', 1, 0),
+('ian_green', 'hashed_pwd37', 'Ian', 'Green', '1989-06-12', 'ian.green@email.com', '5554172839', 'Male', 1, 0),
+('jess_adams', 'hashed_pwd38', 'Jess', 'Adams', '1991-10-19', 'jess.adams@email.com', '5558529174', 'Non-binary', 1, 0),
+('kyle_baker', 'hashed_pwd39', 'Kyle', 'Baker', '1986-02-26', 'kyle.baker@email.com', '5553746291', 'Male', 1, 0),
+('lily_nelson', 'hashed_pwd40', 'Lily', 'Nelson', '1994-07-03', 'lily.nelson@email.com', '5557851294', 'Female', 0, 0),
+('mason_carter', 'hashed_pwd41', 'Mason', 'Carter', '1992-11-10', 'mason.carter@email.com', '5552948176', 'Male', 1, 0),
+('nora_mitchell', 'hashed_pwd42', 'Nora', 'Mitchell', '1988-03-17', 'nora.mitchell@email.com', '5556271849', 'Female', 1, 0),
+('oscar_perez', 'hashed_pwd43', 'Oscar', 'Perez', '1990-07-24', 'oscar.perez@email.com', '5554839627', 'Male', 1, 1),
+('penny_roberts', 'hashed_pwd44', 'Penny', 'Roberts', '1987-11-30', 'penny.roberts@email.com', '5558174629', 'Female', 1, 0),
+('quincy_turner', 'hashed_pwd45', 'Quincy', 'Turner', '1995-04-07', 'quincy.turner@email.com', '5553629481', 'Male', 1, 0),
+('rosa_phillips', 'hashed_pwd46', 'Rosa', 'Phillips', '1993-08-14', 'rosa.phillips@email.com', '5557394816', 'Female', 1, 0),
+('steve_campbell', 'hashed_pwd47', 'Steve', 'Campbell', '1989-12-21', 'steve.campbell@email.com', '5552617394', 'Male', 1, 0),
+('tara_parker', 'hashed_pwd48', 'Tara', 'Parker', '1991-05-28', 'tara.parker@email.com', '5558462917', 'Female', 1, 0),
+('uri_evans', 'hashed_pwd49', 'Uri', 'Evans', '1986-09-04', 'uri.evans@email.com', '5554928371', 'Male', 0, 0),
 ('violet_edwards', 'hashed_pwd50', 'Violet', 'Edwards', '1994-01-11', 'violet.edwards@email.com', '5557163849', 'Female', 1, 0),
 ('wyatt_collins', 'hashed_pwd51', 'Wyatt', 'Collins', '1992-06-18', 'wyatt.collins@email.com', '5553841729', 'Male', 1, 0),
 ('yasmin_stewart', 'hashed_pwd52', 'Yasmin', 'Stewart', '1988-10-25', 'yasmin.stewart@email.com', '5559274183', 'Female', 1, 1);
@@ -283,7 +298,34 @@ VALUES
 (16, 'Freelance Work', 'Azure'),
 (16, 'Gaming Sessions', 'Ivory'),
 (17, 'Consulting Jobs', 'Tan'),
-(17, 'Book Club', 'Amber');
+(17, 'Book Club', 'Amber'),
+(18, 'Design Projects', 'Jade'),
+(18, 'Music Practice', 'Ruby'),
+(19, 'Content Creation', 'Emerald'),
+(19, 'Pet Care', 'Chocolate'),
+(20, 'Teaching Schedule', 'Burgundy'),
+(20, 'Garden Planning', 'Mint Green'),
+(21, 'Photography Gigs', 'Sky Blue'),
+(21, 'Language Learning', 'Coral Pink'),
+(22, 'Writing Deadlines', 'Forest Green'),
+(22, 'Movie Nights', 'Deep Purple'),
+(23, 'Coding Bootcamp', 'Electric Blue'),
+(23, 'Meal Planning', 'Sunshine Yellow'),
+(24, 'Art Classes', 'Hot Pink'),
+(24, 'Investment Tracking', 'Dark Green'),
+(25, 'Yoga Sessions', 'Soft Blue'),
+(25, 'Reading List', 'Warm Orange');
+
+INSERT INTO Calendar (id_user, name, color)
+VALUES
+(54, 'Work Schedule', 'Blue')
+
+INSERT INTO UserEvents (
+    id_calendar, name, Start_Date, Due_Date, description, location,
+    is_all_day, is_recurring, color, remind_method, remind_before, remind_unit, created_at
+)
+VALUES
+(51, N'Test Mail Event', DATEADD(minute, 8, GETDATE()), DATEADD(minute, 10, GETDATE()), N'Sự kiện test gửi mail reminder', 'Phòng Test', 0, 0, N'Blue', 1, 5, 'minutes', GETDATE());
 
 
 INSERT INTO UserEvents (
@@ -307,7 +349,40 @@ VALUES
 (14, 'Weekend Hiking Trip', '2025-07-19 06:00:00', '2025-07-20 18:00:00', 'Mountain trail hiking adventure', 'Blue Ridge Mountains', 1, 0, NULL, 'Coral', 0, 12, 'hours', '2025-07-17 16:20:00'),
 (15, 'Quarterly Business Review', '2025-07-30 09:00:00', '2025-07-30 17:00:00', 'Q2 results and Q3 planning', 'Corporate Headquarters', 1, 1, 'FREQ=MONTHLY;INTERVAL=3', 'Brown', 1, 2, 'days', '2025-07-28 11:15:00'),
 (16, 'Meditation Session', '2025-07-04 07:00:00', '2025-07-04 07:30:00', 'Morning mindfulness practice', 'Home Garden', 0, 1, 'FREQ=DAILY', 'Magenta', 0, 5, 'minutes', '2025-07-03 22:10:00'),
-(17, 'School Science Fair', '2025-07-22 10:00:00', '2025-07-22 16:00:00', 'Judging student projects', 'Elementary School Gym', 1, 0, NULL, 'Olive', 1, 1, 'days', '2025-07-21 14:35:00');
+(17, 'School Science Fair', '2025-07-22 10:00:00', '2025-07-22 16:00:00', 'Judging student projects', 'Elementary School Gym', 1, 0, NULL, 'Olive', 1, 1, 'days', '2025-07-21 14:35:00'),
+(18, 'Family BBQ', '2025-07-26 12:00:00', '2025-07-26 20:00:00', 'Annual summer family gathering', 'Backyard', 1, 1, 'FREQ=YEARLY', 'Silver', 0, 2, 'hours', '2025-07-24 17:50:00'),
+(19, 'Night Shift - Security', '2025-07-11 22:00:00', '2025-07-12 06:00:00', 'Building security patrol', 'Office Complex', 0, 1, 'FREQ=WEEKLY;BYDAY=FR,SA', 'Gold', 0, 1, 'hours', '2025-07-10 20:25:00'),
+(20, 'Netflix Movie Marathon', '2025-07-13 19:00:00', '2025-07-13 23:00:00', 'Marvel movies night', 'Living Room', 0, 0, NULL, 'Lavender', 0, 0, 'minutes', '2025-07-13 10:30:00'),
+(21, 'Social Media Content Planning', '2025-07-16 10:00:00', '2025-07-16 12:00:00', 'Plan next week''s posts', 'Home Office', 0, 1, 'FREQ=WEEKLY;BYDAY=TU', 'Turquoise', 1, 30, 'minutes', '2025-07-15 13:40:00'),
+(22, 'Volunteer at Food Bank', '2025-07-17 14:00:00', '2025-07-17 18:00:00', 'Help distribute meals', 'Community Food Bank', 0, 1, 'FREQ=WEEKLY;BYDAY=WE', 'Beige', 0, 1, 'hours', '2025-07-16 09:55:00'),
+(23, 'Personal Training Session', '2025-07-21 17:00:00', '2025-07-21 18:00:00', 'Upper body strength training', 'Local Gym', 0, 1, 'FREQ=WEEKLY;BYDAY=MO,WE,FR', 'Crimson', 0, 15, 'minutes', '2025-07-20 21:15:00'),
+(24, 'Instagram Live Session', '2025-07-23 20:00:00', '2025-07-23 21:00:00', 'Q&A with followers', 'Home Studio', 0, 1, 'FREQ=WEEKLY;BYDAY=TU', 'Mint', 1, 30, 'minutes', '2025-07-22 16:45:00'),
+(25, 'Web Development Workshop', '2025-07-24 09:00:00', '2025-07-24 17:00:00', 'React and Node.js bootcamp', 'Tech Center', 1, 0, NULL, 'Salmon', 1, 1, 'days', '2025-07-22 12:20:00'),
+(26, 'Home Renovation Planning', '2025-07-27 10:00:00', '2025-07-27 12:00:00', 'Kitchen remodel discussion', 'Home', 0, 0, NULL, 'Khaki', 0, 2, 'hours', '2025-07-26 18:30:00'),
+(27, 'Sales Pitch - New Client', '2025-07-28 15:00:00', '2025-07-28 16:30:00', 'Present our services', 'Client Office', 0, 0, NULL, 'Plum', 1, 1, 'hours', '2025-07-27 11:45:00'),
+(28, 'Garden Watering', '2025-07-02 06:30:00', '2025-07-02 07:00:00', 'Water vegetables and flowers', 'Backyard Garden', 0, 1, 'FREQ=DAILY', 'Peach', 0, 10, 'minutes', '2025-07-01 19:20:00'),
+(29, 'Research Paper Deadline', '2025-07-31 23:59:00', '2025-07-31 23:59:00', 'Submit final draft to journal', 'University', 0, 0, NULL, 'Violet', 1, 3, 'days', '2025-07-28 15:10:00'),
+(30, 'Cooking Class', '2025-07-06 18:00:00', '2025-07-06 21:00:00', 'Italian cuisine basics', 'Culinary School', 0, 1, 'FREQ=WEEKLY;BYDAY=SA', 'Rose', 0, 45, 'minutes', '2025-07-05 14:25:00'),
+(31, 'Freelance Project Delivery', '2025-07-09 17:00:00', '2025-07-09 17:00:00', 'Website redesign completion', 'Client Location', 0, 0, NULL, 'Azure', 1, 2, 'hours', '2025-07-08 10:15:00'),
+(32, 'Gaming Tournament', '2025-07-11 19:00:00', '2025-07-11 23:00:00', 'Online esports competition', 'Home', 0, 0, NULL, 'Ivory', 0, 30, 'minutes', '2025-07-10 16:40:00'),
+(33, 'Business Consultation', '2025-07-29 11:00:00', '2025-07-29 13:00:00', 'Strategic planning session', 'Downtown Office', 0, 0, NULL, 'Tan', 1, 1, 'hours', '2025-07-28 09:30:00'),
+(34, 'Reading Session', '2025-07-04 20:00:00', '2025-07-04 21:30:00', 'Finish current novel chapter', 'Library Corner', 0, 1, 'FREQ=DAILY', 'Amber', 0, 0, 'minutes', '2025-07-04 12:50:00'),
+(35, 'Logo Design Review', '2025-07-12 10:00:00', '2025-07-12 11:30:00', 'Client feedback incorporation', 'Design Studio', 0, 0, NULL, 'Jade', 1, 30, 'minutes', '2025-07-11 15:20:00'),
+(36, 'Piano Recital Practice', '2025-07-15 19:00:00', '2025-07-15 20:30:00', 'Prepare for upcoming recital', 'Music Room', 0, 1, 'FREQ=WEEKLY;BYDAY=MO,WE,FR', 'Ruby', 0, 20, 'minutes', '2025-07-14 21:10:00'),
+(37, 'YouTube Video Upload', '2025-07-18 16:00:00', '2025-07-18 17:00:00', 'Edit and publish weekly vlog', 'Home Office', 0, 1, 'FREQ=WEEKLY;BYDAY=TH', 'Emerald', 1, 1, 'hours', '2025-07-17 13:35:00'),
+(38, 'Vet Appointment - Max', '2025-07-25 14:30:00', '2025-07-25 15:00:00', 'Annual checkup for dog', 'Animal Hospital', 0, 0, NULL, 'Chocolate', 0, 2, 'hours', '2025-07-23 11:25:00'),
+(39, 'Lecture - Modern History', '2025-07-08 10:00:00', '2025-07-08 11:30:00', 'World War II analysis', 'University Auditorium', 0, 1, 'FREQ=WEEKLY;BYDAY=TU,TH', 'Burgundy', 1, 15, 'minutes', '2025-07-07 17:40:00'),
+(40, 'Plant Repotting Day', '2025-07-19 09:00:00', '2025-07-19 12:00:00', 'Repot indoor plants', 'Garden Shed', 0, 1, 'FREQ=MONTHLY;BYMONTHDAY=19', 'Mint Green', 0, 30, 'minutes', '2025-07-18 20:15:00'),
+(41, 'Wedding Photography Gig', '2025-07-26 13:00:00', '2025-07-26 22:00:00', 'Capture ceremony and reception', 'Riverside Chapel', 1, 0, NULL, 'Sky Blue', 1, 2, 'hours', '2025-07-24 14:50:00'),
+(42, 'Spanish Lesson', '2025-07-01 18:00:00', '2025-07-01 19:00:00', 'Conversational practice', 'Language Center', 0, 1, 'FREQ=WEEKLY;BYDAY=MO,WE', 'Coral Pink', 0, 25, 'minutes', '2025-06-30 16:30:00'),
+(43, 'Article Submission', '2025-07-14 23:59:00', '2025-07-14 23:59:00', 'Tech blog post deadline', 'Home Office', 0, 0, NULL, 'Forest Green', 1, 6, 'hours', '2025-07-13 19:20:00'),
+(44, 'Movie Night - Friends', '2025-07-05 20:00:00', '2025-07-05 23:00:00', 'Weekly movie with roommates', 'Living Room', 0, 1, 'FREQ=WEEKLY;BYDAY=FR', 'Deep Purple', 0, 1, 'hours', '2025-07-04 22:45:00'),
+(45, 'Coding Bootcamp - Final Project', '2025-07-31 18:00:00', '2025-07-31 20:00:00', 'Present capstone project', 'Bootcamp Center', 0, 0, NULL, 'Electric Blue', 1, 1, 'days', '2025-07-30 10:25:00'),
+(46, 'Meal Prep Sunday', '2025-07-06 10:00:00', '2025-07-06 14:00:00', 'Prepare meals for the week', 'Kitchen', 0, 1, 'FREQ=WEEKLY;BYDAY=SU', 'Sunshine Yellow', 0, 30, 'minutes', '2025-07-05 18:15:00'),
+(47, 'Art Exhibition Opening', '2025-07-17 18:00:00', '2025-07-17 21:00:00', 'Local artists showcase', 'Downtown Gallery', 0, 0, NULL, 'Hot Pink', 1, 2, 'hours', '2025-07-16 12:40:00'),
+(48, 'Portfolio Review', '2025-07-23 09:00:00', '2025-07-23 10:30:00', 'Quarterly investment check', 'Financial Advisor Office', 0, 1, 'FREQ=MONTHLY;INTERVAL=3', 'Dark Green', 1, 1, 'days', '2025-07-22 15:55:00'),
+(49, 'Morning Yoga', '2025-07-02 07:30:00', '2025-07-02 08:30:00', 'Hatha yoga practice', 'Yoga Studio', 0, 1, 'FREQ=WEEKLY;BYDAY=TU,TH,SA', 'Soft Blue', 0, 15, 'minutes', '2025-07-01 21:30:00'),
+(50, 'Book Review Due', '2025-07-16 23:59:00', '2025-07-16 23:59:00', 'Submit review for book club', 'Online', 0, 0, NULL, 'Warm Orange', 1, 2, 'days', '2025-07-14 13:20:00');
 
 INSERT INTO Task (id_user, name, color)
 VALUES

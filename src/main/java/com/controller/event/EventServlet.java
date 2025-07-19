@@ -226,6 +226,7 @@ public class EventServlet extends HttpServlet {
             String allDay = request.getParameter("allDay");
             String color = request.getParameter("color");
             String calendarId = request.getParameter("calendarId");
+            String remindMethod = request.getParameter("remindMethod");
             
             // Debug logging
             System.out.println("[EventServlet] Creating event with data:");
@@ -239,6 +240,7 @@ public class EventServlet extends HttpServlet {
             System.out.println("  AllDay: " + allDay);
             System.out.println("  Color: " + color);
             System.out.println("  CalendarId: " + calendarId);
+            System.out.println("  RemindMethod: " + remindMethod);
             
             // Validate required fields
             if (title == null || title.trim().isEmpty() || 
@@ -257,8 +259,8 @@ public class EventServlet extends HttpServlet {
             event.setColor(color != null ? color : "#3b82f6");
             event.setIsAllDay("on".equals(allDay));
             event.setIsRecurring(false);
-            event.setRemindMethod(false);
-            event.setRemindBefore(30);
+            event.setRemindMethod(true);
+            event.setRemindBefore(5);
             event.setRemindUnit("minutes");
             event.setCreatedAt(new Date());
             event.setUpdatedAt(new Date());
