@@ -29,4 +29,12 @@ public interface ICourseService {
 
     List<Course> selectCourseByPage(int pageNumber, int pageSize);
 
+    int countCoursesByMonth(int year, int month);
+    
+    List<Course> searchCourses(String name, String category, String price);
+    
+    List<Course> searchCoursesWithPagination(String name, String category, String price, int pageNumber, int pageSize);
+    
+    int countSearchResults(String name, String category, String price);
+
 }

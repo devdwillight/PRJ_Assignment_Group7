@@ -80,6 +80,7 @@ public class Orders implements Serializable {
         this.totalAmount = totalAmount;
     }
 
+
     public Integer getIdOrder() {
         return idOrder;
     }

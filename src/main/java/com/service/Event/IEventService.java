@@ -28,8 +28,12 @@ public interface IEventService {
 
     List<UserEvents> getAllEventsByCalendarId(int id);
 
+<<<<<<< HEAD
     List<UserEvents> getAllEventsByUserId(int userId);
 
     boolean updateEventTime(int eventId, Date start, Date end, boolean allDay);
+=======
+    int countEventsByMonth(int year, int month);
+>>>>>>> fba18bb (update admin)
 
 }

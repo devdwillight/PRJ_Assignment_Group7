@@ -100,6 +100,14 @@ public class OrderService implements IOrderService {
     }
 
     @Override
+    public List<Orders> getByPaymentMethod(String paymentMethod) {
+        System.out.println("[getByPaymentMethod] Lọc đơn hàng theo phương thức: " + paymentMethod);
+        List<Orders> list = orderDAO.selectByPaymentMethod(paymentMethod);
+        System.out.println("[getByPaymentMethod] ✔ Tìm thấy " + (list != null ? list.size() : 0) + " đơn hàng");
+        return list;
+    }
+
+    @Override
     public List<Orders> getAllOrderByUserId(int id) {
         System.out.println("[getAllOrderByUserId] Lấy danh sách toàn bộ đơn hàng");
         List<Orders> list = orderDAO.selectAllByUserId(id);

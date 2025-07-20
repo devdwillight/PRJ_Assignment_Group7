@@ -12,7 +12,11 @@
         <title>JSP Page</title>
     </head>
     <body>
+<<<<<<< HEAD
         <h1>Bạn đã mua khóa học này rồi</h1>
         <a href="<%=request.getContextPath() %>/Course">COMEBACK </a>
+=======
+        <p>${errorMessage}</p>
+>>>>>>> fba18bb (update admin)
     </body>
 </html>

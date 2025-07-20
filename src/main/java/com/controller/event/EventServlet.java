@@ -6,7 +6,9 @@ package com.controller.event;
 
 import com.model.UserEvents;
 import com.model.Calendar;
+import com.model.Calendar;
 import com.service.Event.EventService;
+import com.service.Calendar.CalendarService;
 import com.service.Calendar.CalendarService;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -31,10 +33,12 @@ public class EventServlet extends HttpServlet {
 
     private EventService eventService;
     private CalendarService calendarService;
+    private CalendarService calendarService;
 
     @Override
     public void init() throws ServletException {
         eventService = new EventService();
+        calendarService = new CalendarService();
         calendarService = new CalendarService();
     }
 

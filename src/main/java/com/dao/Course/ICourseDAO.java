@@ -33,4 +33,12 @@ public interface ICourseDAO {
     
     public List<Course> filterCourses(String search, String sort, String[] categories);
 
+    public int countCoursesByMonth(int year, int month);
+    
+    public List<Course> searchCourses(String name, String category, String price);
+    
+    public List<Course> searchCoursesWithPagination(String name, String category, String price, int pageNumber, int pageSize);
+    
+    public int countSearchResults(String name, String category, String price);
+
 }

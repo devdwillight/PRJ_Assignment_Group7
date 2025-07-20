@@ -28,4 +28,6 @@ public interface ICalendarService {
 
     List<Calendar> getAllCalendarByUserId(int userid);
 
+    int countCalendarsByMonth(int year, int month);
+
 }

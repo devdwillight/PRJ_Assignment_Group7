@@ -66,22 +66,22 @@
             <artifactId>slf4j-simple</artifactId>
             <version>2.0.12</version>
         </dependency>
+        
+        <!-- JAXB API (single declaration) -->
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
             <version>2.3.1</version>
         </dependency>
 
+        <!-- JSTL -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
             <version>1.2</version>
         </dependency>
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.3.1</version>
-        </dependency>
+        
+        <!-- JAXB Implementation -->
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-core</artifactId>
@@ -92,7 +92,8 @@
             <artifactId>jaxb-impl</artifactId>
             <version>2.3.0</version>
         </dependency>
-
+    
+        <!-- OpenAI -->
         <dependency>
             <groupId>com.openai</groupId>
             <artifactId>openai-java</artifactId>
@@ -113,7 +114,7 @@
             <version>5.2.3</version>
         </dependency>
 
-        <!-- Gson -->
+        <!-- Gson (single version) -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -154,13 +155,6 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>fluent-hc</artifactId>
             <version>4.5.5</version>
-        </dependency>
-
-        <!-- gson-2.8.2.jar -->
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.8.2</version>
         </dependency>
 
         <!-- httpclient-4.5.5.jar -->

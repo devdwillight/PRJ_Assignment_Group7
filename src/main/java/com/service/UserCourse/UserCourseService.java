@@ -6,6 +6,7 @@ package com.service.UserCourse;
 
 import com.dao.User_Course.UserCourseDAO;
 import com.model.UserCourse;
+import com.model.Course;
 
 /**
  *
@@ -88,11 +89,17 @@ public class UserCourseService implements IUserCourseService {
         return list;
     }
 
+<<<<<<< HEAD
     @Override
     public boolean isUserEnrolled(int userId, int courseId) {
         boolean result = userCourseDAO.isUserEnrolled(userId, courseId);
         System.out.printf("[Service] isUserEnrolled → userId: %d, courseId: %d → %s\n",
                 userId, courseId, result ? "ENROLLED" : "NOT ENROLLED");
         return result;
+=======
+    // Lấy danh sách Course đã đăng ký của user
+    public List<Course> getCoursesByUserId(int userId) {
+        return userCourseDAO.getCoursesByUserId(userId);
+>>>>>>> fba18bb (update admin)
     }
 }

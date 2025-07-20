@@ -97,7 +97,11 @@
                     
                     <div class="text-center text-gray-500 text-sm">
                         Don’t have an account?
+<<<<<<< HEAD
                         <a href="signup" class="text-blue-500 font-semibold hover:underline">Sign Up</a>
+=======
+                        <a href="/signUp.jsp" class="text-blue-500 font-semibold hover:underline">Sign Up</a>
+>>>>>>> fba18bb (update admin)
                     </div>
                         <div class="mt-6 text-center">
                     <a href="jikan" class="text-gray-500 hover:text-blue-600 text-sm transition">&larr; Back to <span class="font-semibold">Jikan</span></a>

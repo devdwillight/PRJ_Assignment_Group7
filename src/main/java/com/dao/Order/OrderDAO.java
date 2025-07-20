@@ -58,7 +58,16 @@ public class OrderDAO extends BaseDAO<Orders> implements IOrderDAO {
 
     @Override
     public List<Orders> selectByStatus(String status) {
-        return findAllByNamedEntity("Orders.findByStatus", "status", status);
+        EntityManager em = getEntityManager();
+        try {
+            return em.createQuery("SELECT o FROM Orders o WHERE o.status = :status", Orders.class)
+                    .setParameter("status", status)
+                    .getResultList();
+        } catch (NoResultException e) {
+            return null;
+        } finally {
+            em.close();
+        }
     }
 
     @Override
@@ -70,6 +79,20 @@ public class OrderDAO extends BaseDAO<Orders> implements IOrderDAO {
                     .setParameter("end", endDate)
                     .getResultList();
 
+        } catch (NoResultException e) {
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<Orders> selectByPaymentMethod(String paymentMethod) {
+        EntityManager em = getEntityManager();
+        try {
+            return em.createQuery("SELECT o FROM Orders o WHERE o.paymentMethod = :paymentMethod", Orders.class)
+                    .setParameter("paymentMethod", paymentMethod)
+                    .getResultList();
         } catch (NoResultException e) {
             return null;
         } finally {

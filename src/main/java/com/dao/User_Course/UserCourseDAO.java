@@ -7,7 +7,10 @@ package com.dao.User_Course;
 import com.dao.BaseDAO;
 import com.model.UserCourse;
 import jakarta.persistence.EntityManager;
+import com.model.Course;
+import com.dao.Course.CourseDAO;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  *
@@ -68,5 +71,20 @@ public class UserCourseDAO extends BaseDAO<UserCourse> implements IUserCourseDAO
                 .setParameter("courseId", courseId)
                 .getSingleResult();
         return count != null && count > 0;
+    }
+    // Lấy danh sách Course đã đăng ký của user
+    public List<Course> getCoursesByUserId(int userId) {
+        List<Course> courses = new ArrayList<>();
+        List<UserCourse> userCourses = selectAllUserCoursesByUserId(userId);
+        CourseDAO courseDAO = new CourseDAO();
+        for (UserCourse uc : userCourses) {
+            if (uc.getIdCourse() != null) {
+                Course course = courseDAO.selectCourseById(uc.getIdCourse().getIdCourse());
+                if (course != null) {
+                    courses.add(course);
+                }
+            }
+        }
+        return courses;
     }
 }

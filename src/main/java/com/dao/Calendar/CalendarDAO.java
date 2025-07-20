@@ -7,6 +7,7 @@ package com.dao.Calendar;
 import com.dao.BaseDAO;
 import com.model.Calendar;
 import java.util.List;
+import jakarta.persistence.EntityManager;
 
 /**
  *
@@ -51,6 +52,23 @@ public class CalendarDAO extends BaseDAO<Calendar> implements ICalendarDAO {
     @Override
     public List<Calendar> selectAllCalendar() {
         return findAllByEntity("Calendar.findAll");
+    }
+
+    @Override
+    public int countCalendarsByMonth(int year, int month) {
+        EntityManager em = getEntityManager();
+        try {
+            String jpql = "SELECT COUNT(c) FROM Calendar c WHERE YEAR(c.createdAt) = :year AND MONTH(c.createdAt) = :month";
+            jakarta.persistence.Query query = em.createQuery(jpql);
+            query.setParameter("year", year);
+            query.setParameter("month", month);
+            return ((Long) query.getSingleResult()).intValue();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        } finally {
+            em.close();
+        }
     }
 
 }

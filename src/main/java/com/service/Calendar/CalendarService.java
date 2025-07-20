@@ -89,6 +89,13 @@ public class CalendarService implements ICalendarService {
         return list;
     }
 
+    @Override
+    public int countCalendarsByMonth(int year, int month) {
+        int count = calendarDAO.countCalendarsByMonth(year, month);
+        System.out.println("[countCalendarsByMonth] Tháng " + month + "/" + year + ": " + count + " lịch");
+        return count;
+    }
+
     public static void main(String[] args) {
         CalendarService service = new CalendarService();
         service.removeCalendar(37);

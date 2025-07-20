@@ -32,5 +32,6 @@ public interface IEventDAO {
 
     public boolean updateEventTime(int eventId, Date start, Date end, boolean allDay);
     public List<UserEvents> getEventsToRemind();
+    public int countEventsByMonth(int year, int month);
 
 }
