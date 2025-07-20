@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Google Calendar Style - Professional Calendar</title>
+        <link rel="stylesheet" href="css/calendar.css">
+        <link rel="stylesheet" href="css/chatBot.css">
+
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <div class="calendar-container">
+            <!-- Header -->
+            <header class="calendar-header">
+                <div class="header-left">
+                    <div class="logo">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Calendar</span>
+                    </div>
+                    <div class="date-navigation">
+                        <button class="nav-btn" id="prevMonth">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="nav-btn" id="nextMonth">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <h1 id="currentMonth">Tháng 12, 2024</h1>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="btn-primary" id="addEvent">
+                        <i class="fas fa-plus"></i>
+                        Tạo sự kiện
+                    </button>
+                    <div class="view-options">
+                        <button class="view-btn active" data-view="month">Tháng</button>
+                        <button class="view-btn" data-view="week">Tuần</button>
+                        <button class="view-btn" data-view="day">Ngày</button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Calendar -->
+            <div class="calendar-main">
+                <!-- Sidebar -->
+                <aside class="calendar-sidebar">
+                    <div class="sidebar-section">
+                        <h3>Lịch</h3>
+                        <div class="calendar-list">
+                            <div class="calendar-item active">
+                                <div class="calendar-color" style="background-color: #4285f4;"></div>
+                                <span>Lịch chính</span>
+                            </div>
+                            <div class="calendar-item">
+                                <div class="calendar-color" style="background-color: #ea4335;"></div>
+                                <span>Công việc</span>
+                            </div>
+                            <div class="calendar-item">
+                                <div class="calendar-color" style="background-color: #34a853;"></div>
+                                <span>Cá nhân</span>
+                            </div>
+                            <div class="calendar-item">
+                                <div class="calendar-color" style="background-color: #fbbc04;"></div>
+                                <span>Gia đình</span>
+                            </div>
+                        </div>
+                        <button class="btn-add-calendar">
+                            <i class="fas fa-plus"></i>
+                            Thêm lịch
+                        </button>
+                    </div>
+
+                    <!-- Todo List Section -->
+                    <div class="sidebar-section">
+                        <h3>
+                            <i class="fas fa-tasks"></i>
+                            Todo List
+                            <button class="btn-add-todo" id="addTodoBtn">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </h3>
+                        <div class="todo-container">
+                            <div class="todo-input-container" id="todoInputContainer" style="display: none;">
+                                <input type="text" id="todoInput" placeholder="Thêm công việc mới...">
+                                <div class="todo-input-actions">
+                                    <button class="btn-save-todo" id="saveTodo">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn-cancel-todo" id="cancelTodo">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="todo-list" id="todoList">
+                                <!-- Todo items will be generated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <h3>Mini Calendar</h3>
+                        <div class="mini-calendar" id="miniCalendar">
+                            <script>
+                                const calendarEl = document.getElementById("miniCalendar");
+
+                                let currentDate = new Date();
+
+                                function renderCalendar(date) {
+                                    const year = date.getFullYear();
+                                    const month = date.getMonth();
+
+                                    // Lấy ngày đầu tiên và số ngày trong tháng
+                                    const firstDay = new Date(year, month, 1).getDay();
+                                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+                                    const today = new Date();
+
+                                    const monthNames = ["January", "February", "March", "April", "May", "June",
+                                        "July", "August", "September", "October", "November", "December"];
+                                    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+                                    let html = `
+                                        <div class="mini-calendar-header">
+                                            <button onclick="changeMonth(-1)">&#8592;</button>
+                                            <span>${monthNames[month]} ${year}</span>
+                                            <button onclick="changeMonth(1)">&#8594;</button>
+                                        </div>
+                                        <div class="mini-calendar-days">
+                                            ${dayNames.map(d => `<div>${d}</div>`).join("")}
+                                        </div>
+                                        <div class="mini-calendar-dates">
+                                    `;
+
+                                    // Thêm ô trống đầu tháng
+                                    for (let i = 0; i < firstDay; i++) {
+                                        html += `<div></div>`;
+                                    }
+
+                                    // Thêm ngày
+                                    for (let day = 1; day <= daysInMonth; day++) {
+                                        const isToday = day === today.getDate() &&
+                                                month === today.getMonth() &&
+                                                year === today.getFullYear();
+                                        html += `<div class="mini-calendar-date ${isToday ? "today" : ""}">${day}</div>`;
+                                    }
+
+                                    html += "</div>";
+                                    calendarEl.innerHTML = html;
+                                }
+
+                                function changeMonth(offset) {
+                                    currentDate.setMonth(currentDate.getMonth() + offset);
+                                    renderCalendar(currentDate);
+                                }
+
+                                // Hiển thị lịch ban đầu
+                                renderCalendar(currentDate);
+                            </script>
+
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Calendar Grid -->
+                <main class="calendar-grid">
+                    <!-- Weekday Headers -->
+                    <div class="weekday-headers">
+                        <div class="weekday">CN</div>
+                        <div class="weekday">T2</div>
+                        <div class="weekday">T3</div>
+                        <div class="weekday">T4</div>
+                        <div class="weekday">T5</div>
+                        <div class="weekday">T6</div>
+                        <div class="weekday">T7</div>
+                    </div>
+
+                    <!-- Calendar Days -->
+                    <div class="calendar-days" id="calendarDays">
+                        <!-- Days will be generated by JavaScript -->
+                    </div>
+                </main>
+            </div>
+        </div>
+
+        <!-- Chatbot -->
+        <div class="chatbot-container" id="chatbotContainer">
+            <div class="chatbot-header" id="chatbotToggle">
+                <div class="chatbot-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="chatbot-info">
+                    <h4 style="font-size:1.2rem; font-weight:700; margin-bottom:2px;">Calendar Assistant</h4>
+                    <span class="chatbot-status" style="color:#4ade80; font-weight:600; font-size:0.95rem;">
+                        <i class="fas fa-circle" style="font-size:0.7em; vertical-align:middle;"></i> Online
+                    </span>
+                </div>
+                <button class="chatbot-minimize" id="chatbotMinimize" title="Thu nhỏ">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
+            <div class="chatbot-body" id="chatbotBody">
+                <!-- Welcome/Intro -->
+                <div class="chat-welcome" style="background:#f3f4f6; border-radius:12px; margin:12px 8px 8px 8px; padding:10px 8px 8px 8px; box-shadow:0 1px 3px rgba(60,60,120,0.04); font-size:0.92rem;">
+                    <h2 style="font-size:1rem; color:#764ba2; font-weight:600; margin-bottom:4px;">📅 AI Quản lý Lịch trình Thông minh</h2>
+                    <p style="font-size:0.9rem; color:#555; margin-bottom:6px;">Tư vấn & tối ưu lịch cá nhân</p>
+                    <div class="schedule-types" style="gap:4px; display:flex; flex-wrap:wrap;">
+                        <span class="schedule-type" style="font-size:0.85rem; padding:4px 8px; border-radius:8px; background:#e0e7ff;">📚 Học tập</span>
+                        <span class="schedule-type" style="font-size:0.85rem; padding:4px 8px; border-radius:8px; background:#e0e7ff;">💼 Công việc</span>
+                        <span class="schedule-type" style="font-size:0.85rem; padding:4px 8px; border-radius:8px; background:#e0e7ff;">🎉 Sự kiện</span>
+                        <span class="schedule-type" style="font-size:0.85rem; padding:4px 8px; border-radius:8px; background:#e0e7ff;">✈️ Du lịch</span>
+                        <span class="schedule-type" style="font-size:0.85rem; padding:4px 8px; border-radius:8px; background:#e0e7ff;">👤 Cá nhân</span>
+                    </div>
+                </div>
+
+                <!-- Chat messages -->
+                <div class="chat-messages scrollbar" id="chatMessages" style="background:#fff; border-radius:12px; box-shadow:0 1px 6px rgba(60,60,120,0.06); margin:0 10px 10px 10px; padding:14px 10px 10px 10px; min-height:120px; max-height:220px;">
+                    <!-- Tin nhắn sẽ hiển thị ở đây -->
+                </div>
+                <!-- Typing indicator -->
+                <div class="typing-indicator" id="typingIndicator" style="margin:0 10px 10px 10px;">
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+                <!-- Action buttons -->
+                <div class="action-buttons" style="margin:0 10px 10px 10px;">
+                    <button class="action-button primary" onclick="getCurrentSchedule()">📋 Xem lịch hiện tại</button>
+                    <button class="action-button" style="background:#eeeeee; color:#333;" onclick="getSummary()">📊 Tóm tắt</button>
+                    <button class="action-button" style="background:#eeeeee; color:#333;" onclick="clearChat()">🔄 Làm mới</button>
+                </div>
+            </div>
+            <div class="chat-input-container" style="background:#f8fafc; border-top:1px solid #e0e0e0; padding:14px 16px;">
+                <input type="text" id="chatInput" placeholder="Nhập tin nhắn..." style="background:#fff; border-radius:22px; border:2px solid #e0e0e0; padding:12px 16px; font-size:1rem;">
+                <button class="chat-send-btn" id="chatSendBtn" title="Gửi">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+
+            </div>
+            <script>
+                let sessionId = localStorage.getItem("sessionId");
+                if (!sessionId) {
+                    sessionId = 'SCHEDULE_SESSION_' + Date.now();
+                    localStorage.setItem("sessionId", sessionId);
+                }
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Gọi lời chào khi load xong
+                    getGreeting();
+
+                    const sendButton = document.getElementById('chatSendBtn');
+                    const input = document.getElementById('chatInput');
+
+                    // Gửi khi bấm nút
+                    sendButton.addEventListener('click', sendMessage);
+
+                    // Gửi khi nhấn Enter
+                    input.addEventListener('keypress', function (e) {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            sendMessage();
+                        }
+                    });
+                    loadChatHistory(sessionId);
+                });
+                async function loadChatHistory(sessionId) {
+                    const container = document.getElementById('chatMessages');
+                    container.innerHTML = ''; // Clear current content
+
+                    try {
+
+
+                        const basePath = window.location.pathname.replace(/\/[^/]*$/, ''); // → /PRJ_Assignment_toidaiii
+                        const url = `${basePath}/api/chat_history?sessionId=${encodeURIComponent(sessionId)}`;
+
+                        const response = await fetch(url);
+
+                        const messages = await response.json();
+
+                        messages.forEach(msg => {
+                            if (msg.userMessage)
+                                displayMessage('user', msg.userMessage);
+                            if (msg.aiResponse)
+                                displayMessage('bot', msg.aiResponse);
+                        });
+                    } catch (error) {
+                        console.error("Lỗi khi tải lịch sử chat:", error);
+                        container.innerHTML = '<p class="error">Không thể tải lịch sử trò chuyện.</p>';
+                    }
+                }
+                async function getGreeting() {
+                    try {
+                        const response = await fetch(window.location.pathname.replace(/\/[^/]*$/, '') + '/api/greeting', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({sessionId: sessionId})
+                        });
+
+                        const data = await response.json();
+                        displayMessage('bot', data.message);
+                    } catch (error) {
+                        displayMessage('bot', '🤖 Xin chào! Tôi là AI Assistant quản lý lịch trình thông minh.\n\nTôi có thể giúp bạn:\n✅ Tạo lịch học tập, công việc, sự kiện\n✅ Tối ưu hóa thời gian\n✅ Đưa ra lời khuyên quản lý thời gian\n\nHãy chia sẻ kế hoạch của bạn để bắt đầu!');
+                    }
+                }
+
+                async function sendMessage() {
+                    const input = document.getElementById('chatInput');
+                    const sendButton = document.getElementById('chatSendBtn');
+                    const message = input.value.trim();
+
+                    if (!message)
+                        return;
+
+                    displayMessage('user', message);
+                    input.value = '';
+                    showTyping(true);
+                    sendButton.disabled = true;
+
+                    try {
+                        const response = await fetch(window.location.pathname.replace(/\/[^/]*$/, '') + '/api/chat', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({
+                                message: message,
+                                sessionId: sessionId
+                            })
+                        });
+
+                        const data = await response.json();
+
+                        setTimeout(() => {
+                            showTyping(false);
+                            displayMessage('bot', data.response);
+                            sendButton.disabled = false;
+                        }, 1200);
+
+                    } catch (error) {
+                        showTyping(false);
+                        displayMessage('bot', 'Xin lỗi, tôi gặp sự cố kỹ thuật. Bạn có thể thử lại không?');
+                        sendButton.disabled = false;
+                    }
+                }
+
+                async function getCurrentSchedule() {
+                    showTyping(true);
+                    try {
+                        const response = await fetch(window.location.pathname.replace(/\/[^/]*$/, '') + '/api/schedule', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({sessionId: sessionId})
+                        });
+
+                        const data = await response.json();
+                        showTyping(false);
+                        displayMessage('bot', data.schedule);
+                    } catch (error) {
+                        showTyping(false);
+                        displayMessage('bot', 'Không thể tải lịch trình hiện tại.');
+                    }
+                }
+
+                async function getSummary() {
+                    showTyping(true);
+                    try {
+                        const response = await fetch(window.location.pathname.replace(/\/[^/]*$/, '') + '/api/summary', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({sessionId: sessionId})
+                        });
+
+                        const data = await response.json();
+                        showTyping(false);
+                        displayMessage('bot', '📋 <strong>Tóm tắt cuộc trò chuyện:</strong><br><br>' + data.summary);
+                    } catch (error) {
+                        showTyping(false);
+                        displayMessage('bot', 'Không thể tạo tóm tắt cuộc trò chuyện.');
+                    }
+                }
+
+                async function clearChat() {
+                    const oldSessionId = sessionId;
+
+                    // Gửi request xóa lịch sử trên server
+                    const basePath = window.location.pathname.replace(/\/[^/]*$/, '');
+                    const url = `${basePath}/api/delete_chat_history?sessionId=${encodeURIComponent(oldSessionId)}`;
+
+                    await fetch(url, {method: 'POST'});
+
+                    // Reset giao diện và tạo session mới
+                    document.getElementById('chatMessages').innerHTML = '';
+                    sessionId = 'SCHEDULE_SESSION_' + Date.now();
+                    localStorage.setItem("sessionId", sessionId); // cập nhật lại sessionId
+                    getGreeting();
+                }
+
+
+                function displayMessage(sender, message) {
+                    const chatMessages = document.getElementById('chatMessages');
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = `message ${sender}`;
+
+                    const avatar = document.createElement('div');
+                    avatar.className = 'message-avatar';
+                    avatar.textContent = sender === 'user' ? 'U' : 'AI';
+
+                    const content = document.createElement('div');
+                    content.className = 'message-content';
+                    content.innerHTML = formatMessage(message);
+
+                    if (sender === 'user') {
+                        messageDiv.appendChild(content);
+                        messageDiv.appendChild(avatar);
+                    } else {
+                        messageDiv.appendChild(avatar);
+                        messageDiv.appendChild(content);
+                    }
+
+                    chatMessages.appendChild(messageDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+
+
+
+                function formatMessage(message) {
+                    return message
+                            .replace(/\\n/g, '\n')
+                            .replace(/\n/g, '<br>')
+                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                            .replace(/✅(.*?)(?=\n|$)/g, '<div class="schedule-item">✅$1</div>')
+                            .replace(/📅(.*?)(?=\n|$)/g, '<div class="schedule-item">📅$1</div>')
+                            .replace(/\[(.*?)\]/g, '<span class="schedule-type-badge">$1</span>');
+                }
+
+                function showTyping(show) {
+                    const typingIndicator = document.getElementById('typingIndicator');
+                    typingIndicator.style.display = show ? 'flex' : 'none';
+
+                    if (show) {
+                        const chatMessages = document.getElementById('chatMessages');
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                }
+            </script>
+
+        </div>
+
+
+        <!-- Event Modal -->
+        <div class="modal" id="eventModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Tạo sự kiện mới</h2>
+                    <button class="close-btn" id="closeModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="eventForm">
+                        <div class="form-group">
+                            <label for="eventTitle">Tiêu đề</label>
+                            <input type="text" id="eventTitle" placeholder="Thêm tiêu đề" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="eventDate">Ngày</label>
+                                <input type="date" id="eventDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="eventTime">Thời gian</label>
+                                <input type="time" id="eventTime">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventDescription">Mô tả</label>
+                            <textarea id="eventDescription" rows="3" placeholder="Thêm mô tả"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventCalendar">Lịch</label>
+                            <select id="eventCalendar">
+                                <option value="main">Lịch chính</option>
+                                <option value="work">Công việc</option>
+                                <option value="personal">Cá nhân</option>
+                                <option value="family">Gia đình</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="cancelEvent">Hủy</button>
+                    <button class="btn-primary" id="saveEvent">Lưu</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal chi tiết sự kiện -->
+        <div class="modal" id="eventDetailModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="detailTitle"></h2>
+                    <button class="close-btn" onclick="closeEventDetailModal()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body">
+                    <p><b>Ngày:</b> <span id="detailDate"></span></p>
+                    <p><b>Thời gian:</b> <span id="detailTime"></span></p>
+                    <p><b>Mô tả:</b> <span id="detailDesc"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="closeEventDetailModal()">Đóng</button>
+                    <button class="btn-danger" id="deleteEventBtn">Xóa sự kiện</button>
+                </div>
+            </div>
+        </div>
+
+        <script src="js/calendar.js"></script>
+    </body>
+</html>
