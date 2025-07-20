@@ -5,7 +5,9 @@
 package com.controller.event;
 
 import com.model.UserEvents;
+import com.model.Calendar;
 import com.service.Event.EventService;
+import com.service.Calendar.CalendarService;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -25,10 +27,12 @@ import java.io.PrintWriter;
 public class EventServlet extends HttpServlet {
 
     private EventService eventService;
+    private CalendarService calendarService;
 
     @Override
     public void init() throws ServletException {
         eventService = new EventService();
+        calendarService = new CalendarService();
     }
 
     /**
@@ -119,6 +123,12 @@ public class EventServlet extends HttpServlet {
             String color = request.getParameter("color");
             String calendarId = request.getParameter("calendarId");
             
+            System.out.println("[EventServlet] Creating event with data:");
+            System.out.println("  - Title: " + title);
+            System.out.println("  - Calendar ID: " + calendarId);
+            System.out.println("  - Start Date: " + startDate);
+            System.out.println("  - All Day: " + allDay);
+            
             // Validate required fields
             if (title == null || title.trim().isEmpty() || 
                 startDate == null || startDate.trim().isEmpty() ||
@@ -183,18 +193,38 @@ public class EventServlet extends HttpServlet {
                 return;
             }
             
-            // Set calendar (you'll need to load the calendar object)
-            // For now, we'll just store the calendar ID
-            // event.setIdCalendar(calendarService.getCalendarById(Integer.parseInt(calendarId)));
+            // Set calendar - Fix: properly load and set the calendar
+            try {
+                int calendarIdInt = Integer.parseInt(calendarId);
+                System.out.println("[EventServlet] Loading calendar with ID: " + calendarIdInt);
+                Calendar calendar = calendarService.getCalendarById(calendarIdInt);
+                if (calendar != null) {
+                    event.setIdCalendar(calendar);
+                    System.out.println("[EventServlet] Calendar loaded: " + calendar.getName());
+                } else {
+                    System.out.println("[EventServlet] Calendar not found for ID: " + calendarIdInt);
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.getWriter().write("{\"error\":\"Calendar not found\"}");
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("[EventServlet] Invalid calendar ID: " + calendarId);
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("{\"error\":\"Invalid calendar ID\"}");
+                return;
+            }
             
             // Save event
+            System.out.println("[EventServlet] Saving event to database...");
             UserEvents savedEvent = eventService.createEvent(event);
             
             if (savedEvent != null) {
+                System.out.println("[EventServlet] Event saved successfully with ID: " + savedEvent.getIdEvent());
                 // Return success response
                 String jsonResponse = "{\"success\": true, \"message\": \"Event created successfully\", \"eventId\": " + savedEvent.getIdEvent() + "}";
                 response.getWriter().write(jsonResponse);
             } else {
+                System.out.println("[EventServlet] Failed to save event");
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().write("{\"error\":\"Failed to create event\"}");
             }

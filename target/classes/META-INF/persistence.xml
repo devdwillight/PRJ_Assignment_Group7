@@ -24,7 +24,7 @@
       <property name="jakarta.persistence.jdbc.password" value="123456"/>
       <property name="jakarta.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
       <!-- Hibernate -->
-      <property name="hibernate.dialect" value="org.hibernate.dialect.SQLServerDialect"/>
+      <property name="hibernate.dialect" value="org.hibernate.dialect.SQLServer2016Dialect"/>
       <property name="hibernate.hbm2ddl.auto" value="validate"/>
       <property name="hibernate.show_sql" value="true"/>
     </properties>

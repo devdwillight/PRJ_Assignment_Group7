@@ -39,8 +39,15 @@ public class LLM {
                 }
             }
 
+            Map<String, Object> content = new HashMap<>();
+            content.put("role", "user");
+            content.put("parts", parts);
+            
+            List<Map<String, Object>> contents = new ArrayList<>();
+            contents.add(content);
+            
             Map<String, Object> requestBody = new HashMap<>();
-            requestBody.put("contents", List.of(Map.of("role", "user", "parts", parts)));
+            requestBody.put("contents", contents);
 
             // Convert to JSON
             ObjectMapper mapper = new ObjectMapper();

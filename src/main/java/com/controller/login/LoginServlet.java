@@ -178,7 +178,7 @@ public class LoginServlet extends HttpServlet {
             }
 
             // Chuyển hướng về trang home.jsp sau khi đăng nhập thành công
-            response.sendRedirect(request.getContextPath() + "/home");
+            response.sendRedirect(request.getContextPath() + "/admin");
         } else {
             // Nếu đăng nhập không hợp lệ, hiển thị lỗi
             request.setAttribute("error", "1");

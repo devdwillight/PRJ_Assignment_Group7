@@ -27,4 +27,6 @@ public interface IEventService {
 
     List<UserEvents> getAllEventsByCalendarId(int id);
 
+    int countEventsByMonth(int year, int month);
+
 }

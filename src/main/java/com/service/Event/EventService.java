@@ -65,17 +65,29 @@ public class EventService implements IEventService {
 
     @Override
     public UserEvents createEvent(UserEvents event) {
-        System.out.println("[createEvent] tạo sự kiện ID = " + event.getIdEvent());
+        System.out.println("[createEvent] Tạo sự kiện: " + event.getName());
         boolean success = eventDAO.insertEvent(event);
         if (success) {
-            System.out.println("[createEvent] " + (success ? "✔ Thành công" : "✖ Thất bại"));
+            System.out.println("[createEvent] ✔ Thành công với ID = " + event.getIdEvent());
+            return event; // JPA automatically updates the ID after persist
+        } else {
+            System.out.println("[createEvent] ✖ Thất bại");
+            return null;
         }
-        return event;
+        
     }
+    
 
     @Override
     public List<UserEvents> getAllEventsByCalendarId(int id) {
         return eventDAO.selectAllEventByCalendarId(id);
+    }
+
+    @Override
+    public int countEventsByMonth(int year, int month) {
+        int count = eventDAO.countEventsByMonth(year, month);
+        System.out.println("[countEventsByMonth] Tháng " + month + "/" + year + ": " + count + " sự kiện");
+        return count;
     }
 
     public static void main(String[] args) {

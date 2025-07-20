@@ -263,9 +263,14 @@
 
             // Function để load events động
             function loadEvents(calendarId) {
+                console.log('Loading events for calendar ID:', calendarId);
                 fetch('calendar?action=getEvents&calendarId=' + calendarId)
-                        .then(response => response.json())
+                        .then(response => {
+                            console.log('Response status:', response.status);
+                            return response.json();
+                        })
                         .then(data => {
+                            console.log('Loaded events from server:', data);
                             events = data;
                             calendar.refetchEvents();
                         })
@@ -511,15 +516,13 @@
                         try {
                             const result = JSON.parse(response);
                             if (result.success) {
-                                // Add to events array
-                                events.push(newEvent);
-
-                                // Refresh calendar
-                                calendar.refetchEvents();
-
                                 // Hide modal and show success message
                                 hideCreateEventModal();
                                 alert('Event đã được tạo thành công!');
+                                
+                                // Load fresh events from server instead of adding to local array
+                                const currentCalendarId = $('#eventCalendar').val() || '${calendarId}';
+                                loadEvents(currentCalendarId);
                             } else {
                                 alert('Lỗi: ' + (result.error || 'Không thể tạo event'));
                             }

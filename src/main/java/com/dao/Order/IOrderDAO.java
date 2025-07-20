@@ -32,6 +32,8 @@ public interface IOrderDAO {
 
     public List<Orders> selectByDateRange(Date startDate, Date endDate);
 
+    public List<Orders> selectByPaymentMethod(String paymentMethod);
+
     public List<Orders> selectAllByUserId(int id);
 
     public boolean updateOrderStatus(Orders order);

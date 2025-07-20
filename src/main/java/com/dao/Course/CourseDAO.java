@@ -70,4 +70,167 @@ public class CourseDAO extends BaseDAO<Course> implements ICourseDAO {
         }
     }
 
+    @Override
+    public int countCoursesByMonth(int year, int month) {
+        EntityManager em = getEntityManager();
+        try {
+            String jpql = "SELECT COUNT(c) FROM Course c WHERE YEAR(c.createdAt) = :year AND MONTH(c.createdAt) = :month";
+            jakarta.persistence.Query query = em.createQuery(jpql);
+            query.setParameter("year", year);
+            query.setParameter("month", month);
+            return ((Long) query.getSingleResult()).intValue();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<Course> searchCourses(String name, String category, String price) {
+        EntityManager em = getEntityManager();
+        try {
+            StringBuilder jpql = new StringBuilder("SELECT c FROM Course c WHERE 1=1");
+            
+            if (name != null && !name.trim().isEmpty()) {
+                jpql.append(" AND c.name LIKE :name");
+            }
+            
+            if (category != null && !category.trim().isEmpty()) {
+                jpql.append(" AND c.category LIKE :category");
+            }
+            
+            if (price != null && !price.trim().isEmpty()) {
+                jpql.append(" AND c.price = :price");
+            }
+            
+            jpql.append(" ORDER BY c.createdAt DESC");
+            
+            jakarta.persistence.Query query = em.createQuery(jpql.toString(), Course.class);
+            
+            if (name != null && !name.trim().isEmpty()) {
+                query.setParameter("name", "%" + name.trim() + "%");
+            }
+            
+            if (category != null && !category.trim().isEmpty()) {
+                query.setParameter("category", "%" + category.trim() + "%");
+            }
+            
+            if (price != null && !price.trim().isEmpty()) {
+                try {
+                    query.setParameter("price", new java.math.BigDecimal(price.trim()));
+                } catch (NumberFormatException e) {
+                    // Nếu price không phải số, bỏ qua filter này
+                }
+            }
+            
+            return query.getResultList();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<Course> searchCoursesWithPagination(String name, String category, String price, int pageNumber, int pageSize) {
+        EntityManager em = getEntityManager();
+        try {
+            StringBuilder jpql = new StringBuilder("SELECT c FROM Course c WHERE 1=1");
+            
+            if (name != null && !name.trim().isEmpty()) {
+                jpql.append(" AND c.name LIKE :name");
+            }
+            
+            if (category != null && !category.trim().isEmpty()) {
+                jpql.append(" AND c.category LIKE :category");
+            }
+            
+            if (price != null && !price.trim().isEmpty()) {
+                jpql.append(" AND c.price = :price");
+            }
+            
+            jpql.append(" ORDER BY c.createdAt DESC");
+            
+            jakarta.persistence.Query query = em.createQuery(jpql.toString(), Course.class);
+            
+            if (name != null && !name.trim().isEmpty()) {
+                query.setParameter("name", "%" + name.trim() + "%");
+            }
+            
+            if (category != null && !category.trim().isEmpty()) {
+                query.setParameter("category", "%" + category.trim() + "%");
+            }
+            
+            if (price != null && !price.trim().isEmpty()) {
+                try {
+                    query.setParameter("price", new java.math.BigDecimal(price.trim()));
+                } catch (NumberFormatException e) {
+                    // Nếu price không phải số, bỏ qua filter này
+                }
+            }
+            
+            // Set pagination
+            query.setFirstResult((pageNumber - 1) * pageSize);
+            query.setMaxResults(pageSize);
+            
+            return query.getResultList();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public int countSearchResults(String name, String category, String price) {
+        EntityManager em = getEntityManager();
+        try {
+            StringBuilder jpql = new StringBuilder("SELECT COUNT(c) FROM Course c WHERE 1=1");
+            
+            if (name != null && !name.trim().isEmpty()) {
+                jpql.append(" AND c.name LIKE :name");
+            }
+            
+            if (category != null && !category.trim().isEmpty()) {
+                jpql.append(" AND c.category LIKE :category");
+            }
+            
+            if (price != null && !price.trim().isEmpty()) {
+                jpql.append(" AND c.price = :price");
+            }
+            
+            jakarta.persistence.Query query = em.createQuery(jpql.toString());
+            
+            if (name != null && !name.trim().isEmpty()) {
+                query.setParameter("name", "%" + name.trim() + "%");
+            }
+            
+            if (category != null && !category.trim().isEmpty()) {
+                query.setParameter("category", "%" + category.trim() + "%");
+            }
+            
+            if (price != null && !price.trim().isEmpty()) {
+                try {
+                    query.setParameter("price", new java.math.BigDecimal(price.trim()));
+                } catch (NumberFormatException e) {
+                    // Nếu price không phải số, bỏ qua filter này
+                }
+            }
+            
+            return ((Long) query.getSingleResult()).intValue();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        } finally {
+            em.close();
+        }
+    }
+
 }

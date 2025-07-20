@@ -7,6 +7,7 @@ package com.dao.Event;
 import com.dao.BaseDAO;
 import com.model.UserEvents;
 import java.util.List;
+import jakarta.persistence.EntityManager;
 
 /**
  *
@@ -51,6 +52,23 @@ public class EventDAO extends BaseDAO<UserEvents> implements IEventDAO {
     @Override
     public List<UserEvents> selectAllEventByCalendarId(int id) {
         return findAllById("idCalendar", id);
+    }
+
+    @Override
+    public int countEventsByMonth(int year, int month) {
+        EntityManager em = getEntityManager();
+        try {
+            String jpql = "SELECT COUNT(e) FROM UserEvents e WHERE YEAR(e.createdAt) = :year AND MONTH(e.createdAt) = :month";
+            jakarta.persistence.Query query = em.createQuery(jpql);
+            query.setParameter("year", year);
+            query.setParameter("month", month);
+            return ((Long) query.getSingleResult()).intValue();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        } finally {
+            em.close();
+        }
     }
 
 }

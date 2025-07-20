@@ -27,6 +27,8 @@ public interface IUserDAO {
 
     public boolean existsByEmail(String email);
 
+    public boolean existsByUsername(String username);
+
     public boolean existsByID(int id);
 
     public User selectUserByID(int id);
@@ -36,5 +38,13 @@ public interface IUserDAO {
     public List<User> selectAllUsers();
 
     public List<User> selectUserByPage(int pageNumber, int pageSize);
+
+    public int countUsersByMonth(int year, int month);
+
+    public List<User> searchUsers(String name, String email, String status);
+    
+    public List<User> searchUsersWithPagination(String name, String email, String status, int pageNumber, int pageSize);
+    
+    public int countSearchResults(String name, String email, String status);
 
 }

@@ -135,6 +135,9 @@ public class calendarServlet extends HttpServlet {
             String calendarIdParam = request.getParameter("calendarId");
             Integer calendarId = null;
             
+            System.out.println("[CalendarServlet] Loading events for user ID: " + userId);
+            System.out.println("[CalendarServlet] Calendar ID parameter: " + calendarIdParam);
+            
             if (calendarIdParam != null && !calendarIdParam.isEmpty()) {
                 calendarId = Integer.parseInt(calendarIdParam);
             } else {
@@ -145,9 +148,16 @@ public class calendarServlet extends HttpServlet {
                 }
             }
             
+            System.out.println("[CalendarServlet] Final calendar ID: " + calendarId);
+            
             List<UserEvents> events = (calendarId != null)
                 ? eventService.getAllEventsByCalendarId(calendarId)
                 : new ArrayList<>();
+
+            System.out.println("[CalendarServlet] Found " + events.size() + " events");
+            for (UserEvents e : events) {
+                System.out.println("  - Event ID: " + e.getIdEvent() + ", Name: " + e.getName() + ", Calendar: " + (e.getIdCalendar() != null ? e.getIdCalendar().getIdCalendar() : "null"));
+            }
 
             // Tạo JSON response
             StringBuilder jsonResponse = new StringBuilder("[");
@@ -164,9 +174,12 @@ public class calendarServlet extends HttpServlet {
             }
             jsonResponse.append("]");
             
+            System.out.println("[CalendarServlet] JSON response: " + jsonResponse.toString());
             response.getWriter().write(jsonResponse.toString());
             
         } catch (Exception e) {
+            System.err.println("[CalendarServlet] Error loading events: " + e.getMessage());
+            e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("{\"error\":\"Không thể tải dữ liệu events\"}");
         }

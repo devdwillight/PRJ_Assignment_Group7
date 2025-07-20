@@ -27,4 +27,6 @@ public interface IEventDAO {
 
     public List<UserEvents> selectAllEventByCalendarId(int id);
 
+    public int countEventsByMonth(int year, int month);
+
 }

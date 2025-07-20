@@ -32,6 +32,8 @@ public interface IOrderService {
 
     List<Orders> getByDateRange(Date startDate, Date endDate);
 
+    List<Orders> getByPaymentMethod(String paymentMethod);
+
     List<Orders> getAllOrderByUserId(int id);
 
     boolean updateOrderStatus(Orders order);

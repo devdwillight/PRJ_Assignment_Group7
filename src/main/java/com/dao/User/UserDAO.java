@@ -56,6 +56,15 @@ public class UserDAO extends BaseDAO<User> implements IUserDAO {
     }
 
     @Override
+    public boolean existsByUsername(String username) {
+        EntityManager em = getEntityManager();
+        Long count = em.createQuery("SELECT COUNT(u) FROM User u WHERE u.username = :username", Long.class)
+                .setParameter("username", username)
+                .getSingleResult();
+        return count > 0;
+    }
+
+    @Override
     public User selectUserByID(int id) {
         return find(id);
     }
@@ -129,6 +138,157 @@ public class UserDAO extends BaseDAO<User> implements IUserDAO {
                     .getSingleResult();
         } catch (NoResultException e) {
             return null;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public int countUsersByMonth(int year, int month) {
+        EntityManager em = getEntityManager();
+        try {
+            String jpql = "SELECT COUNT(u) FROM User u WHERE YEAR(u.createdAt) = :year AND MONTH(u.createdAt) = :month";
+            jakarta.persistence.Query query = em.createQuery(jpql);
+            query.setParameter("year", year);
+            query.setParameter("month", month);
+            return ((Long) query.getSingleResult()).intValue();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<User> searchUsers(String name, String email, String status) {
+        EntityManager em = getEntityManager();
+        try {
+            StringBuilder jpql = new StringBuilder("SELECT u FROM User u WHERE 1=1");
+            
+            if (name != null && !name.trim().isEmpty()) {
+                jpql.append(" AND (u.firstName LIKE :name OR u.lastName LIKE :name OR u.username LIKE :name OR CONCAT(u.firstName, ' ', u.lastName) LIKE :name OR CONCAT(u.lastName, ' ', u.firstName) LIKE :name)");
+            }
+            
+            if (email != null && !email.trim().isEmpty()) {
+                jpql.append(" AND u.email LIKE :email");
+            }
+            
+            if (status != null && !status.trim().isEmpty()) {
+                if ("active".equals(status)) {
+                    jpql.append(" AND u.active = true");
+                } else if ("inactive".equals(status)) {
+                    jpql.append(" AND u.active = false");
+                }
+            }
+            
+            jpql.append(" ORDER BY u.createdAt DESC");
+            
+            jakarta.persistence.Query query = em.createQuery(jpql.toString(), User.class);
+            
+            if (name != null && !name.trim().isEmpty()) {
+                query.setParameter("name", "%" + name.trim() + "%");
+            }
+            
+            if (email != null && !email.trim().isEmpty()) {
+                query.setParameter("email", "%" + email.trim() + "%");
+            }
+            
+            return query.getResultList();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<User> searchUsersWithPagination(String name, String email, String status, int pageNumber, int pageSize) {
+        EntityManager em = getEntityManager();
+        try {
+            StringBuilder jpql = new StringBuilder("SELECT u FROM User u WHERE 1=1");
+            
+            if (name != null && !name.trim().isEmpty()) {
+                jpql.append(" AND (u.firstName LIKE :name OR u.lastName LIKE :name OR u.username LIKE :name OR CONCAT(u.firstName, ' ', u.lastName) LIKE :name OR CONCAT(u.lastName, ' ', u.firstName) LIKE :name)");
+            }
+            
+            if (email != null && !email.trim().isEmpty()) {
+                jpql.append(" AND u.email LIKE :email");
+            }
+            
+            if (status != null && !status.trim().isEmpty()) {
+                if ("active".equals(status)) {
+                    jpql.append(" AND u.active = true");
+                } else if ("inactive".equals(status)) {
+                    jpql.append(" AND u.active = false");
+                }
+            }
+            
+            jpql.append(" ORDER BY u.createdAt DESC");
+            
+            jakarta.persistence.Query query = em.createQuery(jpql.toString(), User.class);
+            
+            if (name != null && !name.trim().isEmpty()) {
+                query.setParameter("name", "%" + name.trim() + "%");
+            }
+            
+            if (email != null && !email.trim().isEmpty()) {
+                query.setParameter("email", "%" + email.trim() + "%");
+            }
+            
+            // Set pagination
+            query.setFirstResult((pageNumber - 1) * pageSize);
+            query.setMaxResults(pageSize);
+            
+            return query.getResultList();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public int countSearchResults(String name, String email, String status) {
+        EntityManager em = getEntityManager();
+        try {
+            StringBuilder jpql = new StringBuilder("SELECT COUNT(u) FROM User u WHERE 1=1");
+            
+            if (name != null && !name.trim().isEmpty()) {
+                jpql.append(" AND (u.firstName LIKE :name OR u.lastName LIKE :name OR u.username LIKE :name OR CONCAT(u.firstName, ' ', u.lastName) LIKE :name OR CONCAT(u.lastName, ' ', u.firstName) LIKE :name)");
+            }
+            
+            if (email != null && !email.trim().isEmpty()) {
+                jpql.append(" AND u.email LIKE :email");
+            }
+            
+            if (status != null && !status.trim().isEmpty()) {
+                if ("active".equals(status)) {
+                    jpql.append(" AND u.active = true");
+                } else if ("inactive".equals(status)) {
+                    jpql.append(" AND u.active = false");
+                }
+            }
+            
+            jakarta.persistence.Query query = em.createQuery(jpql.toString());
+            
+            if (name != null && !name.trim().isEmpty()) {
+                query.setParameter("name", "%" + name.trim() + "%");
+            }
+            
+            if (email != null && !email.trim().isEmpty()) {
+                query.setParameter("email", "%" + email.trim() + "%");
+            }
+            
+            return ((Long) query.getSingleResult()).intValue();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
         } finally {
             em.close();
         }

@@ -91,6 +91,37 @@ public class CourseService implements ICourseService {
         return list;
     }
 
+    @Override
+    public int countCoursesByMonth(int year, int month) {
+        int count = courseDAO.countCoursesByMonth(year, month);
+        System.out.println("[countCoursesByMonth] Tháng " + month + "/" + year + ": " + count + " khóa học");
+        return count;
+    }
+
+    @Override
+    public List<Course> searchCourses(String name, String category, String price) {
+        System.out.println("[searchCourses] → Tìm kiếm: name=" + name + ", category=" + category + ", price=" + price);
+        List<Course> courses = courseDAO.searchCourses(name, category, price);
+        System.out.println("[searchCourses] ✔ Tìm thấy " + courses.size() + " kết quả");
+        return courses;
+    }
+
+    @Override
+    public List<Course> searchCoursesWithPagination(String name, String category, String price, int pageNumber, int pageSize) {
+        System.out.println("[searchCoursesWithPagination] → Tìm kiếm: name=" + name + ", category=" + category + ", price=" + price + ", page=" + pageNumber + ", size=" + pageSize);
+        List<Course> courses = courseDAO.searchCoursesWithPagination(name, category, price, pageNumber, pageSize);
+        System.out.println("[searchCoursesWithPagination] ✔ Trả về " + courses.size() + " kết quả");
+        return courses;
+    }
+
+    @Override
+    public int countSearchResults(String name, String category, String price) {
+        System.out.println("[countSearchResults] → Đếm kết quả: name=" + name + ", category=" + category + ", price=" + price);
+        int count = courseDAO.countSearchResults(name, category, price);
+        System.out.println("[countSearchResults] ✔ Tổng số: " + count);
+        return count;
+    }
+
     public static void main(String[] args) {
         CourseService courseService = new CourseService();
 

@@ -94,7 +94,7 @@
                     
                     <div class="text-center text-gray-500 text-sm">
                         Don’t have an account?
-                        <a href="signUp.jsp" class="text-blue-500 font-semibold hover:underline">Sign Up</a>
+                        <a href="/signUp.jsp" class="text-blue-500 font-semibold hover:underline">Sign Up</a>
                     </div>
                 </div>
             </div>

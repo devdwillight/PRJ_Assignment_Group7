@@ -6,6 +6,7 @@ package com.service.UserCourse;
 
 import com.dao.User_Course.UserCourseDAO;
 import com.model.UserCourse;
+import com.model.Course;
 
 /**
  *
@@ -84,5 +85,10 @@ public class UserCourseService implements IUserCourseService {
         List<UserCourse> list = userCourseDAO.selectAllUserCoursesByUserId(id);
         System.out.printf("[Service] getAllUserCourses → total: %d\n", list.size());
         return list;
+    }
+
+    // Lấy danh sách Course đã đăng ký của user
+    public List<Course> getCoursesByUserId(int userId) {
+        return userCourseDAO.getCoursesByUserId(userId);
     }
 }

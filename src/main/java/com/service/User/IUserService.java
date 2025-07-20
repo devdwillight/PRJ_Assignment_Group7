@@ -25,6 +25,8 @@ public interface IUserService {
 
     boolean isEmailTaken(String email);
 
+    boolean isUsernameTaken(String username);
+
     boolean isUserExists(int id);
 
     User createUser(User user);
@@ -36,5 +38,13 @@ public interface IUserService {
     List<User> getAllUsers();
 
     List<User> getUsersByPage(int pageNumber, int pageSize);
+
+    int countUsersByMonth(int year, int month);
+
+    List<User> searchUsers(String name, String email, String status);
+    
+    List<User> searchUsersWithPagination(String name, String email, String status, int pageNumber, int pageSize);
+    
+    int countSearchResults(String name, String email, String status);
 
 }

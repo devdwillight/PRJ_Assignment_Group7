@@ -114,6 +114,13 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public boolean isUsernameTaken(String username) {
+        boolean exists = userDAO.existsByUsername(username);
+        System.out.println("[isUsernameTaken] → Username " + username + " đã " + (exists ? "tồn tại." : "chưa được sử dụng."));
+        return exists;
+    }
+
+    @Override
     public boolean isUserExists(int id) {
         boolean exists = userDAO.existsByID(id);
         System.out.println("[isUserExists] → Người dùng với ID " + id + (exists ? " tồn tại." : " không tồn tại."));
@@ -124,6 +131,37 @@ public class UserService implements IUserService {
     public int countUsers() {
         int count = userDAO.countUser();
         System.out.println("[countUsers] → Tổng số người dùng: " + count);
+        return count;
+    }
+
+    @Override
+    public int countUsersByMonth(int year, int month) {
+        int count = userDAO.countUsersByMonth(year, month);
+        System.out.println("[countUsersByMonth] → Tháng " + month + "/" + year + ": " + count + " người dùng");
+        return count;
+    }
+
+    @Override
+    public List<User> searchUsers(String name, String email, String status) {
+        System.out.println("[searchUsers] → Tìm kiếm: name=" + name + ", email=" + email + ", status=" + status);
+        List<User> users = userDAO.searchUsers(name, email, status);
+        System.out.println("[searchUsers] ✔ Tìm thấy " + users.size() + " kết quả");
+        return users;
+    }
+
+    @Override
+    public List<User> searchUsersWithPagination(String name, String email, String status, int pageNumber, int pageSize) {
+        System.out.println("[searchUsersWithPagination] → Tìm kiếm: name=" + name + ", email=" + email + ", status=" + status + ", page=" + pageNumber + ", size=" + pageSize);
+        List<User> users = userDAO.searchUsersWithPagination(name, email, status, pageNumber, pageSize);
+        System.out.println("[searchUsersWithPagination] ✔ Trả về " + users.size() + " kết quả");
+        return users;
+    }
+
+    @Override
+    public int countSearchResults(String name, String email, String status) {
+        System.out.println("[countSearchResults] → Đếm kết quả: name=" + name + ", email=" + email + ", status=" + status);
+        int count = userDAO.countSearchResults(name, email, status);
+        System.out.println("[countSearchResults] ✔ Tổng số: " + count);
         return count;
     }
 

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Search Functionality</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .test-form {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .test-form input, .test-form select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .test-form button {
+            padding: 8px 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .test-form button:hover {
+            background: #0056b3;
+        }
+        .result {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Search Functionality</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Search by Name</h2>
+        <form class="test-form" method="GET" action="/PRJ_Assignment_toidaiii/admin/users">
+            <input type="text" name="searchName" placeholder="Enter name..." value="Nguyen">
+            <input type="hidden" name="searchEmail" value="">
+            <input type="hidden" name="searchStatus" value="">
+            <button type="submit">Search by Name</button>
+        </form>
+        <div class="result">
+            <strong>Expected:</strong> Should find users with "Nguyen" in first name or last name
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 1.1: Search by Full Name</h2>
+        <form class="test-form" method="GET" action="/PRJ_Assignment_toidaiii/admin/users">
+            <input type="text" name="searchName" placeholder="Enter full name..." value="Nguyen Van A">
+            <input type="hidden" name="searchEmail" value="">
+            <input type="hidden" name="searchStatus" value="">
+            <button type="submit">Search by Full Name</button>
+        </form>
+        <div class="result">
+            <strong>Expected:</strong> Should find users with full name "Nguyen Van A" (firstName + lastName)
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 1.2: Search by Partial Name</h2>
+        <form class="test-form" method="GET" action="/PRJ_Assignment_toidaiii/admin/users">
+            <input type="text" name="searchName" placeholder="Enter partial name..." value="Ng">
+            <input type="hidden" name="searchEmail" value="">
+            <input type="hidden" name="searchStatus" value="">
+            <button type="submit">Search by Partial Name</button>
+        </form>
+        <div class="result">
+            <strong>Expected:</strong> Should find users with "Ng" in any part of their name
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Search by Email</h2>
+        <form class="test-form" method="GET" action="/PRJ_Assignment_toidaiii/admin/users">
+            <input type="hidden" name="searchName" value="">
+            <input type="email" name="searchEmail" placeholder="Enter email..." value="gmail.com">
+            <input type="hidden" name="searchStatus" value="">
+            <button type="submit">Search by Email</button>
+        </form>
+        <div class="result">
+            <strong>Expected:</strong> Should find users with "gmail.com" in email
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Search by Status</h2>
+        <form class="test-form" method="GET" action="/PRJ_Assignment_toidaiii/admin/users">
+            <input type="hidden" name="searchName" value="">
+            <input type="hidden" name="searchEmail" value="">
+            <select name="searchStatus">
+                <option value="">All</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+            <button type="submit">Search by Status</button>
+        </form>
+        <div class="result">
+            <strong>Expected:</strong> Should find users with selected status
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3.1: Test "All" Status</h2>
+        <form class="test-form" method="GET" action="/PRJ_Assignment_toidaiii/admin/users">
+            <input type="hidden" name="searchName" value="">
+            <input type="hidden" name="searchEmail" value="">
+            <input type="hidden" name="searchStatus" value="">
+            <button type="submit">Show All Users (Active + Inactive)</button>
+        </form>
+        <div class="result">
+            <strong>Expected:</strong> Should show ALL users regardless of status (both active and inactive)
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 4: Combined Search</h2>
+        <form class="test-form" method="GET" action="/PRJ_Assignment_toidaiii/admin/users">
+            <input type="text" name="searchName" placeholder="Name..." value="Nguyen">
+            <input type="email" name="searchEmail" placeholder="Email..." value="gmail.com">
+            <select name="searchStatus">
+                <option value="">All</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+            <button type="submit">Combined Search</button>
+        </form>
+        <div class="result">
+            <strong>Expected:</strong> Should find users matching all criteria
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 5: Clear Search</h2>
+        <form class="test-form" method="GET" action="/PRJ_Assignment_toidaiii/admin/users">
+            <button type="submit">Show All Users</button>
+        </form>
+        <div class="result">
+            <strong>Expected:</strong> Should show all users without any filter
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Debug Information</h2>
+        <div class="result">
+            <strong>URL Pattern:</strong> /PRJ_Assignment_toidaiii/admin/users<br>
+            <strong>Method:</strong> GET<br>
+            <strong>Parameters:</strong> searchName, searchEmail, searchStatus<br>
+            <strong>Servlet:</strong> UserManageServlet<br>
+            <strong>DAO Method:</strong> searchUsers()<br>
+            <strong>JSP:</strong> manageUser.jsp
+        </div>
+    </div>
+</body>
+</html> 
