@@ -25,7 +25,7 @@ import java.util.Date;
 
 /**
  *
- * @author ADMIN
+ * @author DELL
  */
 @Entity
 @Table(name = "Orders")
@@ -58,9 +58,10 @@ public class Orders implements Serializable {
     @Column(name = "payment_time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date paymentTime;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Basic(optional = false)
+    @NotNull
     @Column(name = "TotalAmount")
-    private Double totalAmount;
+    private double totalAmount;
     @JoinColumn(name = "id_user", referencedColumnName = "id_user")
     @ManyToOne(optional = false)
     private User idUser;
@@ -72,10 +73,11 @@ public class Orders implements Serializable {
         this.idOrder = idOrder;
     }
 
-    public Orders(Integer idOrder, String paymentMethod, Date paymentTime) {
+    public Orders(Integer idOrder, String paymentMethod, Date paymentTime, double totalAmount) {
         this.idOrder = idOrder;
         this.paymentMethod = paymentMethod;
         this.paymentTime = paymentTime;
+        this.totalAmount = totalAmount;
     }
 
     public Integer getIdOrder() {
@@ -110,11 +112,11 @@ public class Orders implements Serializable {
         this.paymentTime = paymentTime;
     }
 
-    public Double getTotalAmount() {
+    public double getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(Double totalAmount) {
+    public void setTotalAmount(double totalAmount) {
         this.totalAmount = totalAmount;
     }
 

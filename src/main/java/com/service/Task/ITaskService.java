@@ -26,4 +26,12 @@ public interface ITaskService {
     List<Task> getAllTasks();
 
     List<Task> getAllTasksByUserId(int id);
+    
+    List<Task> getAllTasksByUserIdOrderByPosition(int userId);
+    
+    boolean updateTaskPosition(int taskId, int newPosition);
+    
+    int getMaxPositionByUserId(int userId);
+    
+    boolean reorderTasks(int userId, int oldPosition, int newPosition);
 }

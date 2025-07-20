@@ -26,4 +26,12 @@ public interface ITaskDAO {
     public List<Task> selectAllTasks();
 
     public List<Task> selectAllByUserId(int id);
+    
+    public List<Task> selectAllByUserIdOrderByPosition(int userId);
+    
+    public boolean updateTaskPosition(int taskId, int newPosition);
+    
+    public int getMaxPositionByUserId(int userId);
+    
+    public boolean reorderTasks(int userId, int oldPosition, int newPosition);
 }

@@ -21,6 +21,8 @@ public interface ITodoService {
     boolean removeTodo(int id);
 
     boolean completeTodo(int id);
+    
+     boolean updateTodoStatus(int id, boolean isCompleted);
 
     ToDo createTodo(ToDo todo);
 

@@ -46,8 +46,13 @@ public class TaskService implements ITaskService {
     @Override
     public Task createTask(Task task) {
         System.out.println("[createTask] Tạo mới công việc: " + task.getName());
+        
+        // Tự động set position cho task mới (thêm vào cuối)
+        int maxPosition = taskDAO.getMaxPositionByUserId(task.getIdUser().getIdUser());
+        task.setPosition(maxPosition + 1);
+        
         if (taskDAO.insertTask(task)) {
-            System.out.println("[createTask] ✔ Đã tạo task với ID = " + task.getIdTask());
+            System.out.println("[createTask] ✔ Đã tạo task với ID = " + task.getIdTask() + " tại vị trí " + task.getPosition());
             return task;
         } else {
             System.out.println("[createTask] ✖ Không thể tạo task");
@@ -81,6 +86,38 @@ public class TaskService implements ITaskService {
         List<Task> list = taskDAO.selectAllByUserId(id);
         System.out.println("[getAllTasksByUserId] ✔ Tổng số: " + list.size() + " task");
         return list;
+    }
+    
+    @Override
+    public List<Task> getAllTasksByUserIdOrderByPosition(int userId) {
+        System.out.println("[getAllTasksByUserIdOrderByPosition] Lấy danh sách task theo thứ tự position");
+        List<Task> list = taskDAO.selectAllByUserIdOrderByPosition(userId);
+        System.out.println("[getAllTasksByUserIdOrderByPosition] ✔ Tổng số: " + list.size() + " task");
+        return list;
+    }
+    
+    @Override
+    public boolean updateTaskPosition(int taskId, int newPosition) {
+        System.out.println("[updateTaskPosition] Cập nhật vị trí task ID = " + taskId + " thành position = " + newPosition);
+        boolean success = taskDAO.updateTaskPosition(taskId, newPosition);
+        System.out.println("[updateTaskPosition] " + (success ? "✔ Thành công" : "✖ Thất bại"));
+        return success;
+    }
+    
+    @Override
+    public int getMaxPositionByUserId(int userId) {
+        System.out.println("[getMaxPositionByUserId] Lấy position lớn nhất của user ID = " + userId);
+        int maxPosition = taskDAO.getMaxPositionByUserId(userId);
+        System.out.println("[getMaxPositionByUserId] ✔ Position lớn nhất: " + maxPosition);
+        return maxPosition;
+    }
+    
+    @Override
+    public boolean reorderTasks(int userId, int oldPosition, int newPosition) {
+        System.out.println("[reorderTasks] Sắp xếp lại task từ vị trí " + oldPosition + " đến " + newPosition);
+        boolean success = taskDAO.reorderTasks(userId, oldPosition, newPosition);
+        System.out.println("[reorderTasks] " + (success ? "✔ Thành công" : "✖ Thất bại"));
+        return success;
     }
 
     // 🧪 Test nhanh

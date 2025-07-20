@@ -5,11 +5,12 @@
 package com.controller.calendar;
 
 import com.model.Calendar;
+import com.model.Task;
 import com.model.UserEvents;
 import com.service.Calendar.CalendarService;
+import com.service.Task.TaskService;
 import com.service.Event.EventService;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import jakarta.servlet.ServletException;
@@ -28,11 +29,13 @@ import java.io.PrintWriter;
 public class calendarServlet extends HttpServlet {
 
     private CalendarService calendarService;
+    private TaskService taskService;
     private EventService eventService;
 
     @Override
     public void init() throws ServletException {
         calendarService = new CalendarService();
+        taskService = new TaskService();
         eventService = new EventService();
     }
 
@@ -109,43 +112,37 @@ public class calendarServlet extends HttpServlet {
             return;
         }
 
-        // Lấy danh sách calendar của user
-        List<Calendar> calendars = calendarService.getAllCalendarByUserId(userId);
+        // Load dữ liệu cho sidebar và calendar (thay thế HomeServlet)
+        loadUserData(request, userId);
+        
+        // Forward đến home.jsp thay vì calendar.jsp
+        request.getRequestDispatcher("home.jsp").forward(request, response);
+    }
 
-        // Lấy calendarId từ request (nếu có), mặc định lấy calendar đầu tiên
-        String calendarIdParam = request.getParameter("calendarId");
-        Integer calendarId = null;
-        if (calendarIdParam != null && !calendarIdParam.isEmpty()) {
-            calendarId = Integer.parseInt(calendarIdParam);
-        } else if (!calendars.isEmpty()) {
-            calendarId = calendars.get(0).getIdCalendar();
+    /**
+     * Load dữ liệu user cho sidebar và calendar
+     */
+    private void loadUserData(HttpServletRequest request, Integer userId) {
+        try {
+            // Lấy calendars và tasks cho sidebar
+            List<Calendar> calendars = calendarService.getAllCalendarByUserId(userId);
+            List<Task> todos = taskService.getAllTasksByUserId(userId);
+            
+            // Set attributes cho JSP
+            request.setAttribute("calendars", calendars);
+            request.setAttribute("todos", todos);
+            request.setAttribute("userId", userId);
+            
+        } catch (Exception e) {
+            System.err.println("Error loading user data: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Set dữ liệu rỗng nếu có lỗi
+            request.setAttribute("calendars", new ArrayList<>());
+            request.setAttribute("todos", new ArrayList<>());
+            request.setAttribute("userId", userId);
+            request.setAttribute("error", "Không thể tải dữ liệu từ database");
         }
-
-        // Lấy events theo calendarId
-        List<UserEvents> events = (calendarId != null)
-            ? eventService.getAllEventsByCalendarId(calendarId)
-            : new ArrayList<>();
-
-        // Chuyển events sang JSON cho FullCalendar
-        StringBuilder eventsJson = new StringBuilder("[");
-        for (int i = 0; i < events.size(); i++) {
-            UserEvents e = events.get(i);
-            eventsJson.append("{")
-                .append("\"id\":").append(e.getIdEvent()).append(",")
-                .append("\"title\":\"").append(e.getName()).append("\",")
-                .append("\"start\":\"").append(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(e.getStartDate())).append("\",")
-                .append("\"end\":\"").append(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(e.getDueDate())).append("\",")
-                .append("\"color\":\"").append(e.getColor() != null ? e.getColor() : "#3b82f6").append("\"")
-                .append("}");
-            if (i < events.size() - 1) eventsJson.append(",");
-        }
-        eventsJson.append("]");
-
-        // Truyền dữ liệu sang JSP
-        request.setAttribute("calendars", calendars);
-        request.setAttribute("calendarId", calendarId);
-        request.setAttribute("eventsJson", eventsJson.toString());
-        request.getRequestDispatcher("views/calendar/calendar.jsp").forward(request, response);
     }
 
     private void handleGetEvents(HttpServletRequest request, HttpServletResponse response, Integer userId) 
@@ -276,9 +273,6 @@ public class calendarServlet extends HttpServlet {
                 handleDeleteCalendar(request, response, userId);
                 return;
             }
-            default: {
-                // processRequest(request, response); // XÓA: Mọi chỗ gọi processRequest(request, response);
-            }
         }
     }
 
@@ -291,7 +285,7 @@ public class calendarServlet extends HttpServlet {
         com.model.User user = new com.model.User(userId);
         calendar.setIdUser(user);
         calendarService.createCalendar(calendar);
-        response.sendRedirect(request.getContextPath() + "/home");
+        response.sendRedirect(request.getContextPath() + "/calendar");
     }
 
     private void handleEditCalendar(HttpServletRequest request, HttpServletResponse response, Integer userId) throws IOException {
@@ -311,7 +305,7 @@ public class calendarServlet extends HttpServlet {
                 // Có thể log lỗi hoặc xử lý thông báo
             }
         }
-        response.sendRedirect(request.getContextPath() + "/home");
+        response.sendRedirect(request.getContextPath() + "/calendar");
     }
 
     private void handleDeleteCalendar(HttpServletRequest request, HttpServletResponse response, Integer userId) throws IOException {
@@ -330,7 +324,7 @@ public class calendarServlet extends HttpServlet {
                 System.out.println("Lỗi khi xóa calendar: " + e.getMessage());
             }
         }
-        response.sendRedirect(request.getContextPath() + "/home");
+        response.sendRedirect(request.getContextPath() + "/calendar");
     }
 
     /**

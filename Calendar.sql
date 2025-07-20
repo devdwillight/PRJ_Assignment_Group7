@@ -96,10 +96,13 @@ CREATE TABLE Task (
     id_user INT NOT NULL,
     name VARCHAR(255) NOT NULL,
     color VARCHAR(50) default N'Blue',
+	 position INT, --mới thêm
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME,
     FOREIGN KEY (id_user) REFERENCES Users(id_user)
 );
+
+
 
 CREATE TABLE To_Do (
     id_todo INT IDENTITY(1,1) PRIMARY KEY,

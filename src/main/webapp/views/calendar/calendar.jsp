@@ -572,7 +572,7 @@
 
             // ====== LOAD TODOS ======
             function loadAllTodos() {
-                fetch('task?action=getAllTodos')
+                fetch('todo?action=getAllTodos')
                         .then(response => response.json())
                         .then(data => {
                             todos = data.map(todo => {

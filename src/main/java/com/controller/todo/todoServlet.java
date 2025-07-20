@@ -11,6 +11,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import com.model.ToDo;
+import com.service.Task.TaskService;
+import com.service.Todo.TodoService;
+import jakarta.servlet.http.HttpSession;
+import java.util.List;
 
 /**
  *
@@ -18,6 +23,15 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "todoServlet", urlPatterns = {"/todo"})
 public class todoServlet extends HttpServlet {
+
+    private TaskService taskService;
+    private TodoService todoService;
+
+    @Override
+    public void init() throws ServletException {
+        taskService = new TaskService();
+        todoService = new TodoService();
+    }
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -57,7 +71,56 @@ public class todoServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        HttpSession session = request.getSession();
+        Integer userId = (Integer) session.getAttribute("user_id");
+        if (userId == null) {
+            response.sendRedirect("views/login/login.jsp");
+            return;
+        }
+
+        String action = request.getParameter("action");
+        if ("getAllTodos".equals(action)) {
+            handleGetAllTodos(request, response, userId);
+            return;
+        }
+    }
+
+    private void handleGetAllTodos(HttpServletRequest request, HttpServletResponse response, Integer userId)
+            throws IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        try {
+            List<ToDo> todos = todoService.getAllToDoByUserId(userId);
+
+            StringBuilder jsonResponse = new StringBuilder("[");
+            for (int i = 0; i < todos.size(); i++) {
+                ToDo t = todos.get(i);
+                jsonResponse.append("{")
+                        .append("\"idTodo\":").append(t.getIdTodo()).append(",")
+                        .append("\"title\":\"").append(t.getTitle().replace("\"", "\\\"")).append("\",")
+                        .append("\"description\":\"")
+                        .append(t.getDescription() != null ? t.getDescription().replace("\"", "\\\"") : "")
+                        .append("\",")
+                        .append("\"dueDate\":\"").append(t.getDueDate()).append("\",")
+                        .append("\"isAllDay\":").append(t.getIsAllDay() != null && t.getIsAllDay() ? "true" : "false")
+                        .append(",")
+                        .append("\"isCompleted\":")
+                        .append(t.getIsCompleted() != null && t.getIsCompleted() ? "true" : "false").append(",")
+                        .append("\"taskId\":")
+                        .append((t.getIdTask() != null && t.getIdTask().getIdTask() != null) ? t.getIdTask().getIdTask()
+                                : "null")
+                        .append("}");
+                if (i < todos.size() - 1) {
+                    jsonResponse.append(",");
+                }
+            }
+            jsonResponse.append("]");
+
+            response.getWriter().write(jsonResponse.toString());
+
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\":\"Không thể tải dữ liệu todo\"}");
+        }
     }
 
     /**
@@ -122,12 +185,12 @@ public class todoServlet extends HttpServlet {
             todo.setDescription(description);
             todo.setDueDate(dueDateTime);
             todo.setIsAllDay("on".equals(isAllDayStr));
-            
+
             // Set các giá trị mặc định
             todo.setIsCompleted(false);
             todo.setCreatedAt(new java.util.Date());
             todo.setUpdatedAt(new java.util.Date());
-            
+
             com.model.Task task = new com.model.Task();
             task.setIdTask(Integer.parseInt(taskIdStr));
             todo.setIdTask(task);
@@ -155,21 +218,30 @@ public class todoServlet extends HttpServlet {
         }
 
         if ("deleteTodo".equals(action)) {
-            String idStr = request.getParameter("id");
-            if (idStr == null) {
-                out.print("{\"success\":false, \"error\":\"Thiếu id\"}");
+            String todoIdStr = request.getParameter("todoId");
+            if (todoIdStr == null) {
+                out.print("{\"success\":false, \"error\":\"Thiếu todoId\"}");
                 return;
             }
             try {
-                int id = Integer.parseInt(idStr);
+                int todoId = Integer.parseInt(todoIdStr);
+                System.out.println("[todoServlet] Xóa ToDo với ID: " + todoId);
+
                 com.service.Todo.TodoService service = new com.service.Todo.TodoService();
-                boolean deleted = service.removeTodo(id);
+                boolean deleted = service.removeTodo(todoId);
+
                 if (deleted) {
+                    System.out.println("[todoServlet] ✅ Xóa ToDo thành công");
                     out.print("{\"success\":true}");
                 } else {
+                    System.out.println("[todoServlet] ❌ Xóa ToDo thất bại");
                     out.print("{\"success\":false, \"error\":\"Không thể xóa ToDo\"}");
                 }
+            } catch (NumberFormatException e) {
+                System.out.println("[todoServlet] Lỗi parse todoId: " + e.getMessage());
+                out.print("{\"success\":false, \"error\":\"ID ToDo không hợp lệ\"}");
             } catch (Exception e) {
+                System.out.println("[todoServlet] Lỗi xóa ToDo: " + e.getMessage());
                 out.print("{\"success\":false, \"error\":\"Lỗi xóa ToDo\"}");
             }
             return;
@@ -193,6 +265,192 @@ public class todoServlet extends HttpServlet {
             } catch (Exception e) {
                 System.out.println("[todoServlet] Lỗi hoàn thành ToDo: " + e.getMessage());
                 out.print("{\"success\":false, \"error\":\"Lỗi hoàn thành ToDo\"}");
+            }
+            return;
+        }
+
+        if ("updateTodoStatus".equals(action)) {
+            String todoIdStr = request.getParameter("todoId");
+            String isCompletedStr = request.getParameter("isCompleted");
+
+            if (todoIdStr == null || isCompletedStr == null) {
+                out.print("{\"success\":false, \"error\":\"Thiếu thông tin bắt buộc\"}");
+                return;
+            }
+
+            try {
+                int todoId = Integer.parseInt(todoIdStr);
+                boolean isCompleted = Boolean.parseBoolean(isCompletedStr);
+
+                System.out.println("[todoServlet] Cập nhật trạng thái ToDo:");
+                System.out.println("  - TodoId: " + todoId);
+                System.out.println("  - IsCompleted: " + isCompleted);
+
+                com.service.Todo.TodoService service = new com.service.Todo.TodoService();
+                boolean updated = service.updateTodoStatus(todoId, isCompleted);
+
+                if (updated) {
+                    System.out.println("[todoServlet] ✅ Cập nhật trạng thái thành công");
+                    out.print("{\"success\":true}");
+                } else {
+                    System.out.println("[todoServlet] ❌ Cập nhật trạng thái thất bại");
+                    out.print("{\"success\":false, \"error\":\"Không thể cập nhật trạng thái ToDo\"}");
+                }
+            } catch (Exception e) {
+                System.out.println("[todoServlet] Lỗi cập nhật trạng thái ToDo: " + e.getMessage());
+                out.print("{\"success\":false, \"error\":\"Lỗi cập nhật trạng thái ToDo\"}");
+            }
+            return;
+        }
+
+        if ("getTodoDetail".equals(action)) {
+            int todoId = Integer.parseInt(request.getParameter("todoId"));
+            com.service.Todo.TodoService service = new com.service.Todo.TodoService();
+            com.model.ToDo todo = service.getToDoById(todoId);
+
+            // Trả về JSON response
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            if (todo != null) {
+                // Tạo JSON object với thông tin todo
+                // Trả về response.success = true và response.todo = todo object
+                out.print("{\"success\":true, \"todo\":" + todo.toString() + "}");
+            } else {
+                // Trả về response.success = false và response.error = "Todo không tồn tại"
+                out.print("{\"success\":false, \"error\":\"Todo không tồn tại\"}");
+            }
+            return;
+        }
+
+        if ("updateTodoTask".equals(action)) {
+            String todoIdStr = request.getParameter("todoId");
+            String newTaskIdStr = request.getParameter("newTaskId");
+
+            if (todoIdStr == null || newTaskIdStr == null) {
+                out.print("{\"success\":false, \"error\":\"Thiếu thông tin bắt buộc\"}");
+                return;
+            }
+
+            try {
+                int todoId = Integer.parseInt(todoIdStr);
+                int newTaskId = Integer.parseInt(newTaskIdStr);
+
+                System.out.println("[todoServlet] Di chuyển ToDo:");
+                System.out.println("  - TodoId: " + todoId);
+                System.out.println("  - NewTaskId: " + newTaskId);
+
+                com.service.Todo.TodoService service = new com.service.Todo.TodoService();
+                com.model.ToDo todo = service.getToDoById(todoId);
+
+                if (todo == null) {
+                    out.print("{\"success\":false, \"error\":\"ToDo không tồn tại\"}");
+                    return;
+                }
+
+                // Tạo task object mới
+                com.model.Task newTask = new com.model.Task();
+                newTask.setIdTask(newTaskId);
+                todo.setIdTask(newTask);
+
+                boolean updated = service.updateTodo(todo);
+
+                if (updated) {
+                    System.out.println("[todoServlet] ✅ Di chuyển ToDo thành công");
+                    out.print("{\"success\":true, \"message\":\"Di chuyển ToDo thành công\"}");
+                } else {
+                    System.out.println("[todoServlet] ❌ Di chuyển ToDo thất bại");
+                    out.print("{\"success\":false, \"error\":\"Không thể di chuyển ToDo\"}");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("[todoServlet] Lỗi parse ID: " + e.getMessage());
+                out.print("{\"success\":false, \"error\":\"ID không hợp lệ\"}");
+            } catch (Exception e) {
+                System.out.println("[todoServlet] Lỗi di chuyển ToDo: " + e.getMessage());
+                out.print("{\"success\":false, \"error\":\"Lỗi di chuyển ToDo\"}");
+            }
+            return;
+        }
+
+        if ("updateTodo".equals(action)) {
+            // Lấy dữ liệu từ request
+            String todoIdStr = request.getParameter("todoId");
+            String title = request.getParameter("title");
+            String description = request.getParameter("description");
+            String dueDateStr = request.getParameter("dueDate");
+            String dueTime = request.getParameter("dueTime");
+            String isAllDayStr = request.getParameter("isAllDay");
+
+            System.out.println("[todoServlet] Cập nhật todo với dữ liệu:");
+            System.out.println("  - TodoId: " + todoIdStr);
+            System.out.println("  - Title: " + title);
+            System.out.println("  - Description: " + description);
+            System.out.println("  - DueDate: " + dueDateStr);
+            System.out.println("  - DueTime: " + dueTime);
+            System.out.println("  - IsAllDay: " + isAllDayStr);
+
+            // Validate
+            if (todoIdStr == null || title == null || dueDateStr == null) {
+                out.print("{\"success\":false, \"error\":\"Thiếu thông tin bắt buộc\"}");
+                return;
+            }
+
+            try {
+                int todoId = Integer.parseInt(todoIdStr);
+                com.service.Todo.TodoService service = new com.service.Todo.TodoService();
+                com.model.ToDo todo = service.getToDoById(todoId);
+
+                if (todo == null) {
+                    out.print("{\"success\":false, \"error\":\"ToDo không tồn tại\"}");
+                    return;
+                }
+
+                // Parse ngày và giờ
+                java.sql.Timestamp dueDateTime;
+                try {
+                    String dateTimeStr = dueDateStr;
+                    if (dueTime != null && !dueTime.isEmpty()) {
+                        dateTimeStr += " " + dueTime + ":00";
+                    } else {
+                        dateTimeStr += " 00:00:00";
+                    }
+                    dueDateTime = java.sql.Timestamp.valueOf(dateTimeStr.replace("T", " "));
+                    System.out.println("[todoServlet] DueDateTime parsed: " + dueDateTime);
+                } catch (Exception e) {
+                    System.out.println("[todoServlet] Lỗi parse datetime: " + e.getMessage());
+                    out.print("{\"success\":false, \"error\":\"Định dạng ngày/giờ không hợp lệ\"}");
+                    return;
+                }
+
+                // Cập nhật thông tin todo
+                todo.setTitle(title);
+                todo.setDescription(description);
+                todo.setDueDate(dueDateTime);
+                todo.setIsAllDay("on".equals(isAllDayStr));
+                todo.setUpdatedAt(new java.util.Date());
+
+                System.out.println("[todoServlet] Todo object đã cập nhật:");
+                System.out.println("  - Title: " + todo.getTitle());
+                System.out.println("  - DueDate: " + todo.getDueDate());
+                System.out.println("  - IsAllDay: " + todo.getIsAllDay());
+                System.out.println("  - UpdatedAt: " + todo.getUpdatedAt());
+
+                // Gọi service để cập nhật
+                boolean updated = service.updateTodo(todo);
+
+                if (updated) {
+                    System.out.println("[todoServlet] ✅ Cập nhật thành công");
+                    out.print("{\"success\":true}");
+                } else {
+                    System.out.println("[todoServlet] ❌ Cập nhật thất bại");
+                    out.print("{\"success\":false, \"error\":\"Không thể cập nhật ToDo\"}");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("[todoServlet] Lỗi parse todoId: " + e.getMessage());
+                out.print("{\"success\":false, \"error\":\"ID ToDo không hợp lệ\"}");
+            } catch (Exception e) {
+                System.out.println("[todoServlet] Lỗi cập nhật ToDo: " + e.getMessage());
+                out.print("{\"success\":false, \"error\":\"Lỗi cập nhật ToDo\"}");
             }
             return;
         }

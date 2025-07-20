@@ -334,7 +334,8 @@
             <div class="course-content">
                 <div style="display: flex; align-items: center; gap: 18px; margin-bottom: 18px;">
 
-                    <a href="home" style="background: #ff4d4f; color: #fff; font-weight: 600; border: none; border-radius: 8px; padding: 10px 22px; font-size: 16px; text-decoration: none; transition: background 0.2s;" onmouseover="this.style.background = '#d9363e'" onmouseout="this.style.background = '#ff4d4f'">Quay lại Home </a>
+                    <a href="calendar" style="background: #ff4d4f; color: #fff; font-weight: 600; border: none; border-radius: 8px; padding: 10px 22px; font-size: 16px; text-decoration: none; transition: background 0.2s;" onmouseover="this.style.background = '#d9363e'" onmouseout="this.style.background = '#ff4d4f'">
+                        Quay lại Home </a>
                 </div>
                 <div class="product-list">
                     <c:forEach var="course" items="${courses}">

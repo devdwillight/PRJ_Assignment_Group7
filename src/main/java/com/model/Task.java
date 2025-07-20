@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  *
- * @author ADMIN
+ * @author DELL
  */
 @Entity
 @Table(name = "Task")
@@ -40,7 +40,8 @@ import java.util.List;
     @NamedQuery(name = "Task.findByName", query = "SELECT t FROM Task t WHERE t.name = :name"),
     @NamedQuery(name = "Task.findByColor", query = "SELECT t FROM Task t WHERE t.color = :color"),
     @NamedQuery(name = "Task.findByCreatedAt", query = "SELECT t FROM Task t WHERE t.createdAt = :createdAt"),
-    @NamedQuery(name = "Task.findByUpdatedAt", query = "SELECT t FROM Task t WHERE t.updatedAt = :updatedAt")})
+    @NamedQuery(name = "Task.findByUpdatedAt", query = "SELECT t FROM Task t WHERE t.updatedAt = :updatedAt"),
+    @NamedQuery(name = "Task.findByPosition", query = "SELECT t FROM Task t WHERE t.position = :position")})
 public class Task implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -63,6 +64,8 @@ public class Task implements Serializable {
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
+    @Column(name = "position")
+    private Integer position;
     @JoinColumn(name = "id_user", referencedColumnName = "id_user")
     @ManyToOne(optional = false)
     private User idUser;
@@ -119,6 +122,14 @@ public class Task implements Serializable {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Integer getPosition() {
+        return position;
+    }
+
+    public void setPosition(Integer position) {
+        this.position = position;
     }
 
     public User getIdUser() {

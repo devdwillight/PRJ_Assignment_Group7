@@ -5,25 +5,25 @@
 package com.controller.task;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import com.service.Task.TaskService;
+import com.service.Todo.TodoService;
 import com.model.Task;
+import com.model.ToDo;
 import java.util.List;
 import jakarta.servlet.http.HttpSession;
-import com.model.ToDo;
-import com.service.Todo.TodoService;
 import java.util.ArrayList;
+import java.io.PrintWriter;
 
 /**
  *
  * @author DELL
  */
-@WebServlet(name = "taskServlet", urlPatterns = { "/task" })
+@WebServlet(name = "taskServlet", urlPatterns = {"/task"})
 public class taskServlet extends HttpServlet {
 
     private TaskService taskService;
@@ -39,10 +39,10 @@ public class taskServlet extends HttpServlet {
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
      *
-     * @param request  servlet request
+     * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException      if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -66,10 +66,10 @@ public class taskServlet extends HttpServlet {
     /**
      * Handles the HTTP <code>GET</code> method.
      *
-     * @param request  servlet request
+     * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException      if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -82,163 +82,61 @@ public class taskServlet extends HttpServlet {
         }
 
         String action = request.getParameter("action");
-        if ("getTodos".equals(action)) {
-            handleGetTodos(request, response, userId);
-            return;
-        } else if ("getAllTodos".equals(action)) {
-            handleGetAllTodos(request, response, userId);
-            return;
-        } else if ("getAllTasks".equals(action)) {
+        if ("getAllTasks".equals(action)) {
             handleGetAllTasks(request, response, userId);
             return;
-        } else if ("create".equals(action)) {
-            request.getRequestDispatcher("views/task/addTask.jsp").forward(request, response);
-            return;
-        } else if ("edit".equals(action)) {
-            String idParam = request.getParameter("id");
-            if (idParam != null) {
+        }
+
+        try {
+            System.out.println("[taskServlet doGet] Starting to load data for user " + userId);
+            
+            // Lấy danh sách Task của user
+            List<Task> tasks = taskService.getAllTasksByUserIdOrderByPosition(userId);
+            
+            System.out.println("[taskServlet doGet] Found " + tasks.size() + " tasks for user " + userId);
+
+            // Gán danh sách ToDo cho từng Task
+            for (Task task : tasks) {
                 try {
-                    int taskIdEdit = Integer.parseInt(idParam);
-                    Task task = taskService.getTaskById(taskIdEdit);
-                    request.setAttribute("task", task);
+                    List<ToDo> allTodos = todoService.getToDoByTaskId(task.getIdTask());
+                    task.setToDoList(allTodos);
+                    System.out.println("Task " + task.getIdTask() + " - Total todos: " + allTodos.size());
                 } catch (Exception e) {
-                    // Có thể log lỗi hoặc xử lý thông báo
+                    System.err.println("[taskServlet doGet] Error loading todos for task " + task.getIdTask() + ": " + e.getMessage());
+                    task.setToDoList(new ArrayList<>());
                 }
             }
-            request.getRequestDispatcher("views/task/addTask.jsp").forward(request, response);
-            return;
-        }
 
-        // Lấy danh sách Task của user
-        List<Task> tasks = taskService.getAllTasksByUserId(userId);
-        request.setAttribute("tasks", tasks);
+            // Lấy tất cả todos để truyền cho subSiderbar.jsp
+            List<ToDo> allTodos = todoService.getAllToDoByUserId(userId);
+            System.out.println("[taskServlet doGet] Found " + allTodos.size() + " todos for user " + userId);
 
-        // Lấy taskId từ request (nếu có), mặc định lấy task đầu tiên
-        String taskIdParam = request.getParameter("taskId");
-        Integer taskId = null;
-        if (taskIdParam != null && !taskIdParam.isEmpty()) {
-            taskId = Integer.parseInt(taskIdParam);
-        } else if (!tasks.isEmpty()) {
-            taskId = tasks.get(0).getIdTask();
-        }
+            // Set attribute cho task.jsp (columns)
+            request.setAttribute("columns", tasks);
 
-        // Lấy ToDo theo taskId
-        List<ToDo> todos = (taskId != null)
-                ? todoService.getToDoByTaskId(taskId)
-                : new ArrayList<>();
+            // Set attribute cho subSiderbar.jsp (tasks và todos)
+            request.setAttribute("tasks", tasks);
+            request.setAttribute("todos", allTodos);
 
-        // Chuyển todos sang JSON cho client nếu cần
-        StringBuilder todosJson = new StringBuilder("[");
-        for (int i = 0; i < todos.size(); i++) {
-            ToDo t = todos.get(i);
-            todosJson.append("{")
-                    .append("\"idTodo\":").append(t.getIdTodo()).append(",")
-                    .append("\"title\":\"").append(t.getTitle().replace("\"", "\\\"")).append("\",")
-                    .append("\"description\":\"")
-                    .append(t.getDescription() != null ? t.getDescription().replace("\"", "\\\"") : "").append("\",")
-                    .append("\"dueDate\":\"").append(t.getDueDate()).append("\",")
-                    .append("\"isAllDay\":").append(t.getIsAllDay() != null && t.getIsAllDay() ? "true" : "false")
-                    .append(",")
-                    .append("\"isCompleted\":")
-                    .append(t.getIsCompleted() != null && t.getIsCompleted() ? "true" : "false")
-                    .append("}");
-            if (i < todos.size() - 1) {
-                todosJson.append(",");
-            }
-        }
-        todosJson.append("]");
-
-        // Truyền dữ liệu sang JSP
-        request.setAttribute("taskId", taskId);
-        request.setAttribute("todosJson", todosJson.toString());
-        request.getRequestDispatcher("views/calendar/calendar.jsp").forward(request, response);
-    }
-
-    private void handleGetTodos(HttpServletRequest request, HttpServletResponse response, Integer userId)
-            throws IOException {
-        response.setContentType("application/json;charset=UTF-8");
-        try {
-            String taskIdParam = request.getParameter("taskId");
-            Integer taskId = null;
-            if (taskIdParam != null && !taskIdParam.isEmpty()) {
-                taskId = Integer.parseInt(taskIdParam);
-            } else {
-                List<Task> tasks = taskService.getAllTasksByUserId(userId);
-                if (!tasks.isEmpty()) {
-                    taskId = tasks.get(0).getIdTask();
-                }
-            }
-            List<ToDo> todos = (taskId != null)
-                    ? todoService.getToDoByTaskId(taskId)
-                    : new ArrayList<>();
-            StringBuilder json = new StringBuilder("[");
-            for (int i = 0; i < todos.size(); i++) {
-                ToDo t = todos.get(i);
-                json.append("{")
-                        .append("\"idTodo\":").append(t.getIdTodo()).append(",")
-                        .append("\"title\":\"").append(t.getTitle().replace("\"", "\\\"")).append("\",")
-                        .append("\"description\":\"")
-                        .append(t.getDescription() != null ? t.getDescription().replace("\"", "\\\"") : "")
-                        .append("\",")
-                        .append("\"dueDate\":\"").append(t.getDueDate()).append("\",")
-                        .append("\"isAllDay\":").append(t.getIsAllDay() != null && t.getIsAllDay() ? "true" : "false")
-                        .append(",")
-                        .append("\"isCompleted\":")
-                        .append(t.getIsCompleted() != null && t.getIsCompleted() ? "true" : "false")
-                        .append("}");
-                if (i < todos.size() - 1) {
-                    json.append(",");
-                }
-            }
-            json.append("]");
-            response.getWriter().write(json.toString());
+            System.out.println("[taskServlet doGet] Forwarding to subHome.jsp");
+            request.getRequestDispatcher("subHome.jsp").forward(request, response);
+            System.out.println("[taskServlet doGet] Forward completed");
         } catch (Exception e) {
+            System.err.println("[taskServlet doGet] Error: " + e.getMessage());
+            e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"error\":\"Không thể tải dữ liệu todo\"}");
+            PrintWriter out = response.getWriter();
+            out.print("Lỗi khi tải dữ liệu: " + e.getMessage());
+            out.flush();
         }
     }
 
-    private void handleGetAllTodos(HttpServletRequest request, HttpServletResponse response, Integer userId)
-            throws IOException {
-        response.setContentType("application/json;charset=UTF-8");
-        try {
-            List<ToDo> todos = todoService.getAllToDoByUserId(userId);
 
-            StringBuilder jsonResponse = new StringBuilder("[");
-            for (int i = 0; i < todos.size(); i++) {
-                ToDo t = todos.get(i);
-                jsonResponse.append("{")
-                        .append("\"idTodo\":").append(t.getIdTodo()).append(",")
-                        .append("\"title\":\"").append(t.getTitle().replace("\"", "\\\"")).append("\",")
-                        .append("\"description\":\"")
-                        .append(t.getDescription() != null ? t.getDescription().replace("\"", "\\\"") : "")
-                        .append("\",")
-                        .append("\"dueDate\":\"").append(t.getDueDate()).append("\",")
-                        .append("\"isAllDay\":").append(t.getIsAllDay() != null && t.getIsAllDay() ? "true" : "false")
-                        .append(",")
-                        .append("\"isCompleted\":")
-                        .append(t.getIsCompleted() != null && t.getIsCompleted() ? "true" : "false").append(",")
-                        .append("\"taskId\":")
-                        .append((t.getIdTask() != null && t.getIdTask().getIdTask() != null) ? t.getIdTask().getIdTask()
-                                : "null")
-                        .append("}");
-                if (i < todos.size() - 1) {
-                    jsonResponse.append(",");
-                }
-            }
-            jsonResponse.append("]");
-
-            response.getWriter().write(jsonResponse.toString());
-
-        } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"error\":\"Không thể tải dữ liệu todo\"}");
-        }
-    }
 
     private void handleGetAllTasks(HttpServletRequest request, HttpServletResponse response, Integer userId)
             throws IOException {
         response.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = response.getWriter();
         try {
             List<Task> tasks = taskService.getAllTasksByUserId(userId);
             StringBuilder json = new StringBuilder("[");
@@ -253,11 +151,14 @@ public class taskServlet extends HttpServlet {
                 }
             }
             json.append("]");
-            response.getWriter().write(json.toString());
+            out.print(json.toString());
+            out.flush();
         } catch (Exception e) {
+            System.err.println("[handleGetAllTasks] Error: " + e.getMessage());
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"error\":\"Không thể tải dữ liệu tasks\"}");
+            out.print("{\"error\":\"Không thể tải dữ liệu tasks\"}");
+            out.flush();
         }
     }
 
@@ -271,41 +172,140 @@ public class taskServlet extends HttpServlet {
             return;
         }
         String action = request.getParameter("action");
+        System.out.println("[taskServlet doPost] Action: " + action);
+        System.out.println("[taskServlet doPost] Action length: " + (action != null ? action.length() : "null"));
+        System.out.println("[taskServlet doPost] Action equals 'deleteTask': " + "deleteTask".equals(action));
+        System.out.println("[taskServlet doPost] UserId: " + userId);
+        
         if (action == null) {
             action = "";
         }
-        switch (action) {
-            case "create": {
-                handleCreateTask(request, response, userId);
-                return;
-            }
-            case "edit": {
-                handleEditTask(request, response, userId);
-                return;
-            }
-            case "delete": {
-                handleDeleteTask(request, response, userId);
-                return;
-            }
-
-            default: {
-                // Không làm gì
-            }
+        // Sử dụng if-else thay vì switch để debug
+        if ("createTask".equals(action)) {
+            handleCreateTask(request, response, userId);
+            return;
+        } else if ("updateColumnPosition".equals(action)) {
+            handleUpdateColumnPosition(request, response, userId);
+            return;
+        } else if ("updateTaskName".equals(action)) {
+            System.out.println("[taskServlet doPost] Processing updateTaskName action");
+            handleUpdateTaskName(request, response, userId);
+            return;
+        } else if ("edit".equals(action)) {
+            handleEditTask(request, response, userId);
+            return;
+        } else if ("deleteTask".equals(action)) {
+            System.out.println("[taskServlet doPost] Processing deleteTask action");
+            handleDeleteTaskAjax(request, response, userId);
+            return;
+        } else {
+            System.out.println("[taskServlet doPost] Unknown action: " + action);
+            // Không làm gì
         }
     }
 
     private void handleCreateTask(HttpServletRequest request, HttpServletResponse response, Integer userId)
             throws IOException {
-        String name = request.getParameter("name");
-        String color = request.getParameter("color");
-        Task task = new Task();
-        task.setName(name);
-        task.setColor(color);
-        com.model.User user = new com.model.User(userId);
-        task.setIdUser(user);
-        taskService.createTask(task);
-        response.sendRedirect(request.getContextPath() + "/home");
+        response.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        try {
+            String name = request.getParameter("name");
+            String color = request.getParameter("color");
+
+            if (name == null || name.trim().isEmpty()) {
+                out.print("{\"success\":false,\"error\":\"Tên Task không được để trống\"}");
+                out.flush();
+                return;
+            }
+
+            Task task = new Task();
+            task.setName(name.trim());
+            task.setColor(color);
+            
+            // Set thời gian tạo và cập nhật
+            java.util.Date currentDate = new java.util.Date();
+            task.setCreatedAt(currentDate);
+            task.setUpdatedAt(currentDate);
+            
+            com.model.User user = new com.model.User(userId);
+            task.setIdUser(user);
+
+            System.out.println("[handleCreateTask] Creating task with data:");
+            System.out.println("  - Name: " + task.getName());
+            System.out.println("  - Color: " + task.getColor());
+            System.out.println("  - CreatedAt: " + task.getCreatedAt());
+            System.out.println("  - UpdatedAt: " + task.getUpdatedAt());
+            System.out.println("  - UserId: " + userId);
+
+            Task createdTask = taskService.createTask(task);
+
+            if (createdTask != null && createdTask.getIdTask() != null) {
+                System.out.println("[handleCreateTask] ✅ Task created successfully with ID: " + createdTask.getIdTask());
+                out.print("{\"success\":true,\"message\":\"Task đã được tạo thành công\"}");
+            } else {
+                System.out.println("[handleCreateTask] ❌ Failed to create task");
+                out.print("{\"success\":false,\"error\":\"Không thể tạo Task\"}");
+            }
+            out.flush();
+        } catch (Exception e) {
+            System.err.println("[handleCreateTask] Error: " + e.getMessage());
+            e.printStackTrace();
+            out.print("{\"success\":false,\"error\":\"Lỗi server: " + e.getMessage() + "\"}");
+            out.flush();
+        }
     }
+
+    private void handleUpdateColumnPosition(HttpServletRequest request, HttpServletResponse response, Integer userId)
+            throws IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        try {
+            String taskIdParam = request.getParameter("taskId");
+            String oldPositionParam = request.getParameter("oldPosition");
+            String newPositionParam = request.getParameter("newPosition");
+
+            if (taskIdParam == null || oldPositionParam == null || newPositionParam == null) {
+                out.print("{\"success\":false,\"error\":\"Thiếu thông tin cần thiết\"}");
+                out.flush();
+                return;
+            }
+
+            int taskId = Integer.parseInt(taskIdParam);
+            int oldPosition = Integer.parseInt(oldPositionParam);
+            int newPosition = Integer.parseInt(newPositionParam);
+
+            // Kiểm tra task có thuộc về user này không
+            Task task = taskService.getTaskById(taskId);
+            if (task == null || !task.getIdUser().getIdUser().equals(userId)) {
+                out.print("{\"success\":false,\"error\":\"Task không tồn tại hoặc không thuộc về bạn\"}");
+                out.flush();
+                return;
+            }
+
+            // Thực hiện reorder
+            boolean success = taskService.reorderTasks(userId, oldPosition, newPosition);
+
+            if (success) {
+                // Cập nhật position của task được kéo
+                taskService.updateTaskPosition(taskId, newPosition);
+                out.print("{\"success\":true,\"message\":\"Cập nhật vị trí thành công\"}");
+            } else {
+                out.print("{\"success\":false,\"error\":\"Không thể cập nhật vị trí\"}");
+            }
+            out.flush();
+
+        } catch (NumberFormatException e) {
+            out.print("{\"success\":false,\"error\":\"Dữ liệu không hợp lệ\"}");
+            out.flush();
+        } catch (Exception e) {
+            System.err.println("[handleUpdateColumnPosition] Error: " + e.getMessage());
+            e.printStackTrace();
+            out.print("{\"success\":false,\"error\":\"Lỗi server: " + e.getMessage() + "\"}");
+            out.flush();
+        }
+    }
+
+
 
     private void handleEditTask(HttpServletRequest request, HttpServletResponse response, Integer userId)
             throws IOException {
@@ -319,30 +319,138 @@ public class taskServlet extends HttpServlet {
                 if (task != null && task.getIdUser() != null && task.getIdUser().getIdUser().equals(userId)) {
                     task.setName(name);
                     task.setColor(color);
+                    task.setUpdatedAt(new java.util.Date());
                     taskService.updateTask(task);
                 }
             } catch (Exception e) {
                 // Có thể log lỗi hoặc xử lý thông báo
             }
         }
-        response.sendRedirect(request.getContextPath() + "/home");
+        response.sendRedirect(request.getContextPath() + "/task");
     }
 
-    private void handleDeleteTask(HttpServletRequest request, HttpServletResponse response, Integer userId)
+    private void handleDeleteTaskAjax(HttpServletRequest request, HttpServletResponse response, Integer userId)
             throws IOException {
-        String idParam = request.getParameter("id");
-        if (idParam != null) {
-            try {
-                int taskId = Integer.parseInt(idParam);
-                Task task = taskService.getTaskById(taskId);
-                if (task != null && task.getIdUser() != null && task.getIdUser().getIdUser().equals(userId)) {
-                    boolean result = taskService.removeTask(taskId);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+        System.out.println("[handleDeleteTaskAjax] Starting delete task process");
+        response.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        try {
+            String taskIdParam = request.getParameter("taskId");
+            
+            if (taskIdParam == null) {
+                out.print("{\"success\":false,\"error\":\"Thiếu ID task\"}");
+                out.flush();
+                return;
             }
+
+            int taskId = Integer.parseInt(taskIdParam);
+            
+            // Kiểm tra task có thuộc về user này không
+            Task task = taskService.getTaskById(taskId);
+            if (task == null) {
+                out.print("{\"success\":false,\"error\":\"Task không tồn tại\"}");
+                out.flush();
+                return;
+            }
+            
+            if (!task.getIdUser().getIdUser().equals(userId)) {
+                out.print("{\"success\":false,\"error\":\"Task không thuộc về bạn\"}");
+                out.flush();
+                return;
+            }
+
+            // Xóa task
+            boolean success = taskService.removeTask(taskId);
+
+            if (success) {
+                out.print("{\"success\":true,\"message\":\"Task đã được xóa thành công\"}");
+            } else {
+                out.print("{\"success\":false,\"error\":\"Không thể xóa task\"}");
+            }
+            out.flush();
+
+        } catch (NumberFormatException e) {
+            out.print("{\"success\":false,\"error\":\"ID task không hợp lệ\"}");
+            out.flush();
+        } catch (Exception e) {
+            System.err.println("[handleDeleteTaskAjax] Error: " + e.getMessage());
+            e.printStackTrace();
+            out.print("{\"success\":false,\"error\":\"Lỗi server: " + e.getMessage() + "\"}");
+            out.flush();
         }
-        response.sendRedirect(request.getContextPath() + "/home");
+    }
+
+    
+
+    private void handleUpdateTaskName(HttpServletRequest request, HttpServletResponse response, Integer userId)
+            throws IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        try {
+            String taskIdParam = request.getParameter("taskId");
+            String newTaskName = request.getParameter("newTaskName");
+
+            System.out.println("[handleUpdateTaskName] Debug info:");
+            System.out.println("  - taskIdParam: " + taskIdParam);
+            System.out.println("  - newTaskName: " + newTaskName);
+            System.out.println("  - userId: " + userId);
+
+            if (taskIdParam == null || newTaskName == null || newTaskName.trim().isEmpty()) {
+                System.out.println("[handleUpdateTaskName] Validation failed");
+                out.print("{\"success\":false,\"error\":\"Thiếu thông tin cần thiết hoặc tên task không được để trống\"}");
+                out.flush();
+                return;
+            }
+
+            int taskId = Integer.parseInt(taskIdParam);
+            String taskName = newTaskName.trim();
+
+            System.out.println("[handleUpdateTaskName] Parsed values:");
+            System.out.println("  - taskId: " + taskId);
+            System.out.println("  - taskName: " + taskName);
+
+            // Kiểm tra task có thuộc về user này không
+            Task task = taskService.getTaskById(taskId);
+            if (task == null) {
+                System.out.println("[handleUpdateTaskName] Task not found: " + taskId);
+                out.print("{\"success\":false,\"error\":\"Task không tồn tại\"}");
+                out.flush();
+                return;
+            }
+            
+            if (!task.getIdUser().getIdUser().equals(userId)) {
+                System.out.println("[handleUpdateTaskName] Task doesn't belong to user. Task userId: " + task.getIdUser().getIdUser() + ", Current userId: " + userId);
+                out.print("{\"success\":false,\"error\":\"Task không thuộc về bạn\"}");
+                out.flush();
+                return;
+            }
+
+            System.out.println("[handleUpdateTaskName] Task found and belongs to user. Current name: " + task.getName());
+
+            // Cập nhật tên task và thời gian cập nhật
+            task.setName(taskName);
+            task.setUpdatedAt(new java.util.Date());
+            boolean success = taskService.updateTask(task);
+
+            System.out.println("[handleUpdateTaskName] Update result: " + success);
+
+            if (success) {
+                out.print("{\"success\":true,\"message\":\"Cập nhật tên task thành công\"}");
+            } else {
+                out.print("{\"success\":false,\"error\":\"Không thể cập nhật tên task\"}");
+            }
+            out.flush();
+
+        } catch (NumberFormatException e) {
+            System.out.println("[handleUpdateTaskName] NumberFormatException: " + e.getMessage());
+            out.print("{\"success\":false,\"error\":\"Dữ liệu không hợp lệ\"}");
+            out.flush();
+        } catch (Exception e) {
+            System.out.println("[handleUpdateTaskName] Exception: " + e.getMessage());
+            e.printStackTrace();
+            out.print("{\"success\":false,\"error\":\"Lỗi server: " + e.getMessage() + "\"}");
+            out.flush();
+        }
     }
 
     /**

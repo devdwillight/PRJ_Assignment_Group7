@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  *
- * @author ADMIN
+ * @author DELL
  */
 @Entity
 @Table(name = "Course")
@@ -60,10 +60,10 @@ public class Course implements Serializable {
     @Size(max = 255)
     @Column(name = "category")
     private String category;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Basic(optional = false)
     @NotNull
     @Column(name = "price")
-    private Double price;
+    private double price;
     @Size(max = 255)
     @Column(name = "duration")
     private String duration;
@@ -92,9 +92,10 @@ public class Course implements Serializable {
         this.idCourse = idCourse;
     }
 
-    public Course(Integer idCourse, String name) {
+    public Course(Integer idCourse, String name, double price) {
         this.idCourse = idCourse;
         this.name = name;
+        this.price = price;
     }
 
     public Integer getIdCourse() {
@@ -121,11 +122,11 @@ public class Course implements Serializable {
         this.category = category;
     }
 
-    public Double getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 

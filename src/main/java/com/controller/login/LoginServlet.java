@@ -178,8 +178,8 @@ public class LoginServlet extends HttpServlet {
                 response.addCookie(passCookie);
             }
 
-            // Chuyển hướng về trang home.jsp sau khi đăng nhập thành công
-            response.sendRedirect(request.getContextPath() + "/home");
+            // Chuyển hướng về trang calendar sau khi đăng nhập thành công
+            response.sendRedirect(request.getContextPath() + "/calendar");
         } else {
             // Nếu đăng nhập không hợp lệ, hiển thị lỗi
             request.setAttribute("error", "1");
