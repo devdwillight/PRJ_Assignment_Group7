@@ -178,7 +178,7 @@ VALUES
 
 INSERT INTO Course (name, price, duration, description, frequency, category,imageUrl)
 VALUES
-('Mobile App Development', 249.99, '5 months', N'Create iOS and Android apps using React Native and Flutter.', 'Weekly', 'Technology', 'https://admin.12grids.com/uploads/blogs/original_cover_images/Webp/Best_Mobile_App_Development_Technologies_12Grids.webp'),
+('Mobile App Development', 249.99, '5 months', N'Create iOS and Android apps using React Native and Flutter.', 'Weekly', 'Technology', 'https://riseuplabs.com/wp-content/uploads/2021/07/mobile-application-development-guidelines-riseuplabs.jpg'),
 ('Digital Marketing Fundamentals', 149.99, '6 weeks', N'Master SEO, social media marketing, and Google Ads strategies.', 'Bi-weekly', 'Marketing', 'https://d2ds8yldqp7gxv.cloudfront.net/Blog+Explanatory+Images/Fundamentals+of+Digital+Marketing+1.webp'),
 ('Python Programming Bootcamp', 179.99, '8 weeks', N'Complete Python course from basics to advanced programming concepts.', 'Weekly', 'Programming', 'https://www.cdmi.in/courses@2x/python-training-institute.webp'),
 ('Graphic Design Essentials', 129.99, '10 weeks', N'Learn Adobe Creative Suite, typography, and design principles.', 'Weekly', 'Design','https://5.imimg.com/data5/SELLER/Default/2024/9/454403725/GP/XZ/HQ/16304956/graphic-design-essentials.png'),

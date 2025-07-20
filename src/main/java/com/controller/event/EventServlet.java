@@ -4,8 +4,8 @@
  */
 package com.controller.event;
 
-import com.model.UserEvents;
 import com.model.Calendar;
+import com.model.UserEvents;
 import com.service.Event.EventService;
 import com.service.Calendar.CalendarService;
 import java.io.IOException;
@@ -21,6 +21,14 @@ import jakarta.servlet.http.HttpSession;
 import java.io.PrintWriter;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
+import com.model.Orders;
+import com.service.Order.OrderService;
+import com.model.UserCourse;
+import com.service.UserCourse.UserCourseService;
+import com.model.Course;
+import com.service.Course.CourseService;
+import java.text.ParseException;
+import java.util.ArrayList;
 
 /**
  *
@@ -181,6 +189,9 @@ public class EventServlet extends HttpServlet {
             } else if ("updateTime".equals(action)) {
                 System.out.println("[EventServlet] Handling updateTime action");
                 handleUpdateEventTime(request, response);
+            } else if ("autoCreateEvents".equals(action)) {
+                System.out.println("[EventServlet] Handling autoCreateEvents action");
+                handleAutoCreateEvents(request, response);
             } else {
                 System.out.println("[EventServlet] Invalid action: " + action);
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -877,6 +888,222 @@ public class EventServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("{\"error\":\"Failed to update event\"}");
         }
+    }
+
+    private void handleAutoCreateEvents(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("application/json;charset=UTF-8");
+
+        try {
+            HttpSession session = request.getSession();
+            Integer userId = (Integer) session.getAttribute("user_id");
+            if (userId == null) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("{\"error\":\"User not logged in\"}");
+                return;
+            }
+
+            int orderId = Integer.parseInt(request.getParameter("orderId"));
+            String calendarName = request.getParameter("calendarName");
+            String startDate = request.getParameter("startDate");
+            String startTime = request.getParameter("startTime");
+            String recurrenceRule = request.getParameter("recurrenceRule");
+            int remindBefore = Integer.parseInt(request.getParameter("remindBefore"));
+            String remindUnit = request.getParameter("remindUnit");
+            boolean remindMethod = "1".equals(request.getParameter("remindMethod"));
+            String eventColor = request.getParameter("eventColor");
+
+            // Lấy userId, courseId, course, duration
+            OrderService orderService = new OrderService();
+            Orders order = orderService.getOrderById(orderId);
+
+            UserCourseService userCourseService = new UserCourseService();
+            List<UserCourse> userCourses = userCourseService.getAllUserCoursesByUserId(userId);
+            UserCourse latestUserCourse = userCourses.stream()
+                    .sorted((a, b) -> b.getEnrollDate().compareTo(a.getEnrollDate()))
+                    .findFirst()
+                    .orElse(null);
+            int courseId = latestUserCourse.getIdCourse().getIdCourse();
+
+            CourseService courseService = new CourseService();
+            Course course = courseService.getCourseById(courseId);
+
+            // Parse duration thành số ngày
+            int totalDays = 0;
+            int totalWeeks = 0;
+            int totalMonths = 0;
+            if (course.getDuration() != null && !course.getDuration().trim().isEmpty()) {
+                if (course.getDuration().contains("week")) {
+                    java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d+)\\s*weeks?").matcher(course.getDuration());
+                    if (m.find()) {
+                        totalWeeks = Integer.parseInt(m.group(1));
+                    }
+                    totalDays = totalWeeks * 7;
+                } else if (course.getDuration().contains("month")) {
+                    java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d+)\\s*months?").matcher(course.getDuration());
+                    if (m.find()) {
+                        totalMonths = Integer.parseInt(m.group(1));
+                    }
+                    totalDays = totalMonths * 4 * 7; // 1 tháng = 4 tuần
+                } else {
+                    java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d+)\\s*days?").matcher(course.getDuration());
+                    if (m.find()) {
+                        totalDays = Integer.parseInt(m.group(1));
+                    }
+                }
+            }
+
+            // Parse recurrenceRule để lấy danh sách các ngày trong tuần
+            List<Integer> weekDays = new ArrayList<>(); // 1=CN, 2=T2, ..., 7=T7
+            if (recurrenceRule != null && recurrenceRule.contains("BYDAY=")) {
+                String byDay = recurrenceRule.split("BYDAY=")[1];
+                if (byDay.contains(";")) {
+                    byDay = byDay.split(";")[0];
+                }
+                String[] days = byDay.split(",");
+                for (String d : days) {
+                    switch (d) {
+                        case "MO":
+                            weekDays.add(java.util.Calendar.MONDAY);
+                            break;
+                        case "TU":
+                            weekDays.add(java.util.Calendar.TUESDAY);
+                            break;
+                        case "WE":
+                            weekDays.add(java.util.Calendar.WEDNESDAY);
+                            break;
+                        case "TH":
+                            weekDays.add(java.util.Calendar.THURSDAY);
+                            break;
+                        case "FR":
+                            weekDays.add(java.util.Calendar.FRIDAY);
+                            break;
+                        case "SA":
+                            weekDays.add(java.util.Calendar.SATURDAY);
+                            break;
+                        case "SU":
+                            weekDays.add(java.util.Calendar.SUNDAY);
+                            break;
+                    }
+                }
+            }
+
+            // Tính ngày cho từng event
+            java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm");
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            try {
+                cal.setTime(dateFormat.parse(startDate + " " + startTime));
+            } catch (ParseException e) {
+                e.printStackTrace();
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("{\"error\":\"Invalid date format\"}");
+                return;
+            }
+            int created = 0;
+            int calendarId = Integer.parseInt(request.getParameter("calendarId"));
+            Calendar calendar = calendarService.getCalendarById(calendarId);
+            for (int day = 0; day < totalDays; day++) {
+                int dayOfWeek = cal.get(java.util.Calendar.DAY_OF_WEEK);
+                if (weekDays.contains(dayOfWeek)) {
+                    UserEvents event = new UserEvents();
+                    event.setName(calendarName + " - Buổi " + (created + 1));
+                    event.setDescription("Buổi học số " + (created + 1) + " của khóa " + course.getName());
+                    event.setColor(eventColor);
+                    event.setRemindBefore(remindBefore);
+                    event.setRemindUnit(remindUnit);
+                    event.setRemindMethod(remindMethod);
+                    event.setIsAllDay(false);
+                    event.setIdCalendar(calendar);
+                    event.setCreatedAt(new java.util.Date());
+                    event.setUpdatedAt(new java.util.Date());
+                    event.setStartDate(cal.getTime());
+                    java.util.Calendar endCal = (java.util.Calendar) cal.clone();
+                    endCal.add(java.util.Calendar.MINUTE, 90);
+                    event.setDueDate(endCal.getTime());
+                    eventService.createEvent(event);
+                    created++;
+                }
+                cal.add(java.util.Calendar.DATE, 1);
+            }
+
+            response.setContentType("application/json");
+            response.getWriter().write("{\"success\": true}");
+            return;
+        } catch (Exception e) {
+            System.err.println("Error in handleAutoCreateEvents: " + e.getMessage());
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\":\"Failed to auto-create events\"}");
+        }
+    }
+
+    public int parseLessonCount(String duration) {
+        duration = duration.toLowerCase();
+        int lessonCount = 1;
+
+        // Trường hợp: "10 buổi"
+        if (duration.contains("buổi") || duration.contains("lessons")) {
+            // Lấy số đầu tiên
+            String[] parts = duration.split("\\D+");
+            for (String part : parts) {
+                if (!part.isEmpty()) {
+                    lessonCount = Integer.parseInt(part);
+                    break;
+                }
+            }
+            // Nếu có dạng "2 lessons/week"
+            if (duration.contains("week")) {
+                int perWeek = 1;
+                java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d+)\\s*lessons?/week").matcher(duration);
+                if (m.find()) {
+                    perWeek = Integer.parseInt(m.group(1));
+                }
+                // Lấy số tuần
+                m = java.util.regex.Pattern.compile("(\\d+)\\s*weeks?").matcher(duration);
+                if (m.find()) {
+                    int weeks = Integer.parseInt(m.group(1));
+                    lessonCount = weeks * perWeek;
+                }
+            }
+        } // Trường hợp: "8 weeks"
+        else if (duration.contains("week")) {
+            int weeks = 1;
+            java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d+)\\s*weeks?").matcher(duration);
+            if (m.find()) {
+                weeks = Integer.parseInt(m.group(1));
+            }
+            // Kiểm tra lessons/week
+            int perWeek = 1;
+            m = java.util.regex.Pattern.compile("(\\d+)\\s*lessons?/week").matcher(duration);
+            if (m.find()) {
+                perWeek = Integer.parseInt(m.group(1));
+            }
+            lessonCount = weeks * perWeek;
+        } // Trường hợp: "5 months"
+        else if (duration.contains("month")) {
+            int months = 1;
+            java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d+)\\s*months?").matcher(duration);
+            if (m.find()) {
+                months = Integer.parseInt(m.group(1));
+            }
+            // Giả sử 1 tháng = 4 tuần, mỗi tuần 1 buổi
+            lessonCount = months * 4;
+            // Nếu có lessons/week
+            int perWeek = 1;
+            m = java.util.regex.Pattern.compile("(\\d+)\\s*lessons?/week").matcher(duration);
+            if (m.find()) {
+                perWeek = Integer.parseInt(m.group(1));
+                lessonCount = months * 4 * perWeek;
+            }
+        } // Trường hợp chỉ có số
+        else {
+            try {
+                lessonCount = Integer.parseInt(duration.replaceAll("[^0-9]", ""));
+            } catch (Exception e) {
+                lessonCount = 1;
+            }
+        }
+        return lessonCount;
     }
 
     /**

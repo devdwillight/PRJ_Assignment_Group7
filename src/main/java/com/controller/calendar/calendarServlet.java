@@ -275,7 +275,11 @@ public class calendarServlet extends HttpServlet {
         if (action == null) action = "";
         switch (action) {
             case "create": {
-                handleCreateCalendar(request, response, userId);
+                handleCreateCalendar(request, response, userId); // redirect như cũ
+                return;
+            }
+            case "createAjax": {
+                handleCreateCalendarAjax(request, response, userId); // trả về JSON
                 return;
             }
             case "edit": {
@@ -299,6 +303,21 @@ public class calendarServlet extends HttpServlet {
         calendar.setIdUser(user);
         calendarService.createCalendar(calendar);
         response.sendRedirect(request.getContextPath() + "/calendar");
+    }
+
+    private void handleCreateCalendarAjax(HttpServletRequest request, HttpServletResponse response, Integer userId) throws IOException {
+        String name = request.getParameter("name");
+        String color = request.getParameter("color");
+        com.model.Calendar calendar = new com.model.Calendar();
+        calendar.setName(name);
+        calendar.setColor(color);
+        com.model.User user = new com.model.User(userId);
+        calendar.setIdUser(user);
+        calendarService.createCalendar(calendar);
+
+        // Trả về JSON chứa id của calendar vừa tạo
+        response.setContentType("application/json");
+        response.getWriter().write("{\"calendarId\":" + calendar.getIdCalendar() + "}");
     }
 
     private void handleEditCalendar(HttpServletRequest request, HttpServletResponse response, Integer userId) throws IOException {

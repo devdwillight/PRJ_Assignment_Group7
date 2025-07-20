@@ -25,6 +25,7 @@ import com.service.Course.CourseService;
 import com.service.UserCourse.UserCourseService;
 import jakarta.servlet.http.HttpSession;
 import static java.lang.System.out;
+import com.utils.EmailUtility;
 
 /**
  *
@@ -35,6 +36,7 @@ public class VnpayReturn extends HttpServlet {
 
     OrderDAO orderDao = new OrderDAO();
     UserCourseService userCourseService = new UserCourseService();
+    EmailUtility emailUtility = new EmailUtility();
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -94,7 +96,14 @@ public class VnpayReturn extends HttpServlet {
                         userCourse.setEnrollDate(new java.util.Date());
                         userCourseService.createUserCourse(userCourse);
 
-                        // đoạn này thì sẽ gọi hàm add user và course ở orderDao vào bảng user_course để map xem user nào có khóa nào
+                        // ==> THÊM CODE GỬI EMAIL Ở ĐÂY <==
+                        String email = user.getEmail();
+                        String link = " http://localhost:9999/PRJ_Assignment_toidaiii/calendar/add?orderId=" + order.getIdOrder();
+                        String subject = "Thiết lập lịch học cho khóa học bạn vừa mua";
+                        String content = "Chúc mừng bạn đã mua khóa học thành công!"
+                                + "Hãy nhấn vào link sau để thiết lập lịch học và các buổi học tự động: '" + link + "' Thiết lập lịch học";
+
+                                emailUtility.send(email, subject, content);
                     } else {
                         order.setStatus("Failed");
                     }
