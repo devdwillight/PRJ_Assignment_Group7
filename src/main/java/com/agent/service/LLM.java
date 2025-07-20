@@ -19,7 +19,7 @@ import java.util.*;
  */
 public class LLM {
 
-    private static final String API_KEY = "";//ConfigLoader.get("GEMINI_API_KEY");
+    private static final String API_KEY = ConfigLoader.get("GEMINI_API_KEY");
     private static final String ENDPOINT = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" + API_KEY;
 
     public String generateResponse(List<Message> messages) {
