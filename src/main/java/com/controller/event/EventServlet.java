@@ -227,6 +227,8 @@ public class EventServlet extends HttpServlet {
             String color = request.getParameter("color");
             String calendarId = request.getParameter("calendarId");
             String remindMethod = request.getParameter("remindMethod");
+            String remindBefore = request.getParameter("remindBefore");
+            String remindUnit = request.getParameter("remindUnit");
             
             // Debug logging
             System.out.println("[EventServlet] Creating event with data:");
@@ -241,6 +243,8 @@ public class EventServlet extends HttpServlet {
             System.out.println("  Color: " + color);
             System.out.println("  CalendarId: " + calendarId);
             System.out.println("  RemindMethod: " + remindMethod);
+            System.out.println("  RemindBefore: " + remindBefore);
+            System.out.println("  RemindUnit: " + remindUnit);
             
             // Validate required fields
             if (title == null || title.trim().isEmpty() || 
@@ -259,9 +263,50 @@ public class EventServlet extends HttpServlet {
             event.setColor(color != null ? color : "#3b82f6");
             event.setIsAllDay("on".equals(allDay));
             event.setIsRecurring(false);
-            event.setRemindMethod(true);
-            event.setRemindBefore(5);
-            event.setRemindUnit("minutes");
+            
+            // Xử lý remindMethod từ form
+            if (remindMethod != null && !remindMethod.trim().isEmpty()) {
+                event.setRemindMethod("1".equals(remindMethod) || "true".equals(remindMethod));
+            } else {
+                event.setRemindMethod(false);
+            }
+            
+            // Xử lý remindBefore từ form
+            if (remindBefore != null && !remindBefore.trim().isEmpty()) {
+                try {
+                    int remindValue = Integer.parseInt(remindBefore);
+                    if (remindValue < 0) {
+                        event.setRemindBefore(30); // Giá trị mặc định nếu âm
+                    } else {
+                        event.setRemindBefore(remindValue);
+                    }
+                } catch (NumberFormatException e) {
+                    event.setRemindBefore(30); // Giá trị mặc định nếu parse lỗi
+                }
+            } else {
+                event.setRemindBefore(30); // Giá trị mặc định
+            }
+            
+            // Xử lý remindUnit từ form
+            if (remindUnit != null && !remindUnit.trim().isEmpty()) {
+                // Validate remindUnit chỉ nhận các giá trị hợp lệ
+                String validUnits[] = {"minutes", "hours", "days", "weeks"};
+                boolean isValidUnit = false;
+                for (String unit : validUnits) {
+                    if (unit.equals(remindUnit)) {
+                        isValidUnit = true;
+                        break;
+                    }
+                }
+                if (isValidUnit) {
+                    event.setRemindUnit(remindUnit);
+                } else {
+                    event.setRemindUnit("minutes"); // Giá trị mặc định nếu không hợp lệ
+                }
+            } else {
+                event.setRemindUnit("minutes"); // Giá trị mặc định
+            }
+            
             event.setCreatedAt(new Date());
             event.setUpdatedAt(new Date());
             
@@ -528,6 +573,9 @@ public class EventServlet extends HttpServlet {
             String allDay = request.getParameter("allDay");
             String color = request.getParameter("color");
             String calendarId = request.getParameter("calendarId");
+            String remindMethod = request.getParameter("remindMethod");
+            String remindBefore = request.getParameter("remindBefore");
+            String remindUnit = request.getParameter("remindUnit");
             
             // Validate required fields
             if (title == null || title.trim().isEmpty() || 
@@ -559,6 +607,42 @@ public class EventServlet extends HttpServlet {
             existingEvent.setLocation(location != null ? location : "");
             existingEvent.setColor(color != null ? color : "#3b82f6");
             existingEvent.setIsAllDay("on".equals(allDay));
+            
+            // Cập nhật remindMethod từ form
+            if (remindMethod != null && !remindMethod.trim().isEmpty()) {
+                existingEvent.setRemindMethod("1".equals(remindMethod) || "true".equals(remindMethod));
+            }
+            
+            // Cập nhật remindBefore từ form
+            if (remindBefore != null && !remindBefore.trim().isEmpty()) {
+                try {
+                    int remindValue = Integer.parseInt(remindBefore);
+                    if (remindValue >= 0) {
+                        existingEvent.setRemindBefore(remindValue);
+                    }
+                    // Giữ nguyên giá trị cũ nếu âm
+                } catch (NumberFormatException e) {
+                    // Giữ nguyên giá trị cũ nếu parse lỗi
+                }
+            }
+            
+            // Cập nhật remindUnit từ form
+            if (remindUnit != null && !remindUnit.trim().isEmpty()) {
+                // Validate remindUnit chỉ nhận các giá trị hợp lệ
+                String validUnits[] = {"minutes", "hours", "days", "weeks"};
+                boolean isValidUnit = false;
+                for (String unit : validUnits) {
+                    if (unit.equals(remindUnit)) {
+                        isValidUnit = true;
+                        break;
+                    }
+                }
+                if (isValidUnit) {
+                    existingEvent.setRemindUnit(remindUnit);
+                }
+                // Giữ nguyên giá trị cũ nếu không hợp lệ
+            }
+            
             existingEvent.setUpdatedAt(new Date());
             
             // Parse and set dates (same logic as create)

@@ -100,8 +100,9 @@ public class EventDAO extends BaseDAO<UserEvents> implements IEventDAO {
     }
     @Override
     public List<UserEvents> getEventsToRemind() {
-        EntityManager em = getEntityManager();
+        EntityManager em = null;
         try {
+            em = getEntityManager();
             Date now = new Date();
 
             // Lấy tất cả event cần nhắc (remindMethod = true) có startDate >= hiện tại
@@ -148,8 +149,18 @@ public class EventDAO extends BaseDAO<UserEvents> implements IEventDAO {
                 }
             }
             return toRemind;
+        } catch (Exception e) {
+            // Log lỗi nhưng trả về list rỗng thay vì crash
+            System.err.println("Error getting events to remind: " + e.getMessage());
+            return new java.util.ArrayList<>();
         } finally {
-            em.close();
+            if (em != null && em.isOpen()) {
+                try {
+                    em.close();
+                } catch (Exception e) {
+                    // Ignore errors when closing EntityManager during shutdown
+                }
+            }
         }
     }
 }

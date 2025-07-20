@@ -15,16 +15,26 @@ public class ReminderScheduler {
 
     private final EventDAO userEventsDAO = new EventDAO();
     private final ResetService mailSender = new ResetService();
+    private Timer timer; // Lưu reference để có thể dừng
 
     // Lưu ID của event đã gửi email (trong vòng đời app)
     private static final Set<Integer> sentEventIds = new HashSet<>();
 
     public void start() {
-        Timer timer = new Timer(true); // background thread
+        if (timer != null) {
+            timer.cancel(); // Dừng timer cũ nếu có
+        }
+        
+        timer = new Timer(true); // background thread
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 try {
+                    // Kiểm tra xem ứng dụng có đang chạy không
+                    if (timer == null) {
+                        return; // Timer đã bị dừng
+                    }
+                    
                     List<UserEvents> events = userEventsDAO.getEventsToRemind();
 
                     // Lọc ra chỉ những event chưa gửi
@@ -53,9 +63,19 @@ public class ReminderScheduler {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    // Log lỗi nhưng không crash timer thread
+                    System.err.println("Error in ReminderScheduler: " + e.getMessage());
+                    // Không in stack trace để tránh spam log khi ứng dụng shutdown
                 }
             }
         }, 0, 60 * 1000); // check mỗi 1 phút (60*1000ms) – Càng nhỏ càng chính xác
+    }
+    
+    public void stop() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+            System.out.println(">>> ReminderScheduler stopped");
+        }
     }
 }
