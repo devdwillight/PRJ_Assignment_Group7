@@ -29,7 +29,7 @@ import okhttp3.Response;
 public class EmbeddingService {
 
 
-    private static final String API_TOKEN = "";//ConfigLoader.get("API_TOKEN");
+    private static final String API_TOKEN = ConfigLoader.get("API_TOKEN");
     private static final String API_URL = "https://router.huggingface.co/nebius/v1/embeddings";
     private static final String MODEL_ID = "Qwen/Qwen3-Embedding-8B";
     private static final ObjectMapper mapper = new ObjectMapper();
