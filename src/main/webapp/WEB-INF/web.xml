@@ -3,29 +3,18 @@
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
-<<<<<<< HEAD
-    <welcome-file-list>
-        <welcome-file>
-            jikan
-        </welcome-file>
-    </welcome-file-list>
-=======
-    
+
     <!-- Error handling -->
     <error-page>
         <error-code>500</error-code>
         <location>/views/error/error.jsp</location>
     </error-page>
-    
     <error-page>
         <error-code>404</error-code>
         <location>/views/error/error.jsp</location>
     </error-page>
-    
-    <!-- Welcome file -->
+
     <welcome-file-list>
-        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>jikan</welcome-file>
     </welcome-file-list>
-    
->>>>>>> fba18bb (update admin)
 </web-app>

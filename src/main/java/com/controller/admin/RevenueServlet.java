@@ -90,9 +90,7 @@ public class RevenueServlet extends HttpServlet {
                         case "Completed":
                             completedOrders++;
                             // Chỉ tính doanh thu từ đơn hàng đã hoàn thành
-                            if (order.getTotalAmount() != null) {
-                                totalRevenue = totalRevenue.add(order.getTotalAmount());
-                            }
+                            totalRevenue = totalRevenue.add(BigDecimal.valueOf(order.getTotalAmount()));
                             completedOrdersList.add(order);
                             break;
                         case "Processing":
@@ -245,7 +243,7 @@ public class RevenueServlet extends HttpServlet {
         
         // Tính doanh thu theo thời gian với format tương ứng
         for (Orders order : orders) {
-            if (order.getPaymentTime() != null && order.getTotalAmount() != null) {
+            if (order.getPaymentTime() != null) {
                 Calendar orderCal = Calendar.getInstance();
                 orderCal.setTime(order.getPaymentTime());
                 String timeKey;
@@ -274,7 +272,7 @@ public class RevenueServlet extends HttpServlet {
                 }
                 
                 if (revenueByTime.containsKey(timeKey)) {
-                    revenueByTime.merge(timeKey, order.getTotalAmount(), BigDecimal::add);
+                    revenueByTime.merge(timeKey, BigDecimal.valueOf(order.getTotalAmount()), BigDecimal::add);
                 }
             }
         }
@@ -286,9 +284,9 @@ public class RevenueServlet extends HttpServlet {
         Map<String, BigDecimal> revenueByPaymentMethod = new LinkedHashMap<>();
         
         for (Orders order : orders) {
-            if (order.getPaymentMethod() != null && order.getTotalAmount() != null) {
+            if (order.getPaymentMethod() != null) {
                 String paymentMethod = order.getPaymentMethod();
-                revenueByPaymentMethod.merge(paymentMethod, order.getTotalAmount(), BigDecimal::add);
+                revenueByPaymentMethod.merge(paymentMethod, BigDecimal.valueOf(order.getTotalAmount()), BigDecimal::add);
             }
         }
         
@@ -306,11 +304,9 @@ public class RevenueServlet extends HttpServlet {
         
         // Tính doanh thu theo khóa học (giả sử mỗi order là 1 khóa học)
         for (Orders order : orders) {
-            if (order.getTotalAmount() != null) {
-                // Lấy tên khóa học từ user ID (giả sử)
-                String courseName = "Khóa học #" + order.getIdOrder();
-                revenueByCourse.merge(courseName, order.getTotalAmount(), BigDecimal::add);
-            }
+            // Lấy tên khóa học từ user ID (giả sử)
+            String courseName = "Khóa học #" + order.getIdOrder();
+            revenueByCourse.merge(courseName, BigDecimal.valueOf(order.getTotalAmount()), BigDecimal::add);
         }
         
         // Sắp xếp theo doanh thu giảm dần và lấy top 10

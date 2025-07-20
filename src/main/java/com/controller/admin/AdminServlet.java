@@ -148,14 +148,13 @@ public class AdminServlet extends HttpServlet {
             }
             for (Orders order : allOrders) {
                 // Chỉ tính doanh thu từ đơn hàng đã hoàn thành
-                if (order.getPaymentTime() != null && order.getTotalAmount() != null && 
-                    "Completed".equals(order.getStatus())) {
+                if (order.getPaymentTime() != null && "Completed".equals(order.getStatus())) {
                     calRevenue.setTime(order.getPaymentTime());
                     int year = calRevenue.get(java.util.Calendar.YEAR);
                     int month = calRevenue.get(java.util.Calendar.MONTH) + 1;
                     if (year == currentYear) {
                         String label = String.format("%02d/%d", month, year);
-                        revenueByMonth.put(label, revenueByMonth.get(label) + order.getTotalAmount().doubleValue());
+                        revenueByMonth.put(label, revenueByMonth.get(label) + order.getTotalAmount());
                     }
                 }
             }
@@ -236,8 +235,8 @@ public class AdminServlet extends HttpServlet {
             // Tính tổng doanh thu từ đơn hàng đã hoàn thành
             double totalRevenue = 0.0;
             for (Orders order : allOrders) {
-                if (order.getTotalAmount() != null && "Completed".equals(order.getStatus())) {
-                    totalRevenue += order.getTotalAmount().doubleValue();
+                if ("Completed".equals(order.getStatus())) {
+                    totalRevenue += order.getTotalAmount();
                 }
             }
             request.setAttribute("totalRevenue", String.format("%,.0f VND", totalRevenue));
@@ -254,13 +253,12 @@ public class AdminServlet extends HttpServlet {
             double revenueThisMonth = 0.0;
             double revenueLastMonth = 0.0;
             for (Orders order : allOrders) {
-                if (order.getPaymentTime() != null && order.getTotalAmount() != null && 
-                    "Completed".equals(order.getStatus())) {
+                if (order.getPaymentTime() != null && "Completed".equals(order.getStatus())) {
                     calNow.setTime(order.getPaymentTime());
                     int y = calNow.get(java.util.Calendar.YEAR);
                     int m = calNow.get(java.util.Calendar.MONTH) + 1;
-                    if (y == currentYear && m == currentMonth) revenueThisMonth += order.getTotalAmount().doubleValue();
-                    if (y == lastYear && m == lastMonth) revenueLastMonth += order.getTotalAmount().doubleValue();
+                    if (y == currentYear && m == currentMonth) revenueThisMonth += order.getTotalAmount();
+                    if (y == lastYear && m == lastMonth) revenueLastMonth += order.getTotalAmount();
                 }
             }
             double revenuePercentChange = 0.0;

@@ -166,10 +166,10 @@ public class CourseManageServlet extends HttpServlet {
                 return;
             }
             
-            BigDecimal price = null;
+            double price = 0.0;
             if (priceStr != null && !priceStr.trim().isEmpty()) {
                 try {
-                    price = new BigDecimal(priceStr);
+                    price = Double.parseDouble(priceStr);
                 } catch (NumberFormatException e) {
                     response.sendRedirect(request.getContextPath() + "/admin/courses?error=" + java.net.URLEncoder.encode("Giá không hợp lệ!", "UTF-8"));
                     return;
@@ -221,9 +221,9 @@ public class CourseManageServlet extends HttpServlet {
                 return;
             }
             
-            BigDecimal price = null;
+            double price = 0.0;
             try {
-                price = new BigDecimal(priceStr);
+                price = Double.parseDouble(priceStr);
             } catch (Exception e) {
                 response.sendRedirect(request.getContextPath() + "/admin/courses?error=" + java.net.URLEncoder.encode("Giá khóa học không hợp lệ!", "UTF-8"));
                 return;
@@ -271,7 +271,7 @@ public class CourseManageServlet extends HttpServlet {
                     course.getIdCourse(),
                     course.getName() != null ? course.getName().replace("\"", "\\\"") : "",
                     course.getCategory() != null ? course.getCategory().replace("\"", "\\\"") : "",
-                    course.getPrice() != null ? course.getPrice().toString() : "",
+                    String.valueOf(course.getPrice()),
                     course.getDuration() != null ? course.getDuration().replace("\"", "\\\"") : "",
                     course.getDescription() != null ? course.getDescription().replace("\"", "\\\"").replace("\n", "\\n") : "",
                     course.getFrequency() != null ? course.getFrequency().replace("\"", "\\\"") : "",

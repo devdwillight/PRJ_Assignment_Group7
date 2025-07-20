@@ -234,7 +234,7 @@ public class OrderManageServlet extends HttpServlet {
                     order.getStatus() != null ? order.getStatus().replace("\"", "\\\"") : "",
                     order.getPaymentMethod() != null ? order.getPaymentMethod().replace("\"", "\\\"") : "",
                     order.getPaymentTime() != null ? sdf.format(order.getPaymentTime()) : "",
-                    order.getTotalAmount() != null ? order.getTotalAmount().toString() : "",
+                    String.valueOf(order.getTotalAmount()),
                     order.getIdUser() != null ? order.getIdUser().getIdUser() : 0,
                     order.getIdUser() != null ? (order.getIdUser().getFirstName() + " " + order.getIdUser().getLastName()).replace("\"", "\\\"") : ""
                 );

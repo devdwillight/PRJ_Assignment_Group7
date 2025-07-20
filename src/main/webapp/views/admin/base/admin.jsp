@@ -7,19 +7,22 @@
         <meta charset="UTF-8">
         <title>Admin Dashboard - Quản lý Lịch</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+        <!-- Tailwind CSS -->
+        <script src="https://cdn.tailwindcss.com"></script>
         <style>
             * {
                 margin: 0;
                 padding: 0;
                 box-sizing: border-box;
             }
-            
+
             body {
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                 background: #f5f5f5;
                 color: #333;
             }
-            
+
             .sidebar {
                 width: 250px;
                 height: 100vh;
@@ -31,13 +34,13 @@
                 color: white;
                 transition: all 0.3s ease;
             }
-            
+
             .sidebar h2 {
                 margin-bottom: 30px;
                 text-align: center;
                 font-size: 24px;
             }
-            
+
             .avatar {
                 width: 60px;
                 height: 60px;
@@ -46,20 +49,20 @@
                 display: block;
                 border: 3px solid rgba(255,255,255,0.3);
             }
-            
+
             .admin-name {
                 text-align: center;
                 margin-bottom: 30px;
                 font-size: 14px;
                 opacity: 0.9;
             }
-            
+
             .nav {
                 display: flex;
                 flex-direction: column;
                 gap: 10px;
             }
-            
+
             .nav a {
                 color: white;
                 text-decoration: none;
@@ -70,16 +73,16 @@
                 align-items: center;
                 gap: 10px;
             }
-            
+
             .nav a:hover, .nav a.active {
                 background: rgba(255,255,255,0.2);
                 transform: translateX(5px);
             }
-            
+
             .nav a i {
                 width: 20px;
             }
-            
+
             .main {
                 margin-left: 250px;
                 padding: 20px;
@@ -99,7 +102,7 @@
                 top: 0;
                 z-index: 100;
             }
-            
+
             .toggle-sidebar-btn {
                 background: none;
                 border: none;
@@ -110,27 +113,27 @@
                 border-radius: 6px;
                 transition: all 0.3s ease;
             }
-            
+
             .toggle-sidebar-btn:hover {
                 background: #f0f0f0;
             }
-            
+
             .user-info {
                 display: flex;
                 align-items: center;
                 gap: 10px;
             }
-            
+
             .user-info img {
                 width: 40px;
                 height: 40px;
                 border-radius: 50%;
             }
-            
+
             body.sidebar-collapsed .sidebar {
                 transform: translateX(-100%);
             }
-            
+
             body.sidebar-collapsed .main {
                 margin-left: 0;
             }
@@ -349,8 +352,21 @@
                     <a href="${pageContext.request.contextPath}/admin/revenue"><i class="fa fa-chart-line"></i> Doanh thu</a>
                 </div>
                 <div class="user-info">
-                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="avatar"/>
-                    <span>Admin</span>
+                    <div class="relative">
+                        <button id="userDropdownBtn" class="flex items-center gap-2 text-gray-700 hover:text-blue-500 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-user-circle text-xl"></i>
+                            <span>Admin</span>
+                            <i class="fas fa-chevron-down text-sm"></i>
+                        </button>
+                        <!-- Dropdown menu -->
+                        <div id="userDropdownMenu" class="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50 hidden">
+                            <a href="editProfile.jsp" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">Edit Profile</a>
+                            <form action="logout" method="POST">
+                                <input type="hidden" name="action" value="logout" />
+                                <button  class="w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">  <input type="submit" value="Logout" /> </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="dashboard-content">
@@ -512,6 +528,19 @@
             <!-- Chart.js scripts giữ nguyên như cũ -->
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script>
+                // Dropdown User
+                const userDropdownBtn = document.getElementById('userDropdownBtn');
+                const userDropdownMenu = document.getElementById('userDropdownMenu');
+                userDropdownBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    userDropdownMenu.classList.toggle('hidden');
+                });
+                document.addEventListener('click', function (e) {
+                    if (!userDropdownBtn.contains(e.target) && !userDropdownMenu.contains(e.target)) {
+                        userDropdownMenu.classList.add('hidden');
+                    }
+                });
+
                 // Grouped Bar Chart - Thống kê theo tháng
                 new Chart(document.getElementById('groupedBarChart'), {
                     type: 'bar',
@@ -589,27 +618,37 @@
                 const toggleBtn = document.getElementById('toggleSidebarBtn');
                 const mainContent = document.getElementById('mainContent');
                 let menuVisible = false;
-                toggleBtn.onclick = function() {
+                toggleBtn.onclick = function () {
                     menuVisible = !menuVisible;
-                    if(menuVisible) {
-                        if(sidebar) sidebar.style.display = 'none';
-                        if(headerNav) headerNav.style.display = 'flex';
-                        if(mainContent) mainContent.style.marginLeft = '0';
+                    if (menuVisible) {
+                        if (sidebar)
+                            sidebar.style.display = 'none';
+                        if (headerNav)
+                            headerNav.style.display = 'flex';
+                        if (mainContent)
+                            mainContent.style.marginLeft = '0';
                     } else {
-                        if(sidebar) sidebar.style.display = '';
-                        if(headerNav) headerNav.style.display = 'none';
-                        if(window.innerWidth > 900 && mainContent) mainContent.style.marginLeft = '250px';
+                        if (sidebar)
+                            sidebar.style.display = '';
+                        if (headerNav)
+                            headerNav.style.display = 'none';
+                        if (window.innerWidth > 900 && mainContent)
+                            mainContent.style.marginLeft = '250px';
                     }
                 };
                 // Đảm bảo khi resize về desktop thì sidebar hiện lại
-                window.addEventListener('resize', function() {
-                    if(window.innerWidth > 900) {
-                        if(sidebar) sidebar.style.display = '';
-                        if(headerNav) headerNav.style.display = 'none';
-                        if(mainContent) mainContent.style.marginLeft = '250px';
+                window.addEventListener('resize', function () {
+                    if (window.innerWidth > 900) {
+                        if (sidebar)
+                            sidebar.style.display = '';
+                        if (headerNav)
+                            headerNav.style.display = 'none';
+                        if (mainContent)
+                            mainContent.style.marginLeft = '250px';
                         menuVisible = false;
                     } else {
-                        if(!menuVisible && mainContent) mainContent.style.marginLeft = '0';
+                        if (!menuVisible && mainContent)
+                            mainContent.style.marginLeft = '0';
                     }
                 });
             </script>

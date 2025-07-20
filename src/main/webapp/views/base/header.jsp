@@ -49,10 +49,10 @@
                             </div>
                             <ul class="py-1" aria-labelledby="dropdown">
                                 <li>
-                                    <a href="/profile" class="block py-2 px-4 text-md hover:bg-gray-100">Profile</a>
+                                    <a href="profile" class="block py-2 px-4 text-md hover:bg-gray-100">Profile</a>
                                 </li>
                                 <li>
-                                    <a href="/logout" class="block py-2 px-4 text-md hover:bg-gray-100">Sign out</a>
+                                    <a href="<%=request.getContextPath()%>/logout" class="block py-2 px-4 text-md hover:bg-gray-100">Sign out</a>
                                 </li>
                             </ul>
                         </div>

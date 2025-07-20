@@ -147,6 +147,7 @@ public class LoginServlet extends HttpServlet {
         if (user == null) {
             request.setAttribute("mess", "Email or Password is not correct");
             request.getRequestDispatcher("views/login/login.jsp").forward(request, response);
+            return;
         }
 
         if (user.getEmail().equals(username) && user.getPassword().equals(password)) {
@@ -159,7 +160,7 @@ public class LoginServlet extends HttpServlet {
             int maxAge = 7 * 24 * 60 * 60; // 7 ngày
 
             // Kiểm tra nhiều trường hợp có thể của checkbox
-            if ("true".equals(remember) || "true".equals(remember) || remember != null) {
+            if ("true".equals(remember) || remember != null) {
                 System.out.println("SAVING COOKIES - Remember me is checked");
                 Cookie userCookie = new Cookie("user_email", username);
                 Cookie passCookie = new Cookie("user_password", password);
@@ -178,8 +179,13 @@ public class LoginServlet extends HttpServlet {
                 response.addCookie(passCookie);
             }
 
-            // Chuyển hướng về trang calendar sau khi đăng nhập thành công
-            response.sendRedirect(request.getContextPath() + "/calendar");
+            // Điều kiện chuyển hướng theo quyền admin
+            if (user.getIsAdmin() != null && user.getIsAdmin()) {
+                response.sendRedirect(request.getContextPath() + "/admin");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/calendar");
+            }
+            return;
         } else {
             // Nếu đăng nhập không hợp lệ, hiển thị lỗi
             request.setAttribute("error", "1");

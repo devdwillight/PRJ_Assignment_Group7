@@ -6,9 +6,7 @@ package com.controller.event;
 
 import com.model.UserEvents;
 import com.model.Calendar;
-import com.model.Calendar;
 import com.service.Event.EventService;
-import com.service.Calendar.CalendarService;
 import com.service.Calendar.CalendarService;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -32,7 +30,6 @@ import java.time.format.DateTimeParseException;
 public class EventServlet extends HttpServlet {
 
     private EventService eventService;
-    private CalendarService calendarService;
     private CalendarService calendarService;
 
     @Override
@@ -157,10 +154,10 @@ public class EventServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json;charset=UTF-8");
-        
+
         try {
             String action = request.getParameter("action");
-            
+
             // Debug logging
             System.out.println("[EventServlet] Received POST request");
             System.out.println("[EventServlet] Action parameter: " + action);
@@ -171,7 +168,7 @@ public class EventServlet extends HttpServlet {
                 String paramValue = request.getParameter(paramName);
                 System.out.println("  " + paramName + " = " + paramValue);
             }
-            
+
             if ("create".equals(action)) {
                 System.out.println("[EventServlet] Handling create action");
                 handleCreateEvent(request, response);
@@ -189,7 +186,7 @@ public class EventServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\":\"Invalid action\"}");
             }
-            
+
         } catch (Exception e) {
             System.err.println("Error in EventServlet: " + e.getMessage());
             e.printStackTrace();
@@ -198,9 +195,9 @@ public class EventServlet extends HttpServlet {
         }
     }
 
-    private void handleCreateEvent(HttpServletRequest request, HttpServletResponse response) 
+    private void handleCreateEvent(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         try {
             // Get user session
             HttpSession session = request.getSession();
@@ -233,7 +230,7 @@ public class EventServlet extends HttpServlet {
             String remindMethod = request.getParameter("remindMethod");
             String remindBefore = request.getParameter("remindBefore");
             String remindUnit = request.getParameter("remindUnit");
-            
+
             // Debug logging
             System.out.println("[EventServlet] Creating event with data:");
             System.out.println("  Title: " + title);
@@ -249,16 +246,16 @@ public class EventServlet extends HttpServlet {
             System.out.println("  RemindMethod: " + remindMethod);
             System.out.println("  RemindBefore: " + remindBefore);
             System.out.println("  RemindUnit: " + remindUnit);
-            
+
             // Validate required fields
-            if (title == null || title.trim().isEmpty() || 
-                startDate == null || startDate.trim().isEmpty() ||
-                calendarId == null || calendarId.trim().isEmpty()) {
+            if (title == null || title.trim().isEmpty()
+                    || startDate == null || startDate.trim().isEmpty()
+                    || calendarId == null || calendarId.trim().isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\":\"Missing required fields\"}");
                 return;
             }
-            
+
             // Create UserEvents object
             UserEvents event = new UserEvents();
             event.setName(title);
@@ -267,14 +264,14 @@ public class EventServlet extends HttpServlet {
             event.setColor(color != null ? color : "#3b82f6");
             event.setIsAllDay("on".equals(allDay));
             event.setIsRecurring(false);
-            
+
             // Xử lý remindMethod từ form
             if (remindMethod != null && !remindMethod.trim().isEmpty()) {
                 event.setRemindMethod("1".equals(remindMethod) || "true".equals(remindMethod));
             } else {
                 event.setRemindMethod(false);
             }
-            
+
             // Xử lý remindBefore từ form
             if (remindBefore != null && !remindBefore.trim().isEmpty()) {
                 try {
@@ -290,7 +287,7 @@ public class EventServlet extends HttpServlet {
             } else {
                 event.setRemindBefore(30); // Giá trị mặc định
             }
-            
+
             // Xử lý remindUnit từ form
             if (remindUnit != null && !remindUnit.trim().isEmpty()) {
                 // Validate remindUnit chỉ nhận các giá trị hợp lệ
@@ -310,10 +307,10 @@ public class EventServlet extends HttpServlet {
             } else {
                 event.setRemindUnit("minutes"); // Giá trị mặc định
             }
-            
+
             event.setCreatedAt(new Date());
             event.setUpdatedAt(new Date());
-            
+
             // Nhận recurrenceRule từ request và lưu vào event
             String recurrenceRule = request.getParameter("recurrenceRule");
             System.out.println("[EventServlet] recurrenceRule from request: '" + recurrenceRule + "'");
@@ -325,16 +322,16 @@ public class EventServlet extends HttpServlet {
                 event.setRecurrenceRule(recurrenceRule);
                 event.setIsRecurring(true);
             }
-            
+
             // Parse dates
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
             SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            
+
             try {
                 Date startDateTime = null;
                 Date endDateTime = null;
-                
+
                 if ("on".equals(allDay)) {
                     startDateTime = dateFormat.parse(startDate);
                     if (endDate != null && !endDate.trim().isEmpty()) {
@@ -345,7 +342,7 @@ public class EventServlet extends HttpServlet {
                 } else {
                     boolean hasStartTime = startTime != null && !startTime.trim().isEmpty();
                     boolean hasEndTime = endTime != null && !endTime.trim().isEmpty();
-                    
+
                     if (hasStartTime) {
                         String timeStr = startTime;
                         if (timeStr.length() == 5) {
@@ -355,7 +352,7 @@ public class EventServlet extends HttpServlet {
                     } else {
                         startDateTime = dateFormat.parse(startDate);
                     }
-                    
+
                     if (endDate != null && !endDate.trim().isEmpty()) {
                         if (hasEndTime) {
                             String timeStr = endTime;
@@ -378,10 +375,10 @@ public class EventServlet extends HttpServlet {
                         endDateTime = startDateTime;
                     }
                 }
-                
+
                 event.setStartDate(startDateTime);
                 event.setDueDate(endDateTime);
-                
+
             } catch (Exception e) {
                 System.err.println("[EventServlet] Date parsing error: " + e.getMessage());
                 e.printStackTrace();
@@ -389,12 +386,12 @@ public class EventServlet extends HttpServlet {
                 response.getWriter().write("{\"error\":\"Invalid date format: " + e.getMessage() + "\"}");
                 return;
             }
-            
+
             // Step 1: Get user's calendars
             System.out.println("[EventServlet] Step 1: Getting calendars for user ID: " + userId);
             List<Calendar> userCalendars = calendarService.getAllCalendarByUserId(userId);
             System.out.println("[EventServlet] Found " + userCalendars.size() + " calendars for user");
-            
+
             // Step 2: Validate calendar ID belongs to user
             System.out.println("[EventServlet] Step 2: Validating calendar ID: " + calendarId);
             Calendar selectedCalendar = null;
@@ -406,21 +403,21 @@ public class EventServlet extends HttpServlet {
                         break;
                     }
                 }
-                
+
                 if (selectedCalendar == null) {
                     System.out.println("[EventServlet] Calendar ID " + calendarId + " not found in user's calendars");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.getWriter().write("{\"error\":\"Calendar does not belong to current user\"}");
                     return;
                 }
-                
+
             } catch (NumberFormatException e) {
                 System.out.println("[EventServlet] Invalid calendar ID format: " + calendarId);
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\":\"Invalid calendar ID\"}");
                 return;
             }
-            
+
             // Step 3: Set calendar for event
             System.out.println("[EventServlet] Step 3: Setting calendar for event");
             System.out.println("[EventServlet] Selected calendar details:");
@@ -428,7 +425,7 @@ public class EventServlet extends HttpServlet {
             System.out.println("  - Name: " + selectedCalendar.getName());
             System.out.println("  - User ID: " + (selectedCalendar.getIdUser() != null ? selectedCalendar.getIdUser().getIdUser() : "null"));
             System.out.println("  - Is managed: " + (selectedCalendar.getIdCalendar() != null));
-            
+
             // Refresh calendar object to ensure it's properly loaded
             System.out.println("[EventServlet] Refreshing calendar object...");
             Calendar refreshedCalendar = calendarService.getCalendarById(selectedCalendar.getIdCalendar());
@@ -437,14 +434,14 @@ public class EventServlet extends HttpServlet {
             } else {
                 event.setIdCalendar(selectedCalendar);
             }
-            
+
             System.out.println("[EventServlet] Calendar set for event: " + selectedCalendar.getName() + " (ID: " + selectedCalendar.getIdCalendar() + ")");
             System.out.println("[EventServlet] Event calendar after set: " + (event.getIdCalendar() != null ? event.getIdCalendar().getName() : "NULL"));
-            
+
             // Save event
             System.out.println("[EventServlet] About to save event...");
             UserEvents savedEvent = eventService.createEvent(event);
-            
+
             if (savedEvent != null) {
                 // Kiểm tra nếu là request AJAX (application/json)
                 String accept = request.getHeader("Accept");
@@ -461,7 +458,7 @@ public class EventServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().write("{\"error\":\"Failed to create event\"}");
             }
-            
+
         } catch (Exception e) {
             System.err.println("Error creating event: " + e.getMessage());
             e.printStackTrace();
@@ -470,9 +467,9 @@ public class EventServlet extends HttpServlet {
         }
     }
 
-    private void handleDeleteEvent(HttpServletRequest request, HttpServletResponse response) 
+    private void handleDeleteEvent(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         try {
             // Get user session
             HttpSession session = request.getSession();
@@ -486,7 +483,7 @@ public class EventServlet extends HttpServlet {
             // Get event ID
             String eventIdStr = request.getParameter("eventId");
             System.out.println("[EventServlet] Delete request - eventIdStr: " + eventIdStr);
-            
+
             if (eventIdStr == null || eventIdStr.trim().isEmpty()) {
                 System.out.println("[EventServlet] Missing event ID");
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -496,7 +493,7 @@ public class EventServlet extends HttpServlet {
 
             try {
                 int eventId = Integer.parseInt(eventIdStr);
-                
+
                 // Get event to check ownership
                 UserEvents event = eventService.getEventById(eventId);
                 if (event == null) {
@@ -505,11 +502,11 @@ public class EventServlet extends HttpServlet {
                     response.getWriter().write("{\"error\":\"Event not found\"}");
                     return;
                 }
-                
+
                 System.out.println("[EventServlet] Found event: " + event.getName());
                 System.out.println("[EventServlet] Event calendar user ID: " + (event.getIdCalendar() != null ? event.getIdCalendar().getIdUser().getIdUser() : "null"));
                 System.out.println("[EventServlet] Current user ID: " + userId);
-                
+
                 // Check if user owns the event
                 if (!event.getIdCalendar().getIdUser().getIdUser().equals(userId)) {
                     System.out.println("[EventServlet] User not authorized to delete this event");
@@ -517,10 +514,10 @@ public class EventServlet extends HttpServlet {
                     response.getWriter().write("{\"error\":\"Not authorized to delete this event\"}");
                     return;
                 }
-                
+
                 // Delete event
                 boolean deleted = eventService.removeEvent(eventId);
-                
+
                 if (deleted) {
                     System.out.println("[EventServlet] Event deleted successfully");
                     response.getWriter().write("{\"success\": true, \"message\": \"Event deleted successfully\"}");
@@ -529,12 +526,12 @@ public class EventServlet extends HttpServlet {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     response.getWriter().write("{\"error\":\"Failed to delete event\"}");
                 }
-                
+
             } catch (NumberFormatException e) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\":\"Invalid event ID format\"}");
             }
-            
+
         } catch (Exception e) {
             System.err.println("Error deleting event: " + e.getMessage());
             e.printStackTrace();
@@ -543,9 +540,9 @@ public class EventServlet extends HttpServlet {
         }
     }
 
-    private void handleUpdateEvent(HttpServletRequest request, HttpServletResponse response) 
+    private void handleUpdateEvent(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         try {
             // Get user session
             HttpSession session = request.getSession();
@@ -565,7 +562,7 @@ public class EventServlet extends HttpServlet {
             }
 
             int eventId = Integer.parseInt(eventIdStr);
-            
+
             // Get form data (same as create event)
             String title = request.getParameter("title");
             String description = request.getParameter("description");
@@ -580,16 +577,16 @@ public class EventServlet extends HttpServlet {
             String remindMethod = request.getParameter("remindMethod");
             String remindBefore = request.getParameter("remindBefore");
             String remindUnit = request.getParameter("remindUnit");
-            
+
             // Validate required fields
-            if (title == null || title.trim().isEmpty() || 
-                startDate == null || startDate.trim().isEmpty() ||
-                calendarId == null || calendarId.trim().isEmpty()) {
+            if (title == null || title.trim().isEmpty()
+                    || startDate == null || startDate.trim().isEmpty()
+                    || calendarId == null || calendarId.trim().isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\":\"Missing required fields\"}");
                 return;
             }
-            
+
             // Get existing event
             UserEvents existingEvent = eventService.getEventById(eventId);
             if (existingEvent == null) {
@@ -597,26 +594,26 @@ public class EventServlet extends HttpServlet {
                 response.getWriter().write("{\"error\":\"Event not found\"}");
                 return;
             }
-            
+
             // Check if user owns the event
             if (!existingEvent.getIdCalendar().getIdUser().getIdUser().equals(userId)) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 response.getWriter().write("{\"error\":\"Not authorized to update this event\"}");
                 return;
             }
-            
+
             // Update event data
             existingEvent.setName(title);
             existingEvent.setDescription(description != null ? description : "");
             existingEvent.setLocation(location != null ? location : "");
             existingEvent.setColor(color != null ? color : "#3b82f6");
             existingEvent.setIsAllDay("on".equals(allDay));
-            
+
             // Cập nhật remindMethod từ form
             if (remindMethod != null && !remindMethod.trim().isEmpty()) {
                 existingEvent.setRemindMethod("1".equals(remindMethod) || "true".equals(remindMethod));
             }
-            
+
             // Cập nhật remindBefore từ form
             if (remindBefore != null && !remindBefore.trim().isEmpty()) {
                 try {
@@ -629,7 +626,7 @@ public class EventServlet extends HttpServlet {
                     // Giữ nguyên giá trị cũ nếu parse lỗi
                 }
             }
-            
+
             // Cập nhật remindUnit từ form
             if (remindUnit != null && !remindUnit.trim().isEmpty()) {
                 // Validate remindUnit chỉ nhận các giá trị hợp lệ
@@ -646,17 +643,17 @@ public class EventServlet extends HttpServlet {
                 }
                 // Giữ nguyên giá trị cũ nếu không hợp lệ
             }
-            
+
             existingEvent.setUpdatedAt(new Date());
-            
+
             // Parse and set dates (same logic as create)
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            
+
             try {
                 Date startDateTime = null;
                 Date endDateTime = null;
-                
+
                 if ("on".equals(allDay)) {
                     startDateTime = dateFormat.parse(startDate);
                     if (endDate != null && !endDate.trim().isEmpty()) {
@@ -667,7 +664,7 @@ public class EventServlet extends HttpServlet {
                 } else {
                     boolean hasStartTime = startTime != null && !startTime.trim().isEmpty();
                     boolean hasEndTime = endTime != null && !endTime.trim().isEmpty();
-                    
+
                     if (hasStartTime) {
                         String timeStr = startTime;
                         if (timeStr.length() == 5) {
@@ -677,7 +674,7 @@ public class EventServlet extends HttpServlet {
                     } else {
                         startDateTime = dateFormat.parse(startDate);
                     }
-                    
+
                     if (endDate != null && !endDate.trim().isEmpty()) {
                         if (hasEndTime) {
                             String timeStr = endTime;
@@ -700,16 +697,16 @@ public class EventServlet extends HttpServlet {
                         endDateTime = startDateTime;
                     }
                 }
-                
+
                 existingEvent.setStartDate(startDateTime);
                 existingEvent.setDueDate(endDateTime);
-                
+
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\":\"Invalid date format: " + e.getMessage() + "\"}");
                 return;
             }
-            
+
             // Cập nhật recurrenceRule khi update event
             String recurrenceRule = request.getParameter("recurrenceRule");
             if (recurrenceRule == null || recurrenceRule.trim().isEmpty()) {
@@ -720,7 +717,7 @@ public class EventServlet extends HttpServlet {
                 existingEvent.setRecurrenceRule(recurrenceRule);
                 existingEvent.setIsRecurring(true);
             }
-            
+
             // Update calendar if changed
             if (calendarId != null && !calendarId.trim().isEmpty()) {
                 try {
@@ -735,10 +732,10 @@ public class EventServlet extends HttpServlet {
                     return;
                 }
             }
-            
+
             // Save updated event
             boolean updated = eventService.updateEvent(existingEvent);
-            
+
             if (updated) {
                 // Kiểm tra nếu là request AJAX (application/json)
                 String accept = request.getHeader("Accept");
@@ -753,7 +750,7 @@ public class EventServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().write("{\"error\":\"Failed to update event\"}");
             }
-            
+
         } catch (Exception e) {
             System.err.println("Error updating event: " + e.getMessage());
             e.printStackTrace();
@@ -762,9 +759,9 @@ public class EventServlet extends HttpServlet {
         }
     }
 
-    private void handleUpdateEventTime(HttpServletRequest request, HttpServletResponse response) 
+    private void handleUpdateEventTime(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         try {
             // Get user session
             HttpSession session = request.getSession();
@@ -784,7 +781,7 @@ public class EventServlet extends HttpServlet {
             }
 
             int eventId = Integer.parseInt(eventIdStr);
-            
+
             // Get new start and end dates from request
             String start = request.getParameter("start"); // VD: "2025-07-18T08:00:00Z" hoặc "2025-07-18"
             String end = request.getParameter("end");
@@ -804,7 +801,7 @@ public class EventServlet extends HttpServlet {
                 response.getWriter().write("{\"error\":\"Event not found\"}");
                 return;
             }
-            
+
             // Check if user owns the event
             if (!existingEvent.getIdCalendar().getIdUser().getIdUser().equals(userId)) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -815,18 +812,22 @@ public class EventServlet extends HttpServlet {
             // Parse dates
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            
+
             Date startDateTime = null;
             Date endDateTime = null;
             try {
                 if (start != null && !start.trim().isEmpty()) {
                     String s = start;
-                    if (s.length() == 10) s += "T00:00:00Z"; // Nếu chỉ có ngày, thêm giờ mặc định
+                    if (s.length() == 10) {
+                        s += "T00:00:00Z"; // Nếu chỉ có ngày, thêm giờ mặc định
+                    }
                     startDateTime = Date.from(OffsetDateTime.parse(s).toInstant());
                 }
                 if (end != null && !end.trim().isEmpty()) {
                     String e = end;
-                    if (e.length() == 10) e += "T00:00:00Z";
+                    if (e.length() == 10) {
+                        e += "T00:00:00Z";
+                    }
                     endDateTime = Date.from(OffsetDateTime.parse(e).toInstant());
                 } else {
                     endDateTime = startDateTime;
@@ -836,7 +837,7 @@ public class EventServlet extends HttpServlet {
                 response.getWriter().write("{\"error\":\"Invalid date format: " + e.getMessage() + "\"}");
                 return;
             }
-            
+
             // Cập nhật recurrenceRule khi update event
             String recurrenceRule = request.getParameter("recurrenceRule");
             if (recurrenceRule == null || recurrenceRule.trim().isEmpty()) {
@@ -847,14 +848,14 @@ public class EventServlet extends HttpServlet {
                 existingEvent.setRecurrenceRule(recurrenceRule);
                 existingEvent.setIsRecurring(true);
             }
-            
+
             // Save updated event
             System.out.println("[DEBUG] eventId=" + eventId);
             System.out.println("[DEBUG] startDateTime=" + startDateTime);
             System.out.println("[DEBUG] endDateTime=" + endDateTime);
             System.out.println("[DEBUG] allDay=" + allDay);
             boolean updated = eventService.updateEventTime(eventId, startDateTime, endDateTime, allDay);
-            
+
             if (updated) {
                 // Kiểm tra nếu là request AJAX (application/json)
                 String accept = request.getHeader("Accept");
@@ -869,7 +870,7 @@ public class EventServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().write("{\"error\":\"Failed to update event\"}");
             }
-            
+
         } catch (Exception e) {
             System.err.println("Error updating event: " + e.getMessage());
             e.printStackTrace();

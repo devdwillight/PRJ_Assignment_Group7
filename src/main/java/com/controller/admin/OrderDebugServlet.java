@@ -61,7 +61,7 @@ public class OrderDebugServlet extends HttpServlet {
                     html.append("</td>");
                     html.append("<td>").append(order.getStatus() != null ? order.getStatus() : "N/A").append("</td>");
                     html.append("<td>").append(order.getPaymentMethod() != null ? order.getPaymentMethod() : "N/A").append("</td>");
-                    html.append("<td>").append(order.getTotalAmount() != null ? order.getTotalAmount() : "N/A").append("</td>");
+                    html.append("<td>").append(order.getTotalAmount()).append("</td>");
                     html.append("<td>").append(order.getPaymentTime() != null ? order.getPaymentTime() : "N/A").append("</td>");
                     html.append("</tr>");
                 }
