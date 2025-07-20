@@ -21,7 +21,7 @@ import org.json.JSONObject;
  * @author Admin
  */
 public class WheatherService {
-    private static final String API_KEY = "";//ConfigLoader.get("API_WEATHER");
+    private static final String API_KEY = ConfigLoader.get("API_WEATHER");
     private static final String BASE_URL = "http://api.weatherapi.com/v1/forecast.json";
 
     public String getForecastNote(LocalDateTime date, String location) {
