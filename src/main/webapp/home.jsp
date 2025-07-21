@@ -86,6 +86,10 @@
                 overflow-y: hidden !important;
             }
 
+            /* Thêm vào CSS cho chatbox */
+            #chatboxSidebar.open {
+                transform: translateX(0) !important;
+            }
         </style>
     </head>
     <body class="min-h-screen bg-gray-50 ">
@@ -125,11 +129,21 @@
             <!-- Right Menu -->
             <div class="ml-auto flex items-center gap-4">
 
+
+
+
                 <div class="relative mr-2">
                     <a href="Course" title="Khoá học" class="flex items-center gap-2 text-gray-700 hover:text-blue-500 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors">
                         <i class="fas fa-shopping-cart text-xl"></i>
                     </a>
                 </div>
+
+
+                <!-- Nút mở chatbox -->
+                <button id="chatboxToggleBtn" class="flex items-center gap-2 text-blue-500 hover:text-blue-700 px-3 py-2 rounded-md hover:bg-blue-100 transition-colors" title="Chat với Agent">
+                    <i class="fas fa-comments text-2xl"></i>
+                </button>
+
 
                 <!--nút dropdown content đổi Tháng Tuần Ngày Danh sách-->
                 <div class="relative">
@@ -185,6 +199,8 @@
                         </form>
                     </div>
                 </div>
+
+
             </div>
         </header>
 
@@ -229,11 +245,9 @@
                 }
             });
 
-            // Sidebar toggle functionality
+            // Sidebar trái
             const sidebarWrapper = document.getElementById('sidebarWrapper');
-            const toggleBtn = document.getElementById('headerSidebarToggle');
             let sidebarOpen = true;
-
             function setSidebar(open) {
                 sidebarOpen = open;
                 if (open) {
@@ -249,134 +263,69 @@
                     window.dispatchEvent(new Event('resize'));
                 }, 250);
             }
-
-            // Khởi tạo trạng thái mở
             setSidebar(true);
 
-            toggleBtn.onclick = function () {
-                setSidebar(!sidebarOpen);
-            };
-
-
-
-            // Calendar navigation functionality
-            const prevBtn = document.getElementById('prevBtn');
-            const todayBtn = document.getElementById('todayBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            const calendarTitle = document.getElementById('calendarTitle');
-
-            // Calendar view dropdown functionality
-            const viewDropdownBtn = document.getElementById('viewDropdownBtn');
-            const viewDropdownMenu = document.getElementById('viewDropdownMenu');
-            const currentViewText = document.getElementById('currentViewText');
-
-            // Toggle dropdown
-            viewDropdownBtn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                viewDropdownMenu.classList.toggle('hidden');
-            });
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function (e) {
-                if (!viewDropdownBtn.contains(e.target) && !viewDropdownMenu.contains(e.target)) {
-                    viewDropdownMenu.classList.add('hidden');
-                }
-            });
-
-            function updateViewButtons(activeView) {
-                // Update current view text
-                const viewTexts = {
-                    'month': 'Tháng',
-                    'week': 'Tuần',
-                    'day': 'Ngày',
-                    'list': 'Danh sách'
+            // Nút toggle sidebar trái
+            const toggleBtn = document.getElementById('headerSidebarToggle');
+            if (toggleBtn) {
+                toggleBtn.onclick = function () {
+                    setSidebar(!sidebarOpen);
                 };
-                currentViewText.textContent = viewTexts[activeView] || 'Tháng';
-
-                // Close dropdown
-                viewDropdownMenu.classList.add('hidden');
             }
 
-            function updateCalendarTitle() {
-                if (window.calendar) {
-                    const currentDate = window.calendar.getDate();
-                    const viewType = window.calendar.view.type;
+            document.addEventListener('DOMContentLoaded', function () {
+    // Sidebar chatbox phải
+    const chatboxSidebar = document.getElementById('chatboxSidebar');
+    const chatboxToggleBtn = document.getElementById('chatboxToggleBtn');
+    const closeBtn = document.getElementById('closeChatboxBtn');
 
-                    // Luôn hiển thị theo tháng và năm, bất kể view type
-                    let title = currentDate.toLocaleDateString('vi-VN', {month: 'long', year: 'numeric'});
+    // Hàm resize calendar
+    function resizeCalendar() {
+        if (window.calendar) {
+            window.calendar.updateSize();
+            window.calendar.render();
+        }
+        window.dispatchEvent(new Event('resize'));
+    }
 
-                    calendarTitle.textContent = title;
-                }
-            }
+    // Mở/đóng chatbox khi bấm nút ở header
+    if (chatboxToggleBtn && chatboxSidebar) {
+        chatboxToggleBtn.onclick = function (e) {
+            chatboxSidebar.classList.toggle('open');
+            resizeCalendar(); // Gọi resize khi mở/đóng
+            e.stopPropagation();
+        };
+    }
 
-            // Make functions globally accessible
-            window.updateViewButtons = updateViewButtons;
-            window.updateCalendarTitle = updateCalendarTitle;
+    // Đóng chatbox khi click ra ngoài
+    document.addEventListener('click', function (e) {
+        if (
+            chatboxSidebar &&
+            chatboxSidebar.classList.contains('open') &&
+            !chatboxSidebar.contains(e.target) &&
+            e.target !== chatboxToggleBtn
+        ) {
+            chatboxSidebar.classList.remove('open');
+            resizeCalendar(); // Gọi resize khi đóng
+        }
+    });
 
-            // View button event listeners
-            document.getElementById('viewMonth').addEventListener('click', function () {
-                if (window.calendar) {
-                    window.calendar.changeView('dayGridMonth');
-                    updateViewButtons('month');
-                    updateCalendarTitle();
-                }
-            });
+    // Ngăn sự kiện nổi bọt khi click vào chatbox
+    if (chatboxSidebar) {
+        chatboxSidebar.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+    }
 
-            document.getElementById('viewWeek').addEventListener('click', function () {
-                if (window.calendar) {
-                    window.calendar.changeView('timeGridWeek');
-                    updateViewButtons('week');
-                    updateCalendarTitle();
-                }
-            });
-
-            document.getElementById('viewDay').addEventListener('click', function () {
-                if (window.calendar) {
-                    window.calendar.changeView('timeGridDay');
-                    updateViewButtons('day');
-                    updateCalendarTitle();
-                }
-            });
-
-            document.getElementById('viewList').addEventListener('click', function () {
-                if (window.calendar) {
-                    window.calendar.changeView('listWeek');
-                    updateViewButtons('list');
-                    updateCalendarTitle();
-                }
-            });
-
-            // Navigation button event listeners
-            prevBtn.addEventListener('click', function () {
-                if (window.calendar) {
-                    window.calendar.prev();
-                    updateCalendarTitle();
-                }
-            });
-
-            todayBtn.addEventListener('click', function () {
-                if (window.calendar) {
-                    window.calendar.today();
-                    updateCalendarTitle();
-                }
-            });
-
-            nextBtn.addEventListener('click', function () {
-                if (window.calendar) {
-                    window.calendar.next();
-                    updateCalendarTitle();
-                }
-            });
-
-            // Nếu có lỗi từ server, hiển thị notification
-            var serverError = '<%= request.getAttribute("error") != null ? request.getAttribute("error") : ""%>';
-            if (serverError && serverError !== '') {
-                setTimeout(function () {
-                    if (typeof showNotification === 'function') {
-                        showNotification(serverError);
-                    }
-                }, 1000);
-            }
+    // Đóng chatbox bằng nút X
+    if (closeBtn && chatboxSidebar) {
+        closeBtn.onclick = function (e) {
+            chatboxSidebar.classList.remove('open');
+            resizeCalendar(); // Gọi resize khi đóng
+            e.stopPropagation();
+        };
+    }
+});
         </script>
 
         <!-- Logout Form -->
@@ -384,5 +333,12 @@
             <input type="hidden" name="action" value="logout" />
             <input type="submit" value="Logout" class="btn btn-danger" />
         </form>
+
+        <!-- Sidebar Chatbox Agent (ẩn/hiện bằng JS) -->
+        <div id="chatboxSidebar" class="fixed top-0 right-0 h-full w-80 bg-white border-l border-gray-200 shadow-lg z-50 transform translate-x-full transition-transform duration-200 ease-in-out">
+            <div class="h-full">
+                <jsp:include page="views/agent/siderAgent.jsp" />
+            </div>
+        </div>
     </body>
 </html>
