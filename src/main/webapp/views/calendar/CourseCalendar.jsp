@@ -50,6 +50,16 @@
             </div>
             <div>
                 <label class="block font-medium mb-1">Chọn các ngày trong tuần để lặp:</label>
+                <!-- Take note cho user -->
+                <div class="mb-2 text-yellow-700 bg-yellow-100 rounded px-3 py-2 text-sm">
+                    <b>Lưu ý:</b>
+                    - Nếu khóa học là <b>Weekly</b>, bạn chỉ được chọn <b>1 ngày</b> trong tuần.<br>
+                    - Nếu khóa học là <b>Bi-weekly</b>, bạn chỉ được chọn <b>2 ngày</b> trong tuần.<br>
+                    - Hệ thống sẽ tự động tạo đủ số buổi học theo thời lượng và tần suất của khóa học.<br>
+                    - Nếu chọn nhiều hơn số ngày cho phép, chỉ lấy đúng số ngày đầu tiên bạn chọn.
+                </div>
+                <!-- Hidden input để truyền frequency từ backend -->
+                <input type="hidden" id="frequency" name="frequency" value="<%= request.getAttribute("frequency") %>"/>
                 <div id="weekday-group" class="flex flex-wrap gap-3">
                     <label><input type="checkbox" name="weekdays" value="MO" class="mr-1">Thứ 2</label>
                     <label><input type="checkbox" name="weekdays" value="TU" class="mr-1">Thứ 3</label>
@@ -158,6 +168,7 @@
         });
     }
 
+    // Giới hạn số ngày được chọn theo frequency
     document.addEventListener('DOMContentLoaded', function () {
         var now = new Date();
         var yyyy = now.getFullYear();
@@ -170,6 +181,20 @@
         var min = String(now.getMinutes()).padStart(2, '0');
         var timeNow = hh + ':' + min;
         document.getElementById('startTime').value = timeNow;
+
+        // Giới hạn số ngày được chọn
+        let frequency = document.getElementById('frequency').value;
+        let max = 1;
+        if (frequency === 'Bi-weekly') max = 2;
+        document.querySelectorAll('input[name="weekdays"]').forEach(cb => {
+            cb.addEventListener('change', function() {
+                let checked = document.querySelectorAll('input[name="weekdays"]:checked');
+                if (checked.length > max) {
+                    this.checked = false;
+                    alert('Bạn chỉ được chọn tối đa ' + max + ' ngày trong tuần cho khóa học này!');
+                }
+            });
+        });
     });
     </script>
 </body>

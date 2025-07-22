@@ -3,6 +3,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ page import="com.model.Course" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Set" %>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -337,8 +339,9 @@
                     <a href="calendar" style="background: #ff4d4f; color: #fff; font-weight: 600; border: none; border-radius: 8px; padding: 10px 22px; font-size: 16px; text-decoration: none; transition: background 0.2s;" onmouseover="this.style.background = '#d9363e'" onmouseout="this.style.background = '#ff4d4f'">
                         Quay lại Home </a>
                 </div>
+                <%-- KHÔNG DÙNG SCRIPTLET TÁCH DANH SÁCH Ở ĐÂY --%>
                 <div class="product-list">
-                    <c:forEach var="course" items="${courses}">
+                    <c:forEach var="course" items="${notBought}">
                         <div class="product-item">
                             <div class="thumb">
                                 <img src="${empty course.imageUrl ? 'images/placeholder.png' : course.imageUrl}"
@@ -364,6 +367,36 @@
                                 <input type="hidden" name="coursePrice" value="${course.price}">
                                 <button type="submit" class="buy-button">Mua ngay</button>
                             </form>
+                            <div class="description">
+                                <h3 style="margin-top:0;font-size:20px;font-weight:700;">${course.name}</h3>
+                                <p style="font-size:14px;line-height:1.6;margin-bottom:12px;">${course.description}</p>
+                                <ul style="padding-left:16px;margin:0 0 8px;">
+                                    <li style="margin-bottom:6px;">Tần suất: ${course.frequency}</li>
+                                    <li>Thời lượng: ${course.duration}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </c:forEach>
+                    <c:forEach var="course" items="${bought}">
+                        <div class="product-item" style="opacity:0.7; position:relative;">
+                            <div class="thumb">
+                                <img src="${empty course.imageUrl ? 'images/placeholder.png' : course.imageUrl}"
+                                     alt="${course.name}">
+                            </div>
+                            <span class="course-tag">Khóa học</span>
+                            <div class="title">${course.name}</div>
+                            <div class="sub">Jikan/${course.category}</div>
+                            <div class="rating">
+                                <span class="star-container">
+                                    <svg viewBox="0 0 28 27"><path d="M13.09 1.05c.35-.79 1.47-.79 1.82 0l3.27 7.34c.15.33.46.56.82.6l7.99.84c.86.09 1.21 1.15.57 1.72l-6 5.38c-.27.24-.4.6-.32.96l1.63 7.86c.18.85-.71 1.5-1.44 1.06l-6.73-3.9a1 1 0 0 0-.99 0l-6.73 3.9c-.73.44-1.62-.21-1.44-1.06l1.63-7.86a1 1 0 0 0-.32-.96l-6-5.38c-.64-.57-.29-1.63.57-1.72l7.99-.84c.36-.04.67-.27.82-.6l3.27-7.34Z"/></svg>
+                                </span>
+                                5
+                            </div>
+                            <div class="price">
+                                <fmt:formatNumber value="${course.price}" type="currency"
+                                                  currencySymbol="₫" groupingUsed="true"/>
+                            </div>
+                            <div style="position:absolute;top:10px;right:10px;background:#facc15;color:#23262f;font-weight:700;padding:4px 10px;border-radius:6px;font-size:14px;z-index:2;">Đã mua</div>
                             <div class="description">
                                 <h3 style="margin-top:0;font-size:20px;font-weight:700;">${course.name}</h3>
                                 <p style="font-size:14px;line-height:1.6;margin-bottom:12px;">${course.description}</p>

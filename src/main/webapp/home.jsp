@@ -185,9 +185,15 @@
                 </div>
 
                 <div class="relative">
+                    <%
+                        com.model.User user = (com.model.User) session.getAttribute("user");
+                        String avatar = (user != null && user.getAvatar() != null && !user.getAvatar().isEmpty())
+                            ? user.getAvatar()
+                            : (request.getContextPath() + "/assets/User.svg");
+                    %>
                     <button id="userDropdownBtn" class="flex items-center gap-2 text-gray-700 hover:text-blue-500 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors">
-                        <i class="fas fa-user-circle text-xl"></i>
-                        <span>Người dùng</span>
+                        <img src="<%= avatar %>" alt="avatar" class="w-8 h-8 rounded-full object-cover border" />
+                        <span><%= user != null ? user.getUsername() : "Người dùng" %></span>
                         <i class="fas fa-chevron-down text-sm"></i>
                     </button>
                     <!-- Dropdown menu -->
@@ -273,59 +279,157 @@
                 };
             }
 
+            // Dropdown đổi Tháng/Tuần/Ngày/Danh sách
+            const viewDropdownBtn = document.getElementById('viewDropdownBtn');
+            const viewDropdownMenu = document.getElementById('viewDropdownMenu');
+            const currentViewText = document.getElementById('currentViewText');
+            if (viewDropdownBtn && viewDropdownMenu) {
+                viewDropdownBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    viewDropdownMenu.classList.toggle('hidden');
+                });
+                document.addEventListener('click', function(e) {
+                    if (!viewDropdownBtn.contains(e.target) && !viewDropdownMenu.contains(e.target)) {
+                        viewDropdownMenu.classList.add('hidden');
+                    }
+                });
+            }
+
+            function updateViewButtons(activeView) {
+                // Update current view text
+                const viewTexts = {
+                    'month': 'Tháng',
+                    'week': 'Tuần',
+                    'day': 'Ngày',
+                    'list': 'Danh sách'
+                };
+                currentViewText.textContent = viewTexts[activeView] || 'Tháng';
+                // Close dropdown
+                viewDropdownMenu.classList.add('hidden');
+            }
+
+            function updateCalendarTitle() {
+                if (window.calendar) {
+                    const currentDate = window.calendar.getDate();
+                    // Luôn hiển thị theo tháng và năm, bất kể view type
+                    let title = currentDate.toLocaleDateString('vi-VN', {month: 'long', year: 'numeric'});
+                    const calendarTitle = document.getElementById('calendarTitle');
+                    if (calendarTitle) calendarTitle.textContent = title;
+                }
+            }
+            window.updateViewButtons = updateViewButtons;
+            window.updateCalendarTitle = updateCalendarTitle;
+
+            // View button event listeners
+            const viewMonthBtn = document.getElementById('viewMonth');
+            const viewWeekBtn = document.getElementById('viewWeek');
+            const viewDayBtn = document.getElementById('viewDay');
+            const viewListBtn = document.getElementById('viewList');
+            if (viewMonthBtn) viewMonthBtn.addEventListener('click', function () {
+                if (window.calendar) {
+                    window.calendar.changeView('dayGridMonth');
+                    updateViewButtons('month');
+                    updateCalendarTitle();
+                }
+            });
+            if (viewWeekBtn) viewWeekBtn.addEventListener('click', function () {
+                if (window.calendar) {
+                    window.calendar.changeView('timeGridWeek');
+                    updateViewButtons('week');
+                    updateCalendarTitle();
+                }
+            });
+            if (viewDayBtn) viewDayBtn.addEventListener('click', function () {
+                if (window.calendar) {
+                    window.calendar.changeView('timeGridDay');
+                    updateViewButtons('day');
+                    updateCalendarTitle();
+                }
+            });
+            if (viewListBtn) viewListBtn.addEventListener('click', function () {
+                if (window.calendar) {
+                    window.calendar.changeView('listWeek');
+                    updateViewButtons('list');
+                    updateCalendarTitle();
+                }
+            });
+
+            // Navigation button event listeners
+            const prevBtn = document.getElementById('prevBtn');
+            const todayBtn = document.getElementById('todayBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            if (prevBtn) prevBtn.addEventListener('click', function () {
+                if (window.calendar) {
+                    window.calendar.prev();
+                    updateCalendarTitle();
+                }
+            });
+            if (todayBtn) todayBtn.addEventListener('click', function () {
+                if (window.calendar) {
+                    window.calendar.today();
+                    updateCalendarTitle();
+                }
+            });
+            if (nextBtn) nextBtn.addEventListener('click', function () {
+                if (window.calendar) {
+                    window.calendar.next();
+                    updateCalendarTitle();
+                }
+            });
+
+            // Chatbox sidebar logic giữ nguyên
             document.addEventListener('DOMContentLoaded', function () {
-    // Sidebar chatbox phải
-    const chatboxSidebar = document.getElementById('chatboxSidebar');
-    const chatboxToggleBtn = document.getElementById('chatboxToggleBtn');
-    const closeBtn = document.getElementById('closeChatboxBtn');
+                const chatboxSidebar = document.getElementById('chatboxSidebar');
+                const chatboxToggleBtn = document.getElementById('chatboxToggleBtn');
+                const closeBtn = document.getElementById('closeChatboxBtn');
+                function resizeCalendar() {
+                    if (window.calendar) {
+                        window.calendar.updateSize();
+                        window.calendar.render();
+                    }
+                    window.dispatchEvent(new Event('resize'));
+                }
+                if (chatboxToggleBtn && chatboxSidebar) {
+                    chatboxToggleBtn.onclick = function (e) {
+                        chatboxSidebar.classList.toggle('open');
+                        resizeCalendar();
+                        e.stopPropagation();
+                    };
+                }
+                document.addEventListener('click', function (e) {
+                    if (
+                        chatboxSidebar &&
+                        chatboxSidebar.classList.contains('open') &&
+                        !chatboxSidebar.contains(e.target) &&
+                        e.target !== chatboxToggleBtn
+                    ) {
+                        chatboxSidebar.classList.remove('open');
+                        resizeCalendar();
+                    }
+                });
+                if (chatboxSidebar) {
+                    chatboxSidebar.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                    });
+                }
+                if (closeBtn && chatboxSidebar) {
+                    closeBtn.onclick = function (e) {
+                        chatboxSidebar.classList.remove('open');
+                        resizeCalendar();
+                        e.stopPropagation();
+                    };
+                }
+            });
 
-    // Hàm resize calendar
-    function resizeCalendar() {
-        if (window.calendar) {
-            window.calendar.updateSize();
-            window.calendar.render();
-        }
-        window.dispatchEvent(new Event('resize'));
-    }
-
-    // Mở/đóng chatbox khi bấm nút ở header
-    if (chatboxToggleBtn && chatboxSidebar) {
-        chatboxToggleBtn.onclick = function (e) {
-            chatboxSidebar.classList.toggle('open');
-            resizeCalendar(); // Gọi resize khi mở/đóng
-            e.stopPropagation();
-        };
-    }
-
-    // Đóng chatbox khi click ra ngoài
-    document.addEventListener('click', function (e) {
-        if (
-            chatboxSidebar &&
-            chatboxSidebar.classList.contains('open') &&
-            !chatboxSidebar.contains(e.target) &&
-            e.target !== chatboxToggleBtn
-        ) {
-            chatboxSidebar.classList.remove('open');
-            resizeCalendar(); // Gọi resize khi đóng
-        }
-    });
-
-    // Ngăn sự kiện nổi bọt khi click vào chatbox
-    if (chatboxSidebar) {
-        chatboxSidebar.addEventListener('click', function (e) {
-            e.stopPropagation();
-        });
-    }
-
-    // Đóng chatbox bằng nút X
-    if (closeBtn && chatboxSidebar) {
-        closeBtn.onclick = function (e) {
-            chatboxSidebar.classList.remove('open');
-            resizeCalendar(); // Gọi resize khi đóng
-            e.stopPropagation();
-        };
-    }
-});
+            // Nếu có lỗi từ server, hiển thị notification
+            var serverError = '<%= request.getAttribute("error") != null ? request.getAttribute("error") : ""%>';
+            if (serverError && serverError !== '') {
+                setTimeout(function () {
+                    if (typeof showNotification === 'function') {
+                        showNotification(serverError);
+                    }
+                }, 1000);
+            }
         </script>
 
         <!-- Logout Form -->

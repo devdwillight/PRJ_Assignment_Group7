@@ -303,6 +303,54 @@ public class todoServlet extends HttpServlet {
             return;
         }
 
+        if ("updateTime".equals(action)) {
+            try {
+                int id = Integer.parseInt(request.getParameter("id"));
+                String start = request.getParameter("start");
+                String allDayStr = request.getParameter("allDay");
+
+                if (start == null || start.isEmpty()) {
+                    out.print("{\"success\":false, \"error\":\"Thiếu thông tin ngày giờ mới\"}");
+                    return;
+                }
+
+                // Parse start thành Timestamp theo chuẩn OffsetDateTime (UTC)
+                java.sql.Timestamp dueDateTime;
+                try {
+                    String s = start;
+                    if (s.length() == 10) {
+                        s += "T00:00:00Z"; // Nếu chỉ có ngày, thêm giờ mặc định
+                    }
+                    dueDateTime = java.sql.Timestamp.from(java.time.OffsetDateTime.parse(s).toInstant());
+                } catch (Exception e) {
+                    out.print("{\"success\":false, \"error\":\"Định dạng ngày/giờ không hợp lệ\"}");
+                    return;
+                }
+
+                // Lấy ToDo từ DB
+                ToDo todo = todoService.getToDoById(id);
+                if (todo == null) {
+                    out.print("{\"success\":false, \"error\":\"ToDo không tồn tại\"}");
+                    return;
+                }
+
+                // Cập nhật ngày giờ và allDay
+                todo.setDueDate(dueDateTime);
+                todo.setIsAllDay("true".equals(allDayStr) || "on".equals(allDayStr));
+                todo.setUpdatedAt(new java.util.Date());
+
+                boolean updated = todoService.updateTodo(todo);
+                if (updated) {
+                    out.print("{\"success\":true}");
+                } else {
+                    out.print("{\"success\":false, \"error\":\"Không thể cập nhật ToDo\"}");
+                }
+            } catch (Exception e) {
+                out.print("{\"success\":false, \"error\":\"Lỗi xử lý updateTime: " + e.getMessage() + "\"}");
+            }
+            return;
+        }
+
         if ("getTodoDetail".equals(action)) {
             int todoId = Integer.parseInt(request.getParameter("todoId"));
             com.service.Todo.TodoService service = new com.service.Todo.TodoService();

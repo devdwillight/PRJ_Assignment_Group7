@@ -48,6 +48,15 @@
                 height: 100%;
                 overflow: hidden;
             }
+
+            /* Hiệu ứng mở/đóng chatbox agent giống home.jsp */
+            #chatboxSidebar {
+                transform: translateX(100%);
+                transition: transform 0.2s;
+            }
+            #chatboxSidebar.open {
+                transform: translateX(0) !important;
+            }
         </style>
     </head>
     <body class="min-h-screen bg-gray-50">
@@ -73,6 +82,11 @@
                     </a>
                 </div>
 
+                <!-- Nút mở chatbox -->
+                <button id="chatboxToggleBtn" class="flex items-center gap-2 text-blue-500 hover:text-blue-700 px-3 py-2 rounded-md hover:bg-blue-100 transition-colors" title="Chat với Agent">
+                    <i class="fas fa-comments text-2xl"></i>
+                </button>
+
                 <!-- Segmented Control Calendar/Task -->
                 <div class="relative">
                     <div class="flex bg-gray-100 rounded-full p-1">
@@ -86,9 +100,15 @@
                 </div>
 
                 <div class="relative">
+                    <% 
+                        com.model.User user = (com.model.User) session.getAttribute("user");
+                        String avatar = (user != null && user.getAvatar() != null && !user.getAvatar().isEmpty())
+                            ? user.getAvatar()
+                            : (request.getContextPath() + "/assets/User.svg");
+                    %>
                     <button id="userDropdownBtn" class="flex items-center gap-2 text-gray-700 hover:text-blue-500 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors">
-                        <i class="fas fa-user-circle text-xl"></i>
-                        <span>Người dùng</span>
+                        <img src="<%= avatar %>" alt="avatar" class="w-8 h-8 rounded-full object-cover border" />
+                        <span><%= user != null ? user.getUsername() : "Người dùng" %></span>
                         <i class="fas fa-chevron-down text-sm"></i>
                     </button>
                     <!-- Dropdown menu -->
@@ -125,6 +145,13 @@
                 <div class="h-full min-h-0 task-content-wrapper">
                     <jsp:include page="views/task/task.jsp" />
                 </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Chatbox Agent (ẩn/hiện bằng JS) -->
+        <div id="chatboxSidebar" class="fixed top-0 right-0 h-full w-80 bg-white border-l border-gray-200 shadow-lg z-50 transform translate-x-full transition-transform duration-200 ease-in-out">
+            <div class="h-full">
+                <jsp:include page="views/agent/siderAgent.jsp" />
             </div>
         </div>
 
@@ -167,6 +194,46 @@
             toggleBtn.onclick = function () {
                 setSidebar(!sidebarOpen);
             };
+
+            // Chatbox sidebar logic (giống home.jsp)
+            document.addEventListener('DOMContentLoaded', function () {
+                const chatboxSidebar = document.getElementById('chatboxSidebar');
+                const chatboxToggleBtn = document.getElementById('chatboxToggleBtn');
+                const closeBtn = document.getElementById('closeChatboxBtn');
+                function resizeCalendar() {
+                    window.dispatchEvent(new Event('resize'));
+                }
+                if (chatboxToggleBtn && chatboxSidebar) {
+                    chatboxToggleBtn.onclick = function (e) {
+                        chatboxSidebar.classList.toggle('open');
+                        resizeCalendar();
+                        e.stopPropagation();
+                    };
+                }
+                document.addEventListener('click', function (e) {
+                    if (
+                        chatboxSidebar &&
+                        chatboxSidebar.classList.contains('open') &&
+                        !chatboxSidebar.contains(e.target) &&
+                        e.target !== chatboxToggleBtn
+                    ) {
+                        chatboxSidebar.classList.remove('open');
+                        resizeCalendar();
+                    }
+                });
+                if (chatboxSidebar) {
+                    chatboxSidebar.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                    });
+                }
+                if (closeBtn && chatboxSidebar) {
+                    closeBtn.onclick = function (e) {
+                        chatboxSidebar.classList.remove('open');
+                        resizeCalendar();
+                        e.stopPropagation();
+                    };
+                }
+            });
 
             // Nếu có lỗi từ server, hiển thị notification
             var serverError = '<%= request.getAttribute("error") != null ? request.getAttribute("error") : ""%>';

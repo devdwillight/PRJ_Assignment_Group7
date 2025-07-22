@@ -83,8 +83,10 @@ import jakarta.servlet.ServletException;
         CourseService courseService = new CourseService();
         Course course = courseService.getCourseById(courseId);
         String courseName = course.getName();
+        String frequency = course.getFrequency(); // Lấy frequency
          request.setAttribute("orderId", orderId);
          request.setAttribute("courseName", courseName);
+         request.setAttribute("frequency", frequency); // Truyền sang JSP
          request.getRequestDispatcher("/views/calendar/CourseCalendar.jsp").forward(request, response);
      }
  

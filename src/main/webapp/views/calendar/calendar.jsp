@@ -397,31 +397,63 @@
                     const newEnd = info.event.end ? info.event.end.toISOString() : null;
                     const allDay = info.event.allDay;
 
-                    // Gửi AJAX cập nhật lên server
-                    $.ajax({
-                        url: 'event', // Đúng servlet xử lý update event
-                        type: 'POST',
-                        dataType: 'json',
-                        data: {
-                            action: 'updateTime',
-                            eventId: eventId,
-                            start: newStart,
-                            end: newEnd,
-                            allDay: allDay
-                        },
-                        success: function (response) {
-                            if (response.success) {
-                                console.log('Cập nhật thời gian event thành công!');
-                            } else {
-                                alert('Lỗi: ' + (response.error || 'Không thể cập nhật event'));
+                    // Phân biệt Event và ToDo
+                    if (/^\d+$/.test(eventId)) {
+                        // Là Event, cho phép kéo thả
+                        $.ajax({
+                            url: 'event', // Đúng servlet xử lý update event
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {
+                                action: 'updateTime',
+                                eventId: eventId,
+                                start: newStart,
+                                end: newEnd,
+                                allDay: allDay
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    console.log('Cập nhật thời gian event thành công!');
+                                } else {
+                                    alert('Lỗi: ' + (response.error || 'Không thể cập nhật event'));
+                                    info.revert(); // Quay lại vị trí cũ nếu lỗi
+                                }
+                            },
+                            error: function () {
+                                alert('Lỗi khi gửi dữ liệu cập nhật event!');
                                 info.revert(); // Quay lại vị trí cũ nếu lỗi
                             }
-                        },
-                        error: function () {
-                            alert('Lỗi khi gửi dữ liệu cập nhật event!');
-                            info.revert(); // Quay lại vị trí cũ nếu lỗi
-                        }
-                    });
+                        });
+                    } else if (/^todo-\d+$/.test(eventId)) {
+                        // Là ToDo, cho phép kéo thả và cập nhật thời gian
+                        $.ajax({
+                            url: 'todo',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {
+                                action: 'updateTime',
+                                id: eventId.replace('todo-', ''),
+                                start: newStart,
+                                end: newEnd,
+                                allDay: allDay
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    console.log('Cập nhật thời gian ToDo thành công!');
+                                } else {
+                                    alert('Lỗi: ' + (response.error || 'Không thể cập nhật ToDo'));
+                                    info.revert();
+                                }
+                            },
+                            error: function () {
+                                alert('Lỗi khi gửi dữ liệu cập nhật ToDo!');
+                                info.revert();
+                            }
+                        });
+                    } else {
+                        info.revert();
+                        alert('ID không hợp lệ!');
+                    }
                 },
                 eventResize: function (info) {},
                 dateClick: function (info) {

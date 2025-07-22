@@ -5,7 +5,9 @@
 package com.controller.course;
 
 import com.model.Course;
+import com.model.User;
 import com.service.Course.CourseService;
+import com.service.UserCourse.UserCourseService;
 import jakarta.servlet.RequestDispatcher;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -15,6 +17,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -67,10 +73,26 @@ public class CourseServlet extends HttpServlet {
         String[] categories = request.getParameterValues("category");
 
         List<String> allCategories = courseService.getAllCategoryNames();
-        List<Course> courses = courseService.filterCourses(search, sort, categories);
+        List<Course> allCourses = courseService.filterCourses(search, sort, categories);
 
+        jakarta.servlet.http.HttpSession session = request.getSession(false);
+        User user = (session != null) ? (User) session.getAttribute("user") : null;
+        List<Course> boughtCourses = null;
+        List<Course> notBought = new ArrayList<>();
+        List<Course> bought = new ArrayList<>();
+        if (user != null) {
+            UserCourseService userCourseService = new UserCourseService();
+            boughtCourses = userCourseService.getCoursesByUserId(user.getIdUser());
+            Set<Integer> boughtIds = boughtCourses.stream().map(Course::getIdCourse).collect(Collectors.toSet());
+            for (Course c : allCourses) {
+                if (boughtIds.contains(c.getIdCourse())) bought.add(c); else notBought.add(c);
+            }
+        } else {
+            notBought.addAll(allCourses);
+        }
         request.setAttribute("allCategories", allCategories);
-        request.setAttribute("courses", courses);
+        request.setAttribute("notBought", notBought);
+        request.setAttribute("bought", bought);
         request.getRequestDispatcher("views/vnpay/course_list.jsp").forward(request, response);
     }
 

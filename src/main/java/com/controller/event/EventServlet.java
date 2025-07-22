@@ -44,7 +44,7 @@ public class EventServlet extends HttpServlet {
     public void init() throws ServletException {
         eventService = new EventService();
         calendarService = new CalendarService();
-        calendarService = new CalendarService();
+      
     }
 
     /**
