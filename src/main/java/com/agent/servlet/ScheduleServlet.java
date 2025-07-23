@@ -15,6 +15,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
@@ -50,6 +51,7 @@ public class ScheduleServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
+            HttpSession session = req.getSession(false);
             // Parse JSON request
             Map<String, String> request = mapper.readValue(req.getInputStream(), Map.class);
             String sessionId = request.get("sessionId");
@@ -58,7 +60,8 @@ public class ScheduleServlet extends HttpServlet {
             String scheduleInfo;
 
             if (agent != null) {
-                List<ScheduleItem> schedules = agent.getCurrentSchedule();
+                int user_id = (int) session.getAttribute("user_id");
+                List<ScheduleItem> schedules = agent.getCurrentSchedule(user_id);
                 if (schedules.isEmpty()) {
                     scheduleInfo = "📅 **Lịch trình hiện tại:**\n\nChưa có lịch trình nào được tạo. Hãy bắt đầu bằng cách cho tôi biết kế hoạch của bạn!";
                 } else {

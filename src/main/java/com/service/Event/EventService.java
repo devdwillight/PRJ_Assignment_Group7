@@ -6,6 +6,14 @@ package com.service.Event;
 
 import com.dao.Event.EventDAO;
 import com.model.UserEvents;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
+import jakarta.persistence.TypedQuery;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -107,15 +115,7 @@ public class EventService implements IEventService {
         return count;
     }
 
-    public static void main(String[] args) {
-        EventService service = new EventService();
-
-        int userIdToTest = 1; // thay bằng ID user bạn muốn test
-        List<UserEvents> events = service.getAllEventsByUserId(userIdToTest);
-
-        System.out.println("Danh sách sự kiện của người dùng có ID = " + userIdToTest + ":");
-        System.out.println(events);
-    }
+    
 
     @Override
     public boolean updateEventTime(int eventId, Date start, Date end, boolean allDay) {
@@ -124,4 +124,60 @@ public class EventService implements IEventService {
         System.out.println("[updateEventTime] " + (success ? "✔ Thành công" : "✖ Thất bại"));
         return success;
     }
+    public UserEvents getFirstEventByTitle(String title) {
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("CLDPU");
+        EntityManager em = emf.createEntityManager();
+        try {
+            TypedQuery<UserEvents> query = em.createQuery(
+                    "SELECT e FROM UserEvents e WHERE e.name = :title", UserEvents.class);
+            query.setParameter("title", title);
+            List<UserEvents> results = query.setMaxResults(1).getResultList();
+            return results.isEmpty() ? null : results.get(0);
+        } finally {
+            em.close();
+        }
+    }
+     public List<UserEvents> isTimeConflict(LocalDateTime start, LocalDateTime end,int userId) {
+        List<UserEvents> all = getAllEventsByUserId(userId); // hoặc query theo user/session
+        List<UserEvents> conflicted = new ArrayList<>();
+        for (UserEvents e : all) {
+            Date startDate = e.getStartDate();
+            Date dueDate = e.getDueDate();
+
+            LocalDateTime existingStart = startDate.toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime();
+
+            LocalDateTime existingEnd = dueDate.toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime();
+
+            if (start.isBefore(existingEnd) && end.isAfter(existingStart)) {
+                conflicted.add(e);
+            }
+        }
+        return conflicted;
+    }
+     public List<UserEvents> getEventsBetween(LocalDateTime start, LocalDateTime end, int userId) {
+        Timestamp startTs = Timestamp.valueOf(start);
+        Timestamp endTs = Timestamp.valueOf(end);
+        return eventDAO.findEventsBetweenUserID(startTs, endTs,userId);
+    }
+
+    @Override
+    public boolean deleteByTitle(String title) {
+         return eventDAO.deleteByTitle(title);
+    }
+    
+    
+         public static void main(String[] args) {
+        EventService service = new EventService();
+
+        int userIdToTest = 1; // thay bằng ID user bạn muốn test
+        List<UserEvents> events = service.getAllEventsByUserId(userIdToTest);
+
+        System.out.println("Danh sách sự kiện của người dùng có ID = " + userIdToTest + ":");
+        System.out.println(events);
+    }
+    
 }

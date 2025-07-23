@@ -33,5 +33,7 @@ public interface IEventService {
     boolean updateEventTime(int eventId, Date start, Date end, boolean allDay);
 
     int countEventsByMonth(int year, int month);
+    
+    public boolean deleteByTitle(String title);
 
 }

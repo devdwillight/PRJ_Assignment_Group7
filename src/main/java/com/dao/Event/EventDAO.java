@@ -14,6 +14,7 @@ import jakarta.persistence.TypedQuery;
 import java.util.Date;
 import java.util.List;
 import jakarta.persistence.EntityManager;
+import java.sql.Timestamp;
 
 /**
  *
@@ -180,5 +181,20 @@ public class EventDAO extends BaseDAO<UserEvents> implements IEventDAO {
             em.close();
         }
     }
+
+     @Override
+    public boolean deleteByTitle(String title) {
+        return deleteByTitles(title);
+    }
+@Override
+    public List<UserEvents> findEventsBetween(Timestamp start, Timestamp end) {
+        return findEventsBetweens(start, end);
+    }
+
+    @Override
+    public List<UserEvents> findEventsBetweenUserID(Timestamp start, Timestamp end, int userId) {
+        return findEventsBetweenUserId(start, end, userId);
+    }
+    
 
 }

@@ -45,7 +45,7 @@ public class SummaryServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        try {
+         try {
             // Đọc JSON từ request body
             Map<String, String> request = mapper.readValue(req.getInputStream(), Map.class);
             String sessionId = request.get("sessionId");
