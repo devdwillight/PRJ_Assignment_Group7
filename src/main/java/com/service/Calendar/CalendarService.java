@@ -96,9 +96,6 @@ public class CalendarService implements ICalendarService {
         return count;
     }
 
-    public static void main(String[] args) {
-        CalendarService service = new CalendarService();
-        service.removeCalendar(37);
-    }
+    
 
 }

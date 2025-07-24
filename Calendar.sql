@@ -28,6 +28,8 @@ CREATE TABLE tokenForgetPassword (
 	FOREIGN KEY (userId) REFERENCES [Users](id_user)
 );
 
+select * from User_Course
+
 CREATE TABLE Course (
     id_course INT IDENTITY(1,1) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -40,6 +42,7 @@ CREATE TABLE Course (
     updated_at DATETIME,
 	imageUrl VARCHAR (3000)
 );
+ALTER TABLE Course ALTER COLUMN price FLOAT NOT NULL;
 
 CREATE TABLE User_Course (
     id_enroll INT IDENTITY(1,1) PRIMARY KEY,
@@ -50,7 +53,8 @@ CREATE TABLE User_Course (
     FOREIGN KEY (id_course) REFERENCES Course(id_course),
     UNIQUE (id_user, id_course) -- đảm bảo 1 user chỉ học 1 course 1 lần
 );
-
+ALTER TABLE Course
+DROP COLUMN TotalAmount;
 CREATE TABLE Orders (
     id_order INT IDENTITY(1,1) PRIMARY KEY,
     id_user INT NOT NULL,
@@ -61,6 +65,9 @@ CREATE TABLE Orders (
     FOREIGN KEY (id_user) REFERENCES Users(id_user),
 );
 
+select * from Task
+ ALTER TABLE Task ADD  position INT; --mới thêm
+ select * from Orders
 CREATE TABLE Calendar (
     id_calendar INT IDENTITY(1,1) PRIMARY KEY,
     id_user INT NOT NULL,
@@ -70,6 +77,8 @@ CREATE TABLE Calendar (
     updated_at DATETIME,
     FOREIGN KEY (id_user) REFERENCES Users(id_user)
 );
+ALTER TABLE Course
+DROP CONSTRAINT DF__Course__TotalAmo__44CA3770; -- Thay thế bằng tên ràng buộc thực tế của bạn
 
 CREATE TABLE UserEvents (
     id_event INT IDENTITY(1,1) PRIMARY KEY,
@@ -101,9 +110,6 @@ CREATE TABLE Task (
     updated_at DATETIME,
     FOREIGN KEY (id_user) REFERENCES Users(id_user)
 );
-
-
-
 CREATE TABLE To_Do (
     id_todo INT IDENTITY(1,1) PRIMARY KEY,
     id_task INT NOT NULL,
@@ -118,6 +124,9 @@ CREATE TABLE To_Do (
     updated_at DATETIME,
     FOREIGN KEY (id_task) REFERENCES Task(id_task)
 );
+select * from Users
+select * from Users
+select * from UserEvents
 
 INSERT INTO Users (username, password, first_name, last_name, birthday, email, phone, gender, active, is_admin)
 VALUES
@@ -174,8 +183,7 @@ VALUES
 ('violet_edwards', 'hashed_pwd50', 'Violet', 'Edwards', '1994-01-11', 'violet.edwards@email.com', '5557163849', 'Female', 1, 0),
 ('wyatt_collins', 'hashed_pwd51', 'Wyatt', 'Collins', '1992-06-18', 'wyatt.collins@email.com', '5553841729', 'Male', 1, 0),
 ('yasmin_stewart', 'hashed_pwd52', 'Yasmin', 'Stewart', '1988-10-25', 'yasmin.stewart@email.com', '5559274183', 'Female', 1, 1);
-
-
+select * from Course
 INSERT INTO Course (name, price, duration, description, frequency, category,imageUrl)
 VALUES
 ('Mobile App Development', 249.99, '5 months', N'Create iOS and Android apps using React Native and Flutter.', 'Weekly', 'Technology', 'https://riseuplabs.com/wp-content/uploads/2021/07/mobile-application-development-guidelines-riseuplabs.jpg'),
@@ -495,6 +503,8 @@ VALUES
 (25, 'Set up development environment', 'Configure IDE and dependencies', '2025-07-04 13:00:00', 0, 0, NULL, 1),
 (25, 'Code authentication module', 'Implement user login system', '2025-07-18 16:30:00', 0, 0, NULL, 0);
 
+
+select * from User_Course
 INSERT INTO User_Course (id_user, id_course)
 VALUES
 (1, 1),

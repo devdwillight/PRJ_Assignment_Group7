@@ -50,7 +50,7 @@ public class GreetingServlet extends HttpServlet {
         try {
             Map<String, String> request = mapper.readValue(req.getInputStream(), Map.class);
             String sessionId = request.get("sessionId");
-
+            System.out.println("Da vao ham nay ");
             // Khởi tạo agent mới cho session
             ScheduleAIAgent agent = new ScheduleAIAgent();
             SessionManager.put(sessionId, agent);

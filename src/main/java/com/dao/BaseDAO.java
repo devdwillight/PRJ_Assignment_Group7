@@ -4,7 +4,10 @@
  */
 package com.dao;
 
+import com.model.UserEvents;
 import jakarta.persistence.*;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -142,4 +145,68 @@ public abstract class BaseDAO<T> {
             em.close();
         }
     }
+
+    protected boolean deleteByTitles(String title) {
+        EntityManager em = getEntityManager();
+        try {
+            TypedQuery<UserEvents> query = em.createQuery(
+                    "SELECT e FROM UserEvents e WHERE e.name = :title", UserEvents.class);
+            query.setParameter("title", title);
+            List<UserEvents> events = query.getResultList();
+
+            if (!events.isEmpty()) {
+                em.getTransaction().begin();
+                for (UserEvents event : events) {
+                    em.remove(event);
+                }
+                em.getTransaction().commit();
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            em.getTransaction().rollback();
+        }
+        return false;
+    }
+
+    protected List<UserEvents> findEventsBetweens(Timestamp start, Timestamp end) {
+        EntityManager em = getEntityManager(); // tự tạo class này hoặc inject nếu dùng Spring
+
+        try {
+            return em.createQuery(
+                    "SELECT e FROM UserEvents e WHERE e.startDate >= :start AND e.startDate < :end ORDER BY e.startDate",
+                    UserEvents.class)
+                    .setParameter("start", start)
+                    .setParameter("end", end)
+                    .getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        } finally {
+            em.close();
+        }
+    }
+
+    protected List<UserEvents> findEventsBetweenUserId(Timestamp start, Timestamp end, int userId) {
+        EntityManager em = getEntityManager(); // tự tạo class này hoặc inject nếu dùng Spring
+
+        try {
+            return em.createQuery(
+                    "SELECT e FROM UserEvents e "
+                    + "WHERE e.idCalendar.idUser.idUser = :userId "
+                    + "AND e.startDate >= :start AND e.dueDate <= :end",
+                    UserEvents.class)
+                    .setParameter("userId", userId)
+                    .setParameter("start", start)
+                    .setParameter("end", end)
+                    .getResultList();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        } finally {
+            em.close();
+        }
+    }
+
 }

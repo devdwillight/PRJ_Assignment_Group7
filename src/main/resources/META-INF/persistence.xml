@@ -16,12 +16,13 @@
     <class>com.model.Enrollment</class>
     <class>com.model.UserCourse</class>
     <class>com.model.TokenForgetPassword</class>
+    <class>com.model.ChatHistory</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <!-- Cấu hình kết nối -->
     <properties>
       <property name="jakarta.persistence.jdbc.url" value="jdbc:sqlserver://localhost:1433;databaseName=Calendar;encrypt=true;trustServerCertificate=true"/>
       <property name="jakarta.persistence.jdbc.user" value="sa"/>
-      <property name="jakarta.persistence.jdbc.password" value="123456"/>
+      <property name="jakarta.persistence.jdbc.password" value="sa123456"/>
       <property name="jakarta.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
       <!-- Hibernate -->
       <property name="hibernate.dialect" value="org.hibernate.dialect.SQLServer2016Dialect"/>

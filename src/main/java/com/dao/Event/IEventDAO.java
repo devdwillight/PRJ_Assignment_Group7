@@ -5,6 +5,7 @@
 package com.dao.Event;
 
 import com.model.UserEvents;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -33,5 +34,7 @@ public interface IEventDAO {
     public boolean updateEventTime(int eventId, Date start, Date end, boolean allDay);
     public List<UserEvents> getEventsToRemind();
     public int countEventsByMonth(int year, int month);
-
+    public boolean deleteByTitle(String title);
+    public List<UserEvents> findEventsBetween(Timestamp start, Timestamp end);
+public List<UserEvents> findEventsBetweenUserID(Timestamp start, Timestamp end,int userId); 
 }

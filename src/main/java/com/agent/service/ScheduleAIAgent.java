@@ -5,81 +5,164 @@
 package com.agent.service;
 
 import com.agent.model.Action;
+import com.agent.qdrant.model.ActionType;
 import com.agent.model.Message;
 import com.agent.model.ScheduleItem;
+import com.agent.model.TimeSlot;
+import com.agent.qdrant.model.PendingEvent;
+import com.agent.qdrant.model.TimeContext;
+import com.agent.qdrant.service.VectorIntentClassifier;
+import com.dao.Calendar.CalendarDAO;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.model.Calendar;
+import com.model.UserEvents;
+import com.service.Event.EventService;
+import com.service.Event.TimeSlotUnit;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
  * @author Admin
  */
-public class ScheduleAIAgent implements Serializable{
+public class ScheduleAIAgent implements Serializable {
+
     private final LLM llm;
-    private final ExcelDataManager dataManager;
     private final String sessionId;
     private final List<Message> conversationHistory;
-    private final List<ScheduleItem> currentSchedule;
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    private Map<String, PendingEvent> pendingEvents = new HashMap<>();
+    private EmbeddingService embeddingService = new EmbeddingService();
+    private CalendarDAO calendarDAO = new CalendarDAO();
+    private EventService eventService = new EventService();
+    private AgentEventService agentEventService = new AgentEventService();
+    private VectorIntentClassifier classifier = new VectorIntentClassifier();
+    private WheatherService wheatherService = new WheatherService();
+    private PendingEvent pendingEvent = new PendingEvent();
+
     public ScheduleAIAgent() {
         this.llm = new LLM();
-        this.dataManager = new ExcelDataManager();
         this.sessionId = generateSessionId();
         this.conversationHistory = new ArrayList<>();
-        this.currentSchedule = dataManager.loadSchedules();
 
         initializeSystemMessage();
     }
 
     private void initializeSystemMessage() {
         StringBuilder systemPrompt = new StringBuilder();
-        systemPrompt.append("Bạn là một Trợ lý AI thông minh chuyên hỗ trợ người dùng quản lý lịch cá nhân và sự kiện.\n");
-        systemPrompt.append("Bạn cần hiểu được các yêu cầu phức tạp của người dùng về thời gian, ngày tháng và lịch học/làm việc định kỳ.\n\n");
 
-        systemPrompt.append("## NHIỆM VỤ CỦA BẠN:\n");
-        systemPrompt.append("1. Giúp người dùng thêm, chỉnh sửa, gợi ý hoặc xem các sự kiện trong lịch.\n");
-        systemPrompt.append("2. Hiểu các mốc thời gian như: 'hôm nay', 'tuần sau', 'ba buổi một tuần', 'chỉ vào buổi tối', 'trừ thứ 2', v.v.\n");
-        systemPrompt.append("3. Tự động phân tích yêu cầu và tạo nhiều sự kiện nếu cần thiết (ví dụ: lặp lại 3 buổi mỗi tuần).\n");
-        systemPrompt.append("4. **Tuyệt đối KHÔNG trả JSON cho người dùng**, mà chỉ phản hồi bằng văn bản dễ hiểu.\n\n");
+        systemPrompt.append("""
+Bạn là một Trợ lý AI giúp người dùng quản lý lịch trình học tập và công việc và luôn nhớ các ngày lễ và sự kiện quan trọng của Việt Nam.
+Hãy hiểu ngôn ngữ tự nhiên, linh hoạt với các mô tả như "tối nay", "cuối tuần", "3 buổi mỗi tuần", v.v.
 
-        systemPrompt.append("## KHI NGƯỜI DÙNG MUỐN TẠO SỰ KIỆN:\n");
-        systemPrompt.append("- Nếu đủ thông tin (tiêu đề, thời gian bắt đầu, thời gian kết thúc), tạo một hoặc nhiều sự kiện.\n");
-        systemPrompt.append("- Trả về phản hồi văn bản như: '✅ Đã thêm 3 sự kiện học tiếng Anh vào các buổi tối thứ 3, 5, 7 trong tuần này.'\n");
-        systemPrompt.append("- Ngầm định tạo JSON nội bộ theo định dạng:\n");
-        systemPrompt.append("{ \"toolName\": \"ADD_EVENT\", \"args\": { \"title\": \"Tên sự kiện\", \"start_time\": \"YYYY-MM-DDTHH:mm\", \"end_time\": \"YYYY-MM-DDTHH:mm\" } }\n");
-        systemPrompt.append("- Không hiển thị JSON này với người dùng.\n\n");
+## MỤC TIÊU:
+- Gợi ý, tạo, sửa, hoặc xoá sự kiện.
+- Luôn phản hồi bằng văn bản tự nhiên (không hiện JSON).
+- Nếu thiếu thông tin, hãy hỏi lại người dùng.
+- Bạn hãy phản hồi dựa theo system message
 
-        systemPrompt.append("## KHI CHƯA ĐỦ THÔNG TIN:\n");
-        systemPrompt.append("- Nếu thiếu tiêu đề hoặc thời gian, hãy hỏi lại người dùng rõ ràng, ví dụ: 'Bạn muốn học vào lúc mấy giờ và trong những ngày nào?'\n");
-        systemPrompt.append("- Đừng tạo sự kiện hoặc JSON nếu chưa rõ yêu cầu.\n\n");
+## XỬ LÝ TẠO SỰ KIỆN:
+1. Nếu người dùng yêu cầu tạo sự kiện:
+- Khi người dùng yêu cầu tạo sự kiện (ví dụ: "Lên lịch hẹn", "Tạo lịch họp", "Đặt lịch xem phim",...), bạn phải xác định và xuất hành động nội bộ là `ADD_EVENT`.
+- Nếu thông tin sự kiện đầy đủ (tiêu đề, thời gian bắt đầu, thời gian kết thúc, địa điểm...), hãy xuất ra một JSON hành động nội bộ theo định dạng sau:            
+   [
+     {
+       "toolName": "ADD_EVENT",
+       "args": {
+         "title": "...",
+         "start_time": "YYYY-MM-DDTHH:mm",
+         "end_time": "YYYY-MM-DDTHH:mm",
+         "description": "...",
+         "location": "...",
+         "is_all_day": false,
+         "is_recurring": false,
+         "color": "#2196f3",
+         "remind_method": true,
+         "remind_before": 30,
+         "remind_unit": "minutes"
+       }
+     }
+   ]
+- Không giải thích hay hiển thị nội dung JSON cho người dùng.
+2. Nếu thời tiết có khả năng mưa (do hệ thống thời tiết trả về), hãy phản hồi như sau:
+   - Ví dụ: "🌧 Thời tiết có thể có mưa vào thời gian này. Bạn có muốn tiếp tục tạo sự kiện ngoài trời này không?"
+   - Nếu người dùng xác nhận "có", tiếp tục tạo sự kiện trước đó đang chờ (`PendingEvent`).
+   - Nếu người dùng từ chối, không tạo sự kiện.
 
-        systemPrompt.append("## KHI NGƯỜI DÙNG YÊU CẦU GỢI Ý THỜI GIAN RẢNH:\n");
-        systemPrompt.append("- Phân tích lịch hiện tại, tìm các khoảng trống dài hơn 30 phút.\n");
-        systemPrompt.append("- Gợi ý bằng văn bản như: 'Bạn rảnh vào 19:00 - 20:00 ngày mai, muốn đặt lịch không?'\n");
-        systemPrompt.append("- Nếu họ đồng ý, bạn sẽ tự động tạo JSON nội bộ.\n\n");
+3. Nếu thời gian yêu cầu trùng với sự kiện đã có:
+   - **Không tự ý tạo sự kiện!**
+   - Hỏi lại người dùng:  
+     > "⏰ Thời gian bạn chọn đang bị trùng với một sự kiện khác. Bạn có muốn chọn thời gian khác không?"
 
+## KHI SỬA SỰ KIỆN:
+- Khi người dùng nói các câu như:
+    -"Thay đổi thời gian của lịch hẹn `Đi bơi` lại"
+    -"Sửa lịch hẹn `event_id` = 1"
+    -"Update lịch hẹn"
+    => Hiểu là người dùng muốn** Sửa sự kiện"
+- Nếu có `event_id`, dùng nó.
+- Nếu không, dùng `original_title` để tìm sự kiện cần sửa.
+- Ví dụ:
+[
+  {
+    "toolName": "UPDATE_EVENT",
+    "args": {
+      "event_id": 123,
+      "original_title": "Cuộc họp cũ",
+      "title": "Cuộc họp mới",
+      "start_time": "YYYY-MM-DDTHH:mm",
+      "description": "mô tả mới"
+    }
+  }
+]
+- Không giải thích hay hiển thị nội dung JSON cho người dùng.
 
-        systemPrompt.append("Ngày hiện tại là " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + ".\n");
+## KHI XOÁ SỰ KIỆN:
+- Khi người dùng nói các câu như:
+    -"Xóa lịch hẹn `Học toán` ngày 21 tháng 7"
+    -"Xóa lịch học Tiếng Anh"
+    -"Xóa lịch hẹn `event_id` = 1"
+    => Hiểu là người dùng muốn** Xóa sự kiện"
+- Dùng `event_id` nếu có, hoặc `title` nếu không có ID.
+- Ví dụ:
+[
+  { "toolName": "DELETE_EVENT", "args": { "event_id": 42 } }
+]
+hoặc
+[
+  { "toolName": "DELETE_EVENT", "args": { "title": "Tên sự kiện" } }
+]
+- Không giải thích hay hiển thị nội dung JSON cho người dùng.
+                            
 
-
+## NGUYÊN TẮC:
+- Tránh dùng từ kỹ thuật với người dùng.
+- Nếu phát hiện thời gian bị trùng với sự kiện khác, hãy hỏi lại người dùng một thời gian khác. Không tự ý thêm nếu bị trùng.
+- Luôn diễn giải ý định rõ ràng, thân thiện.
+- Ngày hiện tại là """ + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + ".\n");
 // Không cần đoạn hiển thị mô tả lại nội dung cho người dùng nữa
-
-
         systemPrompt.append("- Nếu chưa rõ nội dung hoặc người dùng chưa xác nhận thời gian gợi ý, hãy hỏi lại người dùng trước khi trả về JSON.\n");
 
         systemPrompt.append("Các loại lịch trình:\n");
         for (ScheduleItem.ScheduleType type : ScheduleItem.ScheduleType.values()) {
             systemPrompt.append("- ").append(type.getDisplayName()).append("\n");
         }
-
 
         conversationHistory.add(new Message("system", systemPrompt.toString()));
     }
@@ -91,246 +174,288 @@ public class ScheduleAIAgent implements Serializable{
     /**
      * Process user input and generate AI response
      */
-    private void updateTodayInfo() {
-        // Xóa các message system chứa ngày hôm nay cũ nếu có (để tránh trùng)
-        conversationHistory.removeIf(m -> m.getRole().equals("system") && m.getContent().startsWith("Ngày hôm nay là"));
+    public String processUserInput(String userInput, int userId, HttpServletResponse response) throws Exception {
+//        String intenttoolEvent = classifier.classiftoolEvent(userInput);
+        boolean shouldReload = false;
+        StringBuilder systemResult = new StringBuilder();
+        if (pendingEvents.containsKey("default")) {
+            String answer = userInput.trim().toLowerCase();
+            if (answer.contains("có") || answer.contains("ok") || answer.contains("tiếp tục")) {
+                UserEvents pending = pendingEvents.remove("default").getEvent();
+                agentEventService.saveUserEvent(pending);
+                systemResult.append("📅 Đã tạo sự kiện: ").append(pending.getName());
+            } else if (answer.contains("không")) {
+                pendingEvents.remove("default");
+                systemResult.append("❌ Đã hủy tạo sự kiện do bạn từ chối.");
+            } else {
+                systemResult.append("❓Bạn có thể xác nhận lại: có/không?");
+            }
+            return systemResult.toString();
+        }
 
-        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        conversationHistory.add(0, new Message("system", "Ngày hôm nay là: " + today));
-    }
-
-    public String processUserInput(String userInput) {
-        conversationHistory.add(new Message("user", userInput + "\n" +
-                "Nếu bạn muốn thêm sự kiện, hãy trả về danh sách các hành động ở dạng JSON:\n" +
-                "[\n" +
-                "  {\n" +
-                "    \"tool_name\": \"ADD_EVENT\",\n" +
-                "    \"args\": {\n" +
-                "      \"title\": \"...\",\n" +
-                "      \"start_time\": \"...\",\n" +
-                "      \"end_time\": \"...\"\n" +
-                "    }\n" +
-                "  }\n" +
-                "]\n" +
-                "Nếu không có hành động nào, chỉ cần phản hồi bình thường.\n" +
-                "⚠️ JSON action sẽ không hiển thị ra giao diện, dùng cho hệ thống xử lý tự động."
-        ));
-
+        conversationHistory.add(new Message("user", userInput));
         String aiResponse = llm.generateResponse(conversationHistory);
-        System.out.println("📥 AI Response:\n" + aiResponse);
-        conversationHistory.add(new Message("assistant", aiResponse));
+        UserEvents recentEvent = null;
 
-        // ✂️ 1. Cố gắng tách JSON ra khỏi phản hồi
-        List<Action> actions = tryParseActions(aiResponse);
-        System.out.println("🎯 Actions parsed: " + actions);
+        aiResponse = aiResponse.replaceAll("(?s)```json\\s*", "").replaceAll("(?s)```\\s*", "");
 
+        Pattern jsonPattern = Pattern.compile("(\\[\\s*\\{[\\s\\S]*?\\}\\s*\\])");
+        Matcher matcher = jsonPattern.matcher(aiResponse);
+
+        String jsonPart = null;
+        if (matcher.find()) {
+            jsonPart = matcher.group();
+        }
+
+        List<Action> actions = tryParseActions(jsonPart);
 
         // ✂️ 2. Gỡ phần JSON khỏi aiResponse để chỉ hiển thị phần văn bản cho người dùng
-        String userVisibleText = aiResponse.replaceAll("(?s)\\[\\s*\\{.*?\\}\\s*\\]", "").trim();
-
-        StringBuilder systemResult = new StringBuilder();
+        String userVisibleText = jsonPart != null
+                ? aiResponse.replace(jsonPart, "").trim()
+                : aiResponse.trim();
 
         if (actions != null && !actions.isEmpty()) {
-            int count = 0;
+            int added = 0, updated = 0, deleted = 0;
 
             for (Action action : actions) {
-                if ("ADD_EVENT".equals(action.getToolName())) {
-                    try {
-                        if (!action.getArgs().containsKey("title") ||
-                                !action.getArgs().containsKey("start_time") ||
-                                !action.getArgs().containsKey("end_time")) {
-                            systemResult.append("📝 Thiếu thông tin sự kiện (tiêu đề hoặc thời gian).\n");
-                            continue;
+                String tool = action.getToolName();
+
+                try {
+                    switch (tool) {
+                        case "ADD_EVENT" -> {
+
+                            if (!action.getArgs().containsKey("title")
+                                    || !action.getArgs().containsKey("start_time")
+                                    || !action.getArgs().containsKey("end_time")) {
+                                systemResult.append("📝 Thiếu thông tin sự kiện (tiêu đề hoặc thời gian).\n");
+                                continue;
+                            }
+                            String title = (String) action.getArgs().get("title");
+                            String rawStart = (String) action.getArgs().get("start_time");
+                            String rawEnd = (String) action.getArgs().get("end_time");
+
+                            LocalDateTime start = tryParseDateTime(rawStart);
+                            LocalDateTime end = tryParseDateTime(rawEnd);
+
+                            List<UserEvents> conflicted = eventService.isTimeConflict(start, end, userId);
+                            if (!conflicted.isEmpty()) {
+                                systemResult.append("⚠️ Sự kiện bị trùng thời gian với các sự kiện sau:\n");
+                                for (UserEvents conflict : conflicted) {
+                                    systemResult.append(" - ").append(conflict.getName())
+                                            .append(" (").append(conflict.getStartDate())
+                                            .append(" - ").append(conflict.getDueDate()).append(")\n");
+                                }
+                                continue;
+                            }
+
+                            UserEvents event = new UserEvents();
+                            event.setName(title);
+                            event.setStartDate(Timestamp.valueOf(start));
+                            event.setDueDate(Timestamp.valueOf(end));
+                            event.setCreatedAt(new Date());
+                            event.setUpdatedAt(new Date());
+                            event.setIsAllDay(false);
+                            event.setIsRecurring(false);
+                            event.setColor("#2196f3");
+                            event.setRemindMethod(true);
+                            event.setRemindBefore(30);
+                            event.setRemindUnit("minutes");
+
+                            if (action.getArgs().containsKey("location")) {
+                                event.setLocation((String) action.getArgs().get("location"));
+                            }
+                            if (action.getArgs().containsKey("description")) {
+                                event.setDescription((String) action.getArgs().get("description"));
+                            }
+                            Calendar calendar = calendarDAO.getOrCreatePersonalCalendarByUserId(userId);
+                            if (calendar == null) {
+                                systemResult.append("❌ Không tìm thấy lịch cá nhân của bạn.\n");
+                                continue;
+                            }
+                            event.setIdCalendar(calendar);
+
+                            String intentWheather = classifier.classifyWeather(userInput);
+                            if (intentWheather.equals("outdoor_activities")) {
+                                String forecastNote = wheatherService.getForecastNote(start, "Da Nang");
+                                if (forecastNote != null && !forecastNote.isEmpty()) {
+                                    pendingEvents.put("default", new PendingEvent(event));
+                                    systemResult.append("🌦 ").append(forecastNote).append("\n").
+                                            append("❓Bạn có muốn tiếp tục tạo sự kiện ngoài trời này không?").
+                                            append("\n");
+                                    continue;
+                                } else {
+
+                                    System.out.println("⛅ Thời tiết tốt, tự động thêm sự kiện.");
+                                }
+
+                            }
+                            agentEventService.saveUserEvent(event);
+                            systemResult.append("✅ Đã thêm sự kiện: ").append(title).append(" vào lịch trình.\n");
+                            shouldReload = true;
+                            recentEvent = event;
+                            added++;
+
                         }
 
-                        ScheduleItem item = new ScheduleItem(
-                                (String) action.getArgs().get("title"),
-                                LocalDateTime.parse((String) action.getArgs().get("start_time")),
-                                LocalDateTime.parse((String) action.getArgs().get("end_time"))
-                        );
-                        currentSchedule.add(item);
-                        count++;
+                        case "UPDATE_EVENT" -> {
+                            UserEvents existing = null;
 
-                    } catch (Exception e) {
-                        systemResult.append("⚠️ Lỗi định dạng thời gian trong sự kiện.\n");
+                            if (action.getArgs().containsKey("event_id")) {
+                                int eventId = (int) action.getArgs().get("event_id");
+                                existing = eventService.getEventById(eventId);
+                            } else if (action.getArgs().containsKey("original_title")) {
+                                String ori_title = (String) action.getArgs().get("original_title");
+                                existing = eventService.getFirstEventByTitle(ori_title);
+                                System.out.println(ori_title);
+                            }
+
+                            if (existing == null) {
+                                systemResult.append("❌ Không tìm thấy sự kiện để cập nhật.\n");
+                                continue;
+                            }
+
+                            if (action.getArgs().containsKey("title")) {
+                                existing.setName((String) action.getArgs().get("title"));
+                            }
+                            if (action.getArgs().containsKey("start_time")) {
+                                existing.setStartDate(Timestamp.valueOf(tryParseDateTime((String) action.getArgs().get("start_time"))));
+                            }
+                            if (action.getArgs().containsKey("end_time")) {
+                                existing.setDueDate(Timestamp.valueOf(tryParseDateTime((String) action.getArgs().get("end_time"))));
+                            }
+                            if (action.getArgs().containsKey("location")) {
+                                existing.setLocation((String) action.getArgs().get("location"));
+                            }
+                            if (action.getArgs().containsKey("description")) {
+                                existing.setDescription((String) action.getArgs().get("description"));
+                            }
+
+                            existing.setUpdatedAt(new Date());
+                            eventService.updateEvent(existing);
+                            shouldReload = true;
+                            updated++;
+                        }
+
+                        case "DELETE_EVENT" -> {
+                            boolean deletedOne = false;
+                            if (action.getArgs().containsKey("event_id")) {
+                                int id = (int) action.getArgs().get("event_id");
+                                deletedOne = eventService.removeEvent(id);
+                            } else if (action.getArgs().containsKey("title")) {
+                                String title = (String) action.getArgs().get("title");
+                                deletedOne = eventService.deleteByTitle(title);
+                            }
+
+                            if (deletedOne) {
+                                shouldReload = true;
+                                deleted++;
+                            } else {
+                                systemResult.append("⚠️ Không tìm thấy sự kiện để xoá.\n");
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    systemResult.append("❌ Lỗi khi xử lý hành động: ").append(tool).append("\n");
+                }
+            }
+        } else {
+            System.out.println("Khong co hanh dong nao. Dang phan loai y dinh bang vector ...");
+
+            ActionType intent = classifier.classifyIntent(userInput);
+
+            switch (intent) {
+                case PROMPT_FREE_TIME -> {
+                    TimeContext context = TimeSlotUnit.extracTimeContext(userInput);
+                    List<UserEvents> busytimes = eventService.getAllEventsByUserId(userId);
+
+                    List<UserEvents> filteredEvents;
+                    switch (context) {
+                        case TODAY ->
+                            filteredEvents = TimeSlotUnit.filterEventsToday(busytimes);
+                        case TOMORROW ->
+                            filteredEvents = TimeSlotUnit.filterEventsTomorrow(busytimes);
+                        case THIS_WEEK ->
+                            filteredEvents = TimeSlotUnit.filterEventsThisWeek(busytimes);
+                        case NEXT_WEEK ->
+                            filteredEvents = TimeSlotUnit.filterEventsNextWeek(busytimes);
+                        default ->
+                            filteredEvents = busytimes;
                     }
 
-                } else {
-                    systemResult.append("⚠️ Hành động không được hỗ trợ: ")
-                            .append(action.getToolName()).append("\n");
+                    List<TimeSlot> freeSlots = TimeSlotUnit.findFreeTime(filteredEvents);
+                    systemResult.append("📆 Các khoảng thời gian rảnh nè hihi :\n");
+                    for (TimeSlot slot : freeSlots) {
+                        systemResult.append(" - ").append(slot.toString()).append("\n");
+                    }
                 }
-            }
+                case PROMPT_SUMMARY_TIME -> {
+                    try {
+                        System.out.println(userId);
+                        String summary = handleSummaryRequest(
+                                userInput, // prompt người dùng nhập
+                                embeddingService, // service để lấy vector embedding
+                                eventService,
+                                userId// service để truy vấn sự kiện trong khoảng thời gian
+                        );
+                        if (summary != null) {
+                            return summary;
+                        } else {
+                            return "📝 Mình không hiểu khoảng thời gian bạn muốn tổng hợp. Bạn có thể hỏi kiểu như: \"Lịch hôm nay\", \"Sự kiện tuần sau\"...";
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return "⚠️ Đã xảy ra lỗi khi xử lý yêu cầu tổng hợp lịch.";
+                    }
+                }
+                case PROMPT_SEND_EMAIL -> {
+                    Pattern pattern = Pattern.compile("trước (\\d{1,3}) ?(phút|giờ)");
+                    matcher = pattern.matcher(userInput.toLowerCase());
+                    if (matcher.find()) {
+                        int value = Integer.parseInt(matcher.group(1));
+                        String unit = matcher.group(2);
 
-            dataManager.saveSchedules(currentSchedule);
-            if (count > 0) {
-                systemResult.append("✅ Đã thêm ").append(count).append(" sự kiện vào lịch trình.");
+                        int remindMinutes = unit.equals("giờ") ? value * 60 : value;
+                        // Tạo nhắc nhở
+//                        UserEvents upcoming = emailReminderDAO.getNextUpcomingEventByEventId(recentEvent.getIdEvent());
+//                        if (upcoming != null) {
+//                            emailReminderDAO.saveEmailReminder(upcoming.getIdEvent(), remindMinutes);
+//                            return "✅ Tôi sẽ gửi email nhắc bạn trước " + remindMinutes + " phút khi sự kiện bắt đầu.";
+//                        }
+                    }
+                }
+
+            } // ✅ Trả kết quả đầy đủ: phản hồi của AI + kết quả hệ thốn
+        }
+        if (!systemResult.isEmpty()) {
+            // Gộp phần phản hồi của AI (không chứa JSON) + phản hồi hệ thống
+            String fullResponse = (userVisibleText + "\n\n" + systemResult.toString().trim()).trim();
+            if (shouldReload) {
+                fullResponse += "\n__RELOAD__";
             }
+            conversationHistory.add(new Message("assistant", fullResponse));
+            return fullResponse;
         }
 
-        // ✅ Trả kết quả đầy đủ: phản hồi của AI + kết quả hệ thống
-        return (userVisibleText + "\n\n" + systemResult).trim();
+// Nếu không có gì trong systemResult, chỉ trả phần văn bản (đã gỡ JSON)
+        conversationHistory.add(new Message("assistant", userVisibleText));
+        return userVisibleText;
     }
 
-
-
-    public static List<Action> tryParseActions(String aiResponse) {
+    public static List<Action> tryParseActions(String jsonPart) {
         try {
-            aiResponse = aiResponse.trim();
-
-            // Kiểm tra xem có bắt đầu bằng '{' hoặc '[' không => JSON
-            if (!(aiResponse.startsWith("{") || aiResponse.startsWith("["))) {
-                return Collections.emptyList();  // Không phải JSON, bỏ qua
+            if (jsonPart == null || jsonPart.isEmpty()) {
+                return Collections.emptyList();
             }
-
-            if (aiResponse.startsWith("[")) {
-                return Arrays.asList(objectMapper.readValue(aiResponse, Action[].class));
-            } else {
-                Action single = objectMapper.readValue(aiResponse, Action.class);
-                return Collections.singletonList(single);
-            }
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<Action> list = Arrays.asList(objectMapper.readValue(jsonPart, Action[].class));
+            System.out.println("✅ Parsed " + list.size() + " action(s).");
+            return list;
         } catch (Exception e) {
             System.out.println("❌ Không thể parse Action(s): " + e.getMessage());
+            System.out.println("📄 JSON:\n" + jsonPart);
             return Collections.emptyList();
         }
-    }
-
-
-
-    //    public String processUserInput(String userInput) {
-//        conversationHistory.add(new Message("user", userInput));
-//        updateTodayInfo();
-//
-//        ActionType action = ActionRouter.detectAction(userInput);
-//
-//        switch (action) {
-//            case ADD_EVENT:
-//                return handleAddEvent(userInput);
-//            case SHOW_TODAY:
-//                return handleShowToday();
-//            case SHOW_WEEK:
-//                return getConversationSummary();
-//            case SUGGEST_TIME:
-//                return suggestAvailableTime();
-//            case END_CONVERSATION:
-//                return "Kết thúc rồi nhé bạn!";
-//            case UNKNOWN:
-//            default:
-//                return "Mình chưa hiểu rõ lắm, bạn có thể nói lại không?";
-//        }
-//    }
-    private String handleShowToday() {
-        LocalDate today = LocalDate.now();
-        List<ScheduleItem> todayEvents = currentSchedule.stream()
-                .filter(e -> e.getStartTime().toLocalDate().equals(today))
-                .toList();
-
-        if (todayEvents.isEmpty()) return "📭 Hôm nay bạn không có lịch nào.";
-
-        StringBuilder sb = new StringBuilder("📅 Lịch hôm nay:\n");
-        for (ScheduleItem e : todayEvents) {
-            sb.append("• ").append(e.getTitle()).append(" lúc ")
-                    .append(e.getStartTime().format(DateTimeFormatter.ofPattern("HH:mm"))).append("\n");
-        }
-        return sb.toString();
-    }
-
-    private String suggestAvailableTime() {
-        // Giả sử bạn chỉ check hôm nay, từ 8h đến 20h
-        LocalDateTime start = LocalDate.now().atTime(8, 0);
-        LocalDateTime end = LocalDate.now().atTime(20, 0);
-        List<ScheduleItem> events = currentSchedule.stream()
-                .filter(e -> e.getStartTime().toLocalDate().equals(LocalDate.now()))
-                .sorted(Comparator.comparing(ScheduleItem::getStartTime))
-                .toList();
-
-        List<String> freeSlots = new ArrayList<>();
-        for (ScheduleItem event : events) {
-            if (start.isBefore(event.getStartTime())) {
-                freeSlots.add(start.format(DateTimeFormatter.ofPattern("HH:mm")) + " - " +
-                        event.getStartTime().format(DateTimeFormatter.ofPattern("HH:mm")));
-            }
-            start = event.getEndTime().isAfter(start) ? event.getEndTime() : start;
-        }
-
-        if (start.isBefore(end)) {
-            freeSlots.add(start.format(DateTimeFormatter.ofPattern("HH:mm")) + " - " +
-                    end.format(DateTimeFormatter.ofPattern("HH:mm")));
-        }
-
-        if (freeSlots.isEmpty()) return "Hôm nay bạn đã kín lịch! 😅";
-
-        StringBuilder sb = new StringBuilder("🕐 Thời gian bạn còn rảnh hôm nay:\n");
-        freeSlots.forEach(slot -> sb.append("• ").append(slot).append("\n"));
-        return sb.toString();
-    }
-
-
-    private String handleAddEvent(String userInput) {
-        ScheduleItem item = parseScheduleFromInput(userInput, "");
-        if (item != null) {
-            currentSchedule.add(item);
-            dataManager.saveSchedules(currentSchedule);
-            return "✅ Đã thêm sự kiện: " + item.getTitle();
-        }
-        return "Không thể thêm sự kiện.";
-    }
-
-
-    private String extractTitle(String input) {
-        String[] stopWords = {
-                "thêm", "lịch", "hẹn", "vào", "lúc", "tối", "sáng", "chiều", "trưa",
-                "nay", "mai", "giờ", "phút", "ngày", "đi", "xem", "làm", "học", "gặp", "cùng"
-        };
-
-        // Chuẩn hóa câu
-        input = input.toLowerCase().replaceAll("[^a-zA-Z0-9àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ\\s]", "");
-
-        // Tách từ
-        List<String> words = new ArrayList<>(Arrays.asList(input.split("\\s+")));
-
-        // Lọc bỏ các từ không mang nghĩa danh từ
-        words.removeIf(w -> Arrays.asList(stopWords).contains(w));
-
-        if (words.isEmpty()) return "Lịch chưa rõ";
-
-        // Gộp lại làm tiêu đề (có thể lấy từ cuối, hoặc tất cả từ còn lại)
-        StringBuilder title = new StringBuilder();
-        for (String word : words) {
-            title.append(Character.toUpperCase(word.charAt(0)))
-                    .append(word.substring(1))
-                    .append(" ");
-        }
-
-        return title.toString().trim();
-    }
-
-    private ScheduleItem parseScheduleFromInput(String userInput, String aiResponse) {
-        // Simplified parsing logic - in real implementation, this would be more sophisticated
-        try {
-            if (userInput.toLowerCase().contains("lịch") || userInput.toLowerCase().contains("hẹn") || userInput.toLowerCase().contains("kiện")) {
-                // Create a basic schedule item
-                LocalDateTime now = LocalDateTime.now();
-                String title = extractTitle(userInput);
-                ScheduleItem item = new ScheduleItem(title, now, now.plusHours(1));
-
-                // Detect type
-                if (userInput.toLowerCase().contains("học")) {
-                    item.setScheduleType(ScheduleItem.ScheduleType.STUDY);
-                } else if (userInput.toLowerCase().contains("làm việc") || userInput.toLowerCase().contains("họp")) {
-                    item.setScheduleType(ScheduleItem.ScheduleType.WORK);
-                } else if (userInput.toLowerCase().contains("du lịch")) {
-                    item.setScheduleType(ScheduleItem.ScheduleType.TRAVEL);
-                } else if (userInput.toLowerCase().contains("sự kiện")) {
-                    item.setScheduleType(ScheduleItem.ScheduleType.EVENT);
-                }
-
-                return item;
-            }
-        } catch (Exception e) {
-            System.err.println("Lỗi parse lịch: " + e.getMessage());
-        }
-
-        return null;
     }
 
     public String getGreeting() {
@@ -341,20 +466,20 @@ public class ScheduleAIAgent implements Serializable{
         try {
             return llm.generateResponse(greetingMessages);
         } catch (Exception e) {
-            return "🤖 Xin chào! Tôi là AI Assistant quản lý lịch trình thông minh.\n" +
-                    "Tôi có thể giúp bạn:\n" +
-                    "✅ Tạo lịch học tập, công việc, sự kiện\n" +
-                    "✅ Tối ưu hóa thời gian\n" +
-                    "✅ Đưa ra lời khuyên quản lý thời gian\n\n" +
-                    "Hãy chia sẻ kế hoạch của bạn để bắt đầu!";
+            return "🤖 Xin chào! Tôi là AI Assistant quản lý lịch trình thông minh.\n"
+                    + "Tôi có thể giúp bạn:\n"
+                    + "✅ Tạo lịch học tập, công việc, sự kiện\n"
+                    + "✅ Tối ưu hóa thời gian\n"
+                    + "✅ Đưa ra lời khuyên quản lý thời gian\n\n"
+                    + "Hãy chia sẻ kế hoạch của bạn để bắt đầu!";
         }
     }
 
     public boolean shouldEndConversation(String userInput) {
         String input = userInput.toLowerCase().trim();
-        return input.equals("bye") || input.equals("tạm biệt") ||
-                input.equals("kết thúc") || input.equals("quit") ||
-                input.equals("exit") || input.equals("end");
+        return input.equals("bye") || input.equals("tạm biệt")
+                || input.equals("kết thúc") || input.equals("quit")
+                || input.equals("exit") || input.equals("end");
     }
 
     public String getConversationSummary() {
@@ -362,26 +487,145 @@ public class ScheduleAIAgent implements Serializable{
             return "Không có cuộc trò chuyện nào được ghi nhận.";
         }
 
-        StringBuilder summary = new StringBuilder();
-        summary.append("📌 TÓM TẮT LỊCH TRÌNH:\n");
-
-        for (ScheduleItem item : currentSchedule) {
-            summary.append("• [").append(item.getScheduleType().getDisplayName()).append("] ")
-                    .append(item.getTitle()).append(" - ")
-                    .append(item.getStartTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
-                    .append("\n");
+        StringBuilder summary = new StringBuilder("📌 TÓM TẮT CUỘC TRÒ CHUYỆN:\n");
+        for (Message msg : conversationHistory) {
+            summary.append(msg.getRole().equals("user") ? "🧑‍💻 Bạn: " : "🤖 AI: ")
+                    .append(msg.getContent()).append("\n");
         }
-
-        summary.append("\n💡 Số lượng sự kiện: ").append(currentSchedule.size());
-
         return summary.toString();
     }
 
-    public List<ScheduleItem> getCurrentSchedule() {
-        return new ArrayList<>(currentSchedule);
-    }
-}
+    public List<ScheduleItem> getCurrentSchedule(int userID) {
 
-/**
- * Console chat application for schedule management
- */
+        EventService eventService = new EventService();
+        List<UserEvents> userEvents = eventService.getAllEventsByUserId(userID);
+        List<ScheduleItem> schedules = new ArrayList<>();
+
+        for (UserEvents event : userEvents) {
+            String name = event.getName();
+            LocalDateTime start = event.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            LocalDateTime end = event.getDueDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+            ScheduleItem item = new ScheduleItem(name, start, end, null);
+
+            // Ưu tiên hoặc màu có thể xác định priority
+            item.setPriority("Normal");
+
+            // Nếu bạn dùng Enum ScheduleType thì gán luôn:
+            item.setScheduleType(ScheduleItem.ScheduleType.EVENT);
+
+            schedules.add(item);
+        }
+
+        return schedules;
+    }
+
+    private LocalDateTime tryParseDateTime(String input) {
+        List<String> patterns = List.of(
+                "yyyy-MM-dd'T'HH:mm",
+                "yyyy-MM-dd HH:mm",
+                "dd/MM/yyyy HH:mm",
+                "dd-MM-yyyy HH:mm"
+        );
+
+        for (String pattern : patterns) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+                return LocalDateTime.parse(input, formatter);
+            } catch (Exception ignored) {
+            }
+        }
+
+        throw new IllegalArgumentException("❌ Không thể parse ngày giờ: " + input);
+    }
+
+    public String checkFreeTimes(String userInputs, EmbeddingService embeddingService) throws Exception {
+        EventService eventService = new EventService();
+        List<String> freeTimeIntents = Arrays.asList(
+                "Gợi ý khung giờ học môn Toán",
+                "Tôi muốn biết lúc nào rảnh để học",
+                "Bạn có thể cho tôi biết thời gian trống để lên lịch?",
+                "Tìm khoảng thời gian rảnh trong tuần",
+                "Lên lịch học phù hợp giúp tôi",
+                "Hãy đề xuất giờ học hợp lý"
+        );
+        float[] inputVec = embeddingService.getEmbedding(userInputs);
+        boolean isGetFreeTimeIntent = false;
+        for (String example : freeTimeIntents) {
+            float[] refVec = embeddingService.getEmbedding(example);
+            if (embeddingService.cosineSimilarity(inputVec, refVec) > 0.82f) {
+                isGetFreeTimeIntent = true;
+                break;
+            }
+        }
+        if (isGetFreeTimeIntent) {
+            List<UserEvents> events = eventService.getAllEvent(); // Tim bang user_ID
+            List<TimeSlot> freeSlots = TimeSlotUnit.findFreeTime(events);
+
+            if (freeSlots.isEmpty()) {
+                return "⛔ Hiện bạn không có khoảng thời gian trống nào trong tuần.";
+            }
+            StringBuilder response = new StringBuilder("📅 Các khoảng thời gian trống gợi ý:\n");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE - dd/MM/yyyy HH:mm");
+
+            for (TimeSlot slot : freeSlots) {
+                response.append("• ").append(slot.getStart().format(formatter))
+                        .append(" → ").append(slot.getEnd().format(formatter))
+                        .append("\n");
+            }
+            return response.toString();
+        }
+
+        return null;
+    }
+
+    public String handleSummaryRequest(String userInputs, EmbeddingService embeddingService, EventService eventService, int userId) throws Exception {
+        // Xác định khoảng thời gian
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime start = now;
+        LocalDateTime end = now;
+        String range = null;
+
+        if (userInputs.contains("hôm nay")) {
+            start = now.toLocalDate().atStartOfDay();
+            end = start.plusDays(1);
+            range = "hôm nay";
+        } else if (userInputs.contains("ngày mai")) {
+            start = now.plusDays(1).toLocalDate().atStartOfDay();
+            end = start.plusDays(1);
+            range = "ngày mai";
+        } else if (userInputs.contains("tuần này")) {
+            DayOfWeek dow = now.getDayOfWeek();
+            start = now.minusDays(dow.getValue() - 1).toLocalDate().atStartOfDay(); // Monday
+            end = start.plusDays(7);
+            range = "tuần này";
+        } else if (userInputs.contains("tuần sau")) {
+            DayOfWeek dow = now.getDayOfWeek();
+            start = now.minusDays(dow.getValue() - 1).toLocalDate().atStartOfDay().plusWeeks(1);
+            end = start.plusDays(7);
+            range = "tuần sau";
+        }
+
+        if (range == null) {
+            return null;
+        }
+
+        List<UserEvents> events = eventService.getEventsBetween(start, end, userId);
+        if (events.isEmpty()) {
+            return "📭 Không có sự kiện nào trong " + range + ".";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("📆 Sự kiện ").append(range).append(":\n");
+        for (UserEvents e : events) {
+            sb.append("• ").append(e.getName())
+                    .append(" 🕒 ").append(e.getStartDate()).append(" - ").append(e.getDueDate());
+            if (e.getLocation() != null) {
+                sb.append(" 📍 ").append(e.getLocation());
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
+}
