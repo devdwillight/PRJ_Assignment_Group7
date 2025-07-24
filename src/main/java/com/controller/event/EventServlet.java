@@ -451,6 +451,12 @@ public class EventServlet extends HttpServlet {
 
             // Save event
             System.out.println("[EventServlet] About to save event...");
+            // Kiểm tra trùng event trước khi lưu
+            if (eventService.isEventConflict(selectedCalendar.getIdCalendar(), event.getStartDate(), event.getDueDate())) {
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                response.getWriter().write("{\"error\":\"Thời gian này đã có sự kiện khác trong lịch!\"}");
+                return;
+            }
             UserEvents savedEvent = eventService.createEvent(event);
 
             if (savedEvent != null) {
@@ -1000,6 +1006,7 @@ public class EventServlet extends HttpServlet {
                 return;
             }
             int created = 0;
+            int skipped = 0; // Đếm số event bị bỏ qua do trùng
             int calendarId = Integer.parseInt(request.getParameter("calendarId"));
             Calendar calendar = calendarService.getCalendarById(calendarId);
             for (int day = 0; day < totalDays; day++) {
@@ -1020,14 +1027,19 @@ public class EventServlet extends HttpServlet {
                     java.util.Calendar endCal = (java.util.Calendar) cal.clone();
                     endCal.add(java.util.Calendar.MINUTE, 90);
                     event.setDueDate(endCal.getTime());
-                    eventService.createEvent(event);
-                    created++;
+                    // Kiểm tra trùng event trước khi tạo
+                    if (!eventService.isEventConflict(calendar.getIdCalendar(), event.getStartDate(), event.getDueDate())) {
+                        eventService.createEvent(event);
+                        created++;
+                    } else {
+                        skipped++;
+                    }
                 }
                 cal.add(java.util.Calendar.DATE, 1);
             }
 
             response.setContentType("application/json");
-            response.getWriter().write("{\"success\": true}");
+            response.getWriter().write("{\"success\": true, \"created\": " + created + ", \"skipped\": " + skipped + ", \"message\": \"Đã tạo " + created + " buổi học. " + (skipped > 0 ? (skipped + " buổi bị bỏ qua do trùng lịch.") : "") + "\"}");
             return;
         } catch (Exception e) {
             System.err.println("Error in handleAutoCreateEvents: " + e.getMessage());

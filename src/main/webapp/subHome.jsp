@@ -113,7 +113,7 @@
                     </button>
                     <!-- Dropdown menu -->
                     <div id="userDropdownMenu" class="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50 hidden">
-                        <a href="editProfile.jsp" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">Edit Profile</a>
+                        <a href="user?action=editProfile" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">Edit Profile</a>
                         <form action="logout" method="POST">
                             <input type="hidden" name="action" value="logout" />
                             <button class="w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">

@@ -124,4 +124,22 @@ public class EventService implements IEventService {
         System.out.println("[updateEventTime] " + (success ? "✔ Thành công" : "✖ Thất bại"));
         return success;
     }
+
+    /**
+     * Kiểm tra có event nào trong calendar bị trùng thời gian không
+     * @param calendarId id của calendar
+     * @param newStart thời gian bắt đầu event mới
+     * @param newEnd thời gian kết thúc event mới
+     * @return true nếu có event trùng, false nếu không
+     */
+    public boolean isEventConflict(int calendarId, Date newStart, Date newEnd) {
+        List<UserEvents> events = getAllEventsByCalendarId(calendarId);
+        for (UserEvents e : events) {
+            if (!(newEnd.before(e.getStartDate()) || newStart.after(e.getDueDate()))) {
+                // Có giao nhau
+                return true;
+            }
+        }
+        return false;
+    }
 }

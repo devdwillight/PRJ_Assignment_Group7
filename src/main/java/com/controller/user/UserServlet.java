@@ -7,6 +7,7 @@ package com.controller.user;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +17,8 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  * @author DELL
  */
-@WebServlet(name = "UserServelet", urlPatterns = {"/User"})
+@WebServlet(name = "UserServelet", urlPatterns = {"/user"})
+@MultipartConfig
 public class UserServlet extends HttpServlet {
 
     /**
@@ -57,6 +59,18 @@ public class UserServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String action = request.getParameter("action");
+        if ("editProfile".equals(action)) {
+            // Lấy user từ session, sau đó lấy lại user mới nhất từ DB
+            com.model.User sessionUser = (com.model.User) request.getSession().getAttribute("user");
+            if (sessionUser != null) {
+                com.service.User.UserService userService = new com.service.User.UserService();
+                com.model.User user = userService.getUserById(sessionUser.getIdUser());
+                request.setAttribute("userProfile", user);
+            }
+            request.getRequestDispatcher("/views/user/profile.jsp").forward(request, response);
+            return;
+        }
         processRequest(request, response);
     }
 
@@ -71,6 +85,73 @@ public class UserServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String action = request.getParameter("action");
+        if ("updateProfile".equals(action)) {
+            // Lấy user từ session
+            com.model.User user = (com.model.User) request.getSession().getAttribute("user");
+            if (user == null) {
+                response.sendRedirect("login.jsp");
+                return;
+            }
+            // Lấy dữ liệu từ form
+            String firstName = request.getParameter("firstName");
+            String lastName = request.getParameter("lastName");
+            String birthday = request.getParameter("birthday");
+            String email = request.getParameter("email");
+            String phone = request.getParameter("phone");
+            String gender = request.getParameter("gender");
+            System.out.println("[DEBUG] firstName=" + firstName);
+            System.out.println("[DEBUG] lastName=" + lastName);
+            System.out.println("[DEBUG] birthday=" + birthday);
+            System.out.println("[DEBUG] email=" + email);
+            System.out.println("[DEBUG] phone=" + phone);
+            System.out.println("[DEBUG] gender=" + gender);
+            // Kiểm tra email trùng
+            com.service.User.UserService userService = new com.service.User.UserService();
+            if (!user.getEmail().equals(email) && userService.isEmailTaken(email)) {
+                request.setAttribute("error", "Email này đã được sử dụng bởi người dùng khác!");
+                request.setAttribute("userProfile", user); // Đảm bảo luôn có userProfile cho JSP
+                request.getRequestDispatcher("/views/user/profile.jsp").forward(request, response);
+                return;
+            }
+            // Xử lý avatar (nếu có upload mới)
+            String avatar = user.getAvatar();
+            if (request.getPart("avatar") != null && request.getPart("avatar").getSize() > 0) {
+                java.io.InputStream is = request.getPart("avatar").getInputStream();
+                String fileName = java.util.UUID.randomUUID() + "_" + request.getPart("avatar").getSubmittedFileName();
+                String uploadPath = request.getServletContext().getRealPath("/uploads/avatar/") + fileName;
+                java.nio.file.Files.createDirectories(java.nio.file.Paths.get(request.getServletContext().getRealPath("/uploads/avatar/")));
+                java.nio.file.Files.copy(is, java.nio.file.Paths.get(uploadPath), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                avatar = request.getContextPath() + "/uploads/avatar/" + fileName;
+            }
+            // Cập nhật user object
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            try {
+                if (birthday != null && !birthday.isEmpty()) {
+                    user.setBirthday(new java.text.SimpleDateFormat("yyyy-MM-dd").parse(birthday));
+                }
+            } catch (Exception e) {
+                System.err.println("Lỗi parse ngày sinh: " + birthday);
+                e.printStackTrace();
+                // Có thể set thông báo lỗi cho user nếu muốn
+            }
+            user.setEmail(email);
+            user.setPhone(phone);
+            user.setGender(gender);
+            user.setAvatar(avatar);
+            user.setUpdatedAt(new java.util.Date());
+            // Cập nhật DB
+            userService.updateUser(user);
+            // Lấy lại user từ DB để đảm bảo data mới nhất
+            com.model.User updatedUser = userService.getUserById(user.getIdUser());
+            // Cập nhật lại session
+            request.getSession().setAttribute("user", updatedUser);
+            request.setAttribute("userProfile", updatedUser); // Đảm bảo luôn có userProfile cho JSP
+            request.setAttribute("success", "Cập nhật thông tin thành công!");
+            request.getRequestDispatcher("/views/user/profile.jsp").forward(request, response);
+            return;
+        }
         processRequest(request, response);
     }
 

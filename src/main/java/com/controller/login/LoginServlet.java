@@ -76,7 +76,7 @@ public class LoginServlet extends HttpServlet {
         // --- BẮT ĐẦU LOGIC ĐỐI CHIẾU DB ---
         User user = userService.getUserByEmail(googleAccount.getEmail());
         if (user == null) {
-            // Nếu chưa có user, tạo mới
+            // Tạo mới user từ Google
             user = new User();
             user.setEmail(googleAccount.getEmail());
             user.setUsername(googleAccount.getEmail().split("@")[0]);
@@ -86,29 +86,9 @@ public class LoginServlet extends HttpServlet {
             user.setActive(true);
             user.setPassword(""); // Google login không cần password
             userService.createUser(user);
-            // Sau khi tạo mới, lấy lại user để có id
             user = userService.getUserByEmail(googleAccount.getEmail());
         }
-        if (user != null) {
-            boolean needUpdate = false;
-            if ((user.getAvatar() == null || user.getAvatar().isEmpty()) && googleAccount.getPicture() != null) {
-                user.setAvatar(googleAccount.getPicture());
-                needUpdate = true;
-            }
-            if ((user.getFirstName() == null || user.getFirstName().isEmpty()) && googleAccount.getGiven_name() != null) {
-                user.setFirstName(googleAccount.getGiven_name());
-                needUpdate = true;
-            }
-            if ((user.getLastName() == null || user.getLastName().isEmpty()) && googleAccount.getFamily_name() != null) {
-                user.setLastName(googleAccount.getFamily_name());
-                needUpdate = true;
-            }
-            // ... các trường khác nếu muốn
-            if (needUpdate) {
-                userService.updateUser(user);
-            }
-        }
-        // Lưu user vào session
+        // Lưu user từ DB vào session
         HttpSession session = request.getSession(true);
         session.setAttribute("user_email", user.getEmail());
         session.setAttribute("user_id", user.getIdUser());
