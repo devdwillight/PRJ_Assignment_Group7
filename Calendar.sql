@@ -126,6 +126,8 @@ CREATE TABLE To_Do (
 );
 select * from Users
 select * from Users
+select * from UserEvents
+
 INSERT INTO Users (username, password, first_name, last_name, birthday, email, phone, gender, active, is_admin)
 VALUES
 ('tuan','123','admin','admin','2000-1-1','nguyenhuuminhtuan20111@gmail.com','1234567890','Male',1,1),

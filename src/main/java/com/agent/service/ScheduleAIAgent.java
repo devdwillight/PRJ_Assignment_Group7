@@ -176,6 +176,7 @@ hoặc
      */
     public String processUserInput(String userInput, int userId, HttpServletResponse response) throws Exception {
 //        String intenttoolEvent = classifier.classiftoolEvent(userInput);
+        boolean shouldReload = false;
         StringBuilder systemResult = new StringBuilder();
         if (pendingEvents.containsKey("default")) {
             String answer = userInput.trim().toLowerCase();
@@ -236,7 +237,7 @@ hoặc
                             LocalDateTime start = tryParseDateTime(rawStart);
                             LocalDateTime end = tryParseDateTime(rawEnd);
 
-                            List<UserEvents> conflicted = eventService.isTimeConflict(start, end,userId);
+                            List<UserEvents> conflicted = eventService.isTimeConflict(start, end, userId);
                             if (!conflicted.isEmpty()) {
                                 systemResult.append("⚠️ Sự kiện bị trùng thời gian với các sự kiện sau:\n");
                                 for (UserEvents conflict : conflicted) {
@@ -290,6 +291,7 @@ hoặc
                             }
                             agentEventService.saveUserEvent(event);
                             systemResult.append("✅ Đã thêm sự kiện: ").append(title).append(" vào lịch trình.\n");
+                            shouldReload = true;
                             recentEvent = event;
                             added++;
 
@@ -330,6 +332,7 @@ hoặc
 
                             existing.setUpdatedAt(new Date());
                             eventService.updateEvent(existing);
+                            shouldReload = true;
                             updated++;
                         }
 
@@ -344,6 +347,7 @@ hoặc
                             }
 
                             if (deletedOne) {
+                                shouldReload = true;
                                 deleted++;
                             } else {
                                 systemResult.append("⚠️ Không tìm thấy sự kiện để xoá.\n");
@@ -363,7 +367,7 @@ hoặc
             switch (intent) {
                 case PROMPT_FREE_TIME -> {
                     TimeContext context = TimeSlotUnit.extracTimeContext(userInput);
-                    List<UserEvents> busytimes = eventService.getAllEvent();
+                    List<UserEvents> busytimes = eventService.getAllEventsByUserId(userId);
 
                     List<UserEvents> filteredEvents;
                     switch (context) {
@@ -426,6 +430,9 @@ hoặc
         if (!systemResult.isEmpty()) {
             // Gộp phần phản hồi của AI (không chứa JSON) + phản hồi hệ thống
             String fullResponse = (userVisibleText + "\n\n" + systemResult.toString().trim()).trim();
+            if (shouldReload) {
+                fullResponse += "\n__RELOAD__";
+            }
             conversationHistory.add(new Message("assistant", fullResponse));
             return fullResponse;
         }

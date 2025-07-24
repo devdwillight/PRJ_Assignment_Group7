@@ -153,6 +153,26 @@
     .message.bot {
         justify-content: flex-start;
     }
+    .message-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #e0e7ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        margin: 0 7px;
+        box-shadow: 0 1px 4px rgba(102,126,234,0.10);
+    }
+    .message.user .message-avatar {
+        background: linear-gradient(135deg, #a1c4fd 0%, #6c63ff 100%);
+        color: #fff;
+    }
+    .message.bot .message-avatar {
+        background: linear-gradient(135deg, #ffb86c 0%, #fcb69f 100%);
+        color: #fff;
+    }
     .message-content {
         max-width: 75%;
         padding: 8px 13px;
@@ -352,16 +372,10 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            // Gọi lời chào khi load xong
             getGreeting();
-
             const sendButton = document.getElementById('chatSendBtn');
             const input = document.getElementById('chatInput');
-
-            // Gửi khi bấm nút
             sendButton.addEventListener('click', sendMessage);
-
-            // Gửi khi nhấn Enter
             input.addEventListener('keypress', function (e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
@@ -373,14 +387,11 @@
         async function loadChatHistory(sessionId) {
             const container = document.getElementById('chatMessages');
             container.innerHTML = '';
-
             try {
                 const basePath = window.location.pathname.replace(/\/[^/]*$/, '');
                 const url = basePath + "/api/chat_history?sessionId=" + encodeURIComponent(sessionId);
-
                 const response = await fetch(url);
                 const messages = await response.json();
-
                 messages.forEach(msg => {
                     if (msg.userMessage)
                         displayMessage('user', msg.userMessage);
@@ -395,66 +406,56 @@
         async function getGreeting() {
             try {
                 const response = await fetch(window.location.pathname.replace(/\/[^/]*$/, '') + '/api/greeting', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({sessionId: sessionId})
                 });
-
                 const data = await response.json();
                 displayMessage('bot', data.message);
             } catch (error) {
                 displayMessage('bot', '🤖 Xin chào! Tôi là AI Assistant quản lý lịch trình thông minh.\n\nTôi có thể giúp bạn:\n✅ Tạo lịch học tập, công việc, sự kiện\n✅ Tối ưu hóa thời gian\n✅ Đưa ra lời khuyên quản lý thời gian\n\nHãy chia sẻ kế hoạch của bạn để bắt đầu!');
             }
         }
-
         async function sendMessage() {
             const input = document.getElementById('chatInput');
             const sendButton = document.getElementById('chatSendBtn');
             const message = input.value.trim();
-
             if (!message)
                 return;
-
             displayMessage('user', message);
             input.value = '';
             showTyping(true);
             sendButton.disabled = true;
-
             try {
                 const basePath = window.location.origin + window.location.pathname.split("/").slice(0, 2).join("/");
                 const response = await fetch(basePath + '/api/chat', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        message: message,
-                        sessionId: sessionId
-                    })
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({message: message, sessionId: sessionId})
                 });
-
                 const data = await response.json();
-
                 setTimeout(() => {
                     showTyping(false);
-                    displayMessage('bot', data.response);
+                    if (data.response.includes("__RELOAD__")) {
+                        let clean = data.response.replace("__RELOAD__", "").trim();
+                        displayMessage('bot', clean);
+                        location.reload(); // hoặc gọi hàm getCurrentSchedule()
+                    } else {
+                        displayMessage('bot', data.response);
+                    }
                     sendButton.disabled = false;
                 }, 1200);
-
             } catch (error) {
                 showTyping(false);
                 displayMessage('bot', 'Xin lỗi, tôi gặp sự cố kỹ thuật. Bạn có thể thử lại không?');
                 sendButton.disabled = false;
             }
         }
-
         async function getCurrentSchedule() {
             showTyping(true);
             try {
                 const response = await fetch(window.location.pathname.replace(/\/[^/]*$/, '') + '/api/schedule', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({sessionId: sessionId})
                 });
-
                 const data = await response.json();
                 showTyping(false);
                 displayMessage('bot', data.schedule);
@@ -463,16 +464,13 @@
                 displayMessage('bot', 'Không thể tải lịch trình hiện tại.');
             }
         }
-
         async function getSummary() {
             showTyping(true);
             try {
                 const response = await fetch(window.location.pathname.replace(/\/[^/]*$/, '') + '/api/summary', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({sessionId: sessionId})
                 });
-
                 const data = await response.json();
                 showTyping(false);
                 displayMessage('bot', '📋 <strong>Tóm tắt cuộc trò chuyện:</strong><br><br>' + data.summary);
@@ -481,36 +479,26 @@
                 displayMessage('bot', 'Không thể tạo tóm tắt cuộc trò chuyện.');
             }
         }
-
         async function clearChat() {
             const oldSessionId = sessionId;
-
-            // Gửi request xóa lịch sử trên server
             const basePath = window.location.pathname.replace(/\/[^/]*$/, '');
             const url = basePath + "/api/delete_chat_history?sessionId=" + encodeURIComponent(oldSessionId);
             await fetch(url, {method: 'POST'});
-
-            // Reset giao diện và tạo session mới
             document.getElementById('chatMessages').innerHTML = '';
             sessionId = 'SCHEDULE_SESSION_' + Date.now();
-            localStorage.setItem("sessionId", sessionId); // cập nhật lại sessionId
+            localStorage.setItem("sessionId", sessionId);
             getGreeting();
         }
-
-
         function displayMessage(sender, message) {
             const chatMessages = document.getElementById('chatMessages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}`;
-
             const avatar = document.createElement('div');
             avatar.className = 'message-avatar';
-            avatar.textContent = sender === 'user' ? 'U' : 'AI';
-
+            avatar.innerHTML = sender === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
             const content = document.createElement('div');
             content.className = 'message-content';
             content.innerHTML = formatMessage(message);
-
             if (sender === 'user') {
                 messageDiv.appendChild(content);
                 messageDiv.appendChild(avatar);
@@ -518,13 +506,9 @@
                 messageDiv.appendChild(avatar);
                 messageDiv.appendChild(content);
             }
-
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
-
-
-
         function formatMessage(message) {
             return message
                     .replace(/\\n/g, '\n')
@@ -535,11 +519,9 @@
                     .replace(/📅(.*?)(?=\n|$)/g, '<div class="schedule-item">📅$1</div>')
                     .replace(/\[(.*?)\]/g, '<span class="schedule-type-badge">$1</span>');
         }
-
         function showTyping(show) {
             const typingIndicator = document.getElementById('typingIndicator');
             typingIndicator.style.display = show ? 'flex' : 'none';
-
             if (show) {
                 const chatMessages = document.getElementById('chatMessages');
                 chatMessages.scrollTop = chatMessages.scrollHeight;

@@ -79,10 +79,12 @@ public class ChatServlet extends HttpServlet {
             Map<String, String> response = new HashMap<>();
             response.put("response", aiResponse);
             response.put("sessionId", sessionId);
+            
             resp.setContentType("application/json");
+            String fullResponse = "Sự kiện đã được thêm thành công. __RELOAD__";
             resp.setCharacterEncoding("UTF-8");
             mapper.writeValue(resp.getWriter(), response);
-
+           
         } catch (Exception e) {
             e.printStackTrace();
             Map<String, String> errorResponse = new HashMap<>();
